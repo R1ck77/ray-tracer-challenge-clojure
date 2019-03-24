@@ -75,7 +75,7 @@
 (defn- simulate [projectile force dt]
   (let [result (tick projectile force dt)
         position (:position result)]
-    (println position)
+    (println (get position 0) (get position 1))
     (if (> (second position) 0)
       (recur result force dt))))
 
