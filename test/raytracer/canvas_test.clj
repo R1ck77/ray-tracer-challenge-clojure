@@ -51,8 +51,19 @@
                                         (canvas/write 0 0 c1)
                                         (canvas/write 2 1 c2)
                                         (canvas/write 4 2 c3)))]
-      (println ppm)
       (is (= ["255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
               "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"
               "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"]
-             (take 3 (drop 3 (string/split-lines ppm))))))))
+             (take 3 (drop 3 (string/split-lines ppm)))))))
+  (testing "lines don't exceed 70 characters"
+    (let [color [1 0.8 0.6]
+          lines (string/split-lines (canvas/canvas-to-ppm (reduce (fn [canvas [x y]]
+                                                                    (canvas/write canvas x y color))
+                                                                  (canvas/create-canvas 10 2)
+                                                                  (for [j (range 2) i (range 10)] (vector i j)))))]
+      (is (= ["255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"
+              "153 255 204 153 255 204 153 255 204 153 255 204 153"
+              "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"
+              "153 255 204 153 255 204 153 255 204 153 255 204 153"]
+             (take 4 (drop 3 lines)))))))
+

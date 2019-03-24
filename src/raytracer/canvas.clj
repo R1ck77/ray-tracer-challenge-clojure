@@ -39,7 +39,6 @@
     (str (apply str (interpose "\n"
                            (concat (vector "P3"
                                            (str width " " (:height canvas))
-                                           max-value)
-                                   ))
-                )
-         "\n" (apply str (format-pixels (:pixels canvas) width)))))
+                                           max-value))))
+         "\n"
+         (apply str (format-pixels (:pixels canvas) width)))))
