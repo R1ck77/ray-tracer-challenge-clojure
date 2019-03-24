@@ -65,5 +65,9 @@
               "153 255 204 153 255 204 153 255 204 153 255 204 153"
               "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"
               "153 255 204 153 255 204 153 255 204 153 255 204 153"]
-             (take 4 (drop 3 lines)))))))
+             (take 4 (drop 3 lines))))))
+  (testing "converted canvas ends with newline"
+    (let [canvas (canvas/create-canvas 5 3)
+          ppm-text (canvas/canvas-to-ppm canvas)]
+      (is (= \newline (last ppm-text))))))
 
