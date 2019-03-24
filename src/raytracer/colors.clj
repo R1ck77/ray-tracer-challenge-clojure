@@ -1,10 +1,5 @@
 (ns raytracer.colors
-  (:require [raytracer.tuples :as tuples :refer [is-about?]]))
-
-(defn eq-color? [[r1 g1 b1] [r2 g2 b2]]
-  (and (is-about? r1 r2)
-       (is-about? g1 g2)
-       (is-about? b1 b2)))
+  (:require [raytracer.tuples :as tuples]))
 
 (defn add [a b]
   (tuples/add a b))

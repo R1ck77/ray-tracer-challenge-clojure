@@ -1,6 +1,8 @@
 (ns demo.projectile
   (:require [clojure.test :refer :all]
-            [raytracer.tuples :refer :all]))
+            [raytracer.tuples :refer [eps= eps4=]]
+            [raytracer.svector :refer :all]
+            [raytracer.point :refer :all]))
 
 (def dt 0.0001)
 
@@ -40,8 +42,8 @@
     :velocity (add v (mul forces dt))}))
 
 (defn- eq-obj [a b]
-  (and (eq (:position a) (:position b))
-       (eq (:velocity a) (:velocity b))))
+  (and (eps4= (:position a) (:position b))
+       (eps4= (:velocity a) (:velocity b))))
 
 (deftest test-eq-obj
   (testing "similar object"
@@ -90,7 +92,7 @@
 
 (deftest testing-deg-to-rad
   (testing "check 45° conversion"
-   (is (is-about? (/ Math/PI 4) (deg-to-rad 45)))))
+   (is (eps= (/ Math/PI 4) (deg-to-rad 45)))))
 
 (defn simulate-dragless-cannon
   [angle-deg muzzle-speed]
