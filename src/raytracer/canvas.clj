@@ -34,6 +34,18 @@
 (defn- format-pixels [colors width]
   (mapcat format-line (partition width colors)))
 
+(defn- compute-split-point [s max-length]
+  (dec (count
+    (drop-while (complement #{\space})
+                (drop (- (count s) max-length) (reverse s))))))
+
+
+(defn- correct-line-sizes
+  ([lines]
+   (correct-line-sizes lines 70))
+  ([lines max-length]
+   (mapcat #(fix-length % max-length) lines)))
+
 (defn canvas-to-ppm [canvas]
   (let [width (:width canvas)]
     (str (apply str (interpose "\n"
@@ -41,4 +53,4 @@
                                            (str width " " (:height canvas))
                                            max-value))))
          "\n"
-         (apply str (format-pixels (:pixels canvas) width)))))
+         (correct-line-sizes (apply str (format-pixels (:pixels canvas) width))))))

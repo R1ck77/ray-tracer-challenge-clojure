@@ -36,6 +36,17 @@
                              black)
                            (canvas/read updated-canvas x y)))))))
 
+(deftest test-fix-length
+  (testing "doesn't change the size of lines that are short already"
+    (is (= ["a b c d e f"] (canvas/fix-length "a b c d e f" 11)))
+    (is (= ["a b c d e f"] (canvas/fix-length "a b c d e f" 12))))
+  (testing "splits line that's too long"
+    (is (= ["a b c d" "e f"] (canvas/fix-length "a b c d e f" 7)))
+    (is (= ["a b c d" "e f"] (canvas/fix-length "a b c d e f" 8))))
+  (testing "lines can be split multiple times"
+    (is (= ["a b" "c d" "e f" "g"] (canvas/fix-length "a b c d e f g" 1)))
+    (is (= ["a b" "c d" "e f" "g"] (canvas/fix-length "a b c d e f g" 2)))))
+
 (deftest test-canvas-to-ppm
   (testing "the ppm header is created correctly"
     (let [canvas (canvas/create-canvas 5 3)
