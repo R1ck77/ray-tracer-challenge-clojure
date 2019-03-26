@@ -71,12 +71,22 @@
 (defn- format-pixels [colors width]
   (map format-line (partition width colors)))
 
+(defn- format-lines [canvas]
+  (correct-line-sizes (format-pixels (:pixels canvas) (:width canvas))))
+
+(defn create-header-lines [canvas]
+  (vector "P3"
+          (str (:width canvas) " " (:height canvas))
+          max-value))
+
+(defn create-ppm-lines [canvas]
+  (concat (create-header-lines canvas)
+          (format-lines canvas)))
+
+(defn add-newlines [lines]
+  (conj (vec (interpose \newline lines))
+        \newline))
+
 (defn canvas-to-ppm [canvas]
   (let [width (:width canvas)]
-    (str (apply str (interpose \newline
-                           (concat (vector "P3"
-                                           (str width " " (:height canvas))
-                                           max-value))))
-         \newline
-         (apply str (interpose \newline (correct-line-sizes (format-pixels (:pixels canvas) width))))
-         \newline)))
+    (apply str (add-newlines (create-ppm-lines canvas)))))
