@@ -19,6 +19,43 @@
           (fn [pixels]
             (assoc pixels (index (:width canvas) x y) color))))
 
+(defn- all-spaces-in-line [line]
+    (map first
+         (filter #(= \space (second %))
+                 (map-indexed vector line))))
+
+(defn- find-split-index [line max-length]
+  (first
+   (reverse
+    (take-while #(<= % max-length) (all-spaces-in-line line)))))
+
+(defn- fix-line-length [line max-length]
+  (let [index (find-split-index line max-length)]
+    (filter (complement empty?) (list (subs line 0 index)
+                                      (subs line (inc index) (count line))))))
+
+(defn- needs-work? [lines max-length]
+  (> (count (first lines)) max-length))
+
+(defn- fix-first-element [inv-lines max-length]
+  (concat
+   (reverse (fix-line-length (first inv-lines)
+                             max-length))
+   (rest inv-lines) ))
+
+(defn fix-length [lines max-length]
+  (if (needs-work? lines max-length)
+    (recur
+     (fix-first-element lines max-length)
+     max-length)
+    (reverse lines)))
+
+(defn- correct-line-sizes
+  ([lines]
+   (correct-line-sizes lines 70))
+  ([lines max-length]
+   (mapcat #(fix-length (vector %) max-length) lines)))
+
 (defn- color-to-ppm [component]
   (cond
       (<= component 0) 0
@@ -29,28 +66,17 @@
   (map color-to-ppm color))
 
 (defn- format-line [colors]
-  (str (apply str (interpose " " (mapcat format-color colors))) "\n"))
+  (apply str (interpose " " (mapcat format-color colors))))
 
 (defn- format-pixels [colors width]
-  (mapcat format-line (partition width colors)))
-
-(defn- compute-split-point [s max-length]
-  (dec (count
-    (drop-while (complement #{\space})
-                (drop (- (count s) max-length) (reverse s))))))
-
-
-(defn- correct-line-sizes
-  ([lines]
-   (correct-line-sizes lines 70))
-  ([lines max-length]
-   (mapcat #(fix-length % max-length) lines)))
+  (map format-line (partition width colors)))
 
 (defn canvas-to-ppm [canvas]
   (let [width (:width canvas)]
-    (str (apply str (interpose "\n"
+    (str (apply str (interpose \newline
                            (concat (vector "P3"
                                            (str width " " (:height canvas))
                                            max-value))))
-         "\n"
-         (correct-line-sizes (apply str (format-pixels (:pixels canvas) width))))))
+         \newline
+         (apply str (interpose \newline (correct-line-sizes (format-pixels (:pixels canvas) width))))
+         \newline)))
