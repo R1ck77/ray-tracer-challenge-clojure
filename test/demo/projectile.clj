@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [raytracer.tuples :refer [eps= eps4=]]
             [raytracer.svector :refer :all]
-            [raytracer.point :refer :all]))
+            [raytracer.point :refer :all]
+            [raytracer.canvas :refer :all]))
 
 (def dt 0.0001)
 
@@ -74,12 +75,58 @@
                 (tick (create-object [3 1 4] [1 2 3])
                       (svector 4 2 3) 0.1)))))
 
-(defn- simulate [projectile force dt]
-  (let [result (tick projectile force dt)
-        position (:position result)]
-    (println (get position 0) (get position 1))
-    (if (> (second position) 0)
-      (recur result force dt))))
+(defn- text-writer
+  ([])
+  ([x y]
+   (println x y)))
+
+(defn- create-scaler-f
+  [point-min point-max canvas-size]
+  (let [convert-f (fn [point point-min point-max canvas-max]
+                    (int (* canvas-max (/ (- point point-min) (- point-max point-min)))))]
+    (fn [x y]
+      (map convert-f [x y] point-min point-max canvas-size))))
+
+(defn- reduce-data [data f]
+  (reduce #(map f %2 %) data))
+
+(defn- write-to-canvas
+  [canvas data]
+  (let [canvas-height (:height canvas)
+        scaler-f (create-scaler-f (reduce-data data min)
+                                  (reduce-data data max)
+                                  (list (dec (:width canvas))
+                                        (dec canvas-height)))]
+    (reduce (fn [canvas [x y]]
+              (let [[px py] (scaler-f x y)]
+                (try
+                  (write canvas px (- canvas-height py 1) [1 0 0])      
+                  (catch Exception e canvas))))
+                  canvas data)))
+
+(defn save-to-file [width height data]
+  (let [ppm-content (canvas-to-ppm
+                     (write-to-canvas (create-canvas width height) data))]
+    (spit "output.ppm" ppm-content)))
+
+(defn create-canvas-writer [width height]
+  (let [data (atom [])]
+    (fn
+      ([x y]
+       (swap! data #(conj % (list x y))))
+      ([]
+       (save-to-file width height @data)))))
+
+(defn- simulate
+  ([projectile force dt]
+   (simulate projectile force dt (create-canvas-writer 320 200)))
+  ([projectile force dt writer]
+   (let [result (tick projectile force dt)
+         position (:position result)]
+     (writer (get position 0) (get position 1))
+     (if (> (second position) 0)
+       (recur result force dt writer)
+       (writer)))))
 
 (defn- create-projectile [angle-rad muzzle-speed]
   (create-object [0 1 0]
