@@ -143,7 +143,5 @@
 
 (defn simulate-dragless-cannon
   [angle-deg muzzle-speed]
-  (let [projectile (create-projectile (deg-to-rad angle-deg)
-                                      muzzle-speed)
-        force (create-forces [0 -9.81 0])]
-    (simulate projectile force 0.1)))
+  (simulate (create-projectile (deg-to-rad angle-deg) muzzle-speed)
+            (create-forces [0 -9.81 0]) 0.1))
