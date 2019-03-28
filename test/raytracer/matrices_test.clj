@@ -76,7 +76,17 @@
                     44 54 114 108
                     40 58 110 102
                     16 26 46 42]]
-      (is (matrices/m= expected (matrices/mul4 m1 m2))))))
+      (is (matrices/m= expected (matrices/mul4 m1 m2)))))
+  (testing "the identity matrix is the identity element"
+    (let [m1 [1 2 3 4
+             5 6 7 8
+             9 8 7 6
+             5 4 3 2]
+          expected [20 22 50 48
+                    44 54 114 108
+                    40 58 110 102
+                    16 26 46 42]]
+      (is (matrices/m= m1 (matrices/mul4 m1 matrices/identity-matrix))))))
 
 (deftest test-transform
   (testing "matrix multiplied by a tuple"

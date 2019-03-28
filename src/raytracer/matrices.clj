@@ -1,6 +1,11 @@
 (ns raytracer.matrices
   (:require [raytracer.tuples :refer [eps=]]))
 
+(def identity-matrix [1 0 0 0
+                      0 1 0 0
+                      0 0 1 0
+                      0 0 0 1])
+
 (defn get4 [matrix i j]
   (get matrix (+ j (* 4 i))))
 
