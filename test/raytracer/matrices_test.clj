@@ -1,6 +1,6 @@
 (ns raytracer.matrices-test
   (:require [clojure.test :refer :all]
-            [raytracer.tuples :refer [eps=]]
+            [raytracer.tuples :refer [eps= eps4=]]
             [raytracer.matrices :as matrices]))
 
 ;;; TODO/FIXME trying hard not to use types
@@ -77,3 +77,13 @@
                     40 58 110 102
                     16 26 46 42]]
       (is (matrices/m= expected (matrices/mul4 m1 m2))))))
+
+(deftest test-transform
+  (testing "matrix multiplied by a tuple"
+    (let [a [1 2 3 4
+             2 4 4 2
+             8 6 4 1
+             0 0 0 1]
+          b [1 2 3 1]]
+      (is (eps4= [18 24 33 1]
+                 (matrices/transform a b))))))
