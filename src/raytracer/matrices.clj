@@ -43,7 +43,7 @@
 (defmacro transform [m v]
   `(let [m# ~m
          v# ~v]
-     (vector (line-vector-prod ~m ~v 0)
-             (line-vector-prod ~m ~v 1)
-             (line-vector-prod ~m ~v 2)
-             (line-vector-prod ~m ~v 3))))
+     (vector (line-vector-prod m# v# 0)
+             (line-vector-prod m# v# 1)
+             (line-vector-prod m# v# 2)
+             (line-vector-prod m# v# 3))))
