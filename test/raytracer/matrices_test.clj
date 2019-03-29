@@ -135,3 +135,11 @@
 (deftest test-minor
   (testing "calculating a minor of a 3x3 matrix"
     (is (eps= 25 (matrices/minor [3 5 0 2 -1 -7 6 -1 5] 3 1 0)))))
+
+(deftest test-cofactor
+  (testing "cofactors of 3x3 matrix"
+    (let [m [3  5  0
+             2 -1 -7
+             6 -1  5]]
+      (is (eps= -12 (matrices/cofactor m 3 0 0)))
+      (is (eps= -25 (matrices/cofactor m 3 1 0))))))
