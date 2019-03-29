@@ -81,3 +81,7 @@
 
 (defn minor [m n row column]
   (det (submatrix m n row column)))
+
+(defn cofactor [m n row column]
+  (* (if (odd? (+ row column)) -1 1)
+     (minor m n row column)))
