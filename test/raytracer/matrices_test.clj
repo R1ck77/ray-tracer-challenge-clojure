@@ -118,9 +118,16 @@
 
 (deftest test-submatrix
   (testing "a submatrix of a 3x3 matrix is a 2x2 matrix"
-    (is (m= [-3 2
+    (is (matrices/m= [-3 2
               0 6]
              (matrices/submatrix [ 1 5  0
                                   -3 2  7
-                                   0 6 -3] 0 2))))
-  (testing "a submatrix of a 4x4 matrix is a 3x3 matrix"))
+                                   0 6 -3] 3 0 2))))
+  (testing "a submatrix of a 4x4 matrix is a 3x3 matrix"
+    (is (matrices/m= [1 2 3
+                      4 5 6
+                      7 8 9]
+                     (matrices/submatrix [1  42  2  3
+                                          4  42  5  6
+                                          42 42 42 42
+                                          7  42  8  9] 4 2 1)))))

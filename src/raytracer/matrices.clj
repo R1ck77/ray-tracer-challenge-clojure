@@ -6,14 +6,17 @@
                       0 0 1 0
                       0 0 0 1])
 
+(defn get-n [matrix n i j]
+  (get matrix (+ j (* n i))))
+
 (defn get4 [matrix i j]
-  (get matrix (+ j (* 4 i))))
+  (get-n matrix 4 i j))
 
 (defn get3 [matrix i j]
-  (get matrix (+ j (* 3 i))))
+  (get-n matrix 3 i j))
 
 (defn get2 [matrix i j]
-  (get matrix (+ j (* 2 i))))
+  (get-n matrix 2 i j))
 
 (defn m= [a b]
   (reduce #(and % %2) (map eps= a b)))
@@ -60,4 +63,17 @@
                                    3 7 11 15]))
 
 (defn det [m]
-  (- (* (nth m 0) (nth m 3)) (* (nth m 1) (nth m 2))))
+  (- (* (nth m 0) (nth m 3))
+     (* (nth m 1) (nth m 2))))
+
+(defn cells-indices-seq [n]
+  (for [i (range n) j (range n)]
+    (vector i j)))
+
+(defn submatrix [m n row column]
+  (let [get-f #(get-n m n % %2)]
+    (vec
+     (map #(apply get-f %)
+          (filter (fn [[i j]]
+                    (and (not= i row) (not= j column)))
+                  (cells-indices-seq n))))))
