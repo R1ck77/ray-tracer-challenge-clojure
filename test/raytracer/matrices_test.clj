@@ -111,3 +111,16 @@
   (testing "transposing the identity yields identity"
     (is (matrices/m= matrices/identity-matrix
                      (matrices/transpose matrices/identity-matrix)))))
+
+(deftest test-det
+  (testing "2x2 matrix determinant"
+    (is (eps= 17 (matrices/det [1 5 -3 2])))))
+
+(deftest test-submatrix
+  (testing "a submatrix of a 3x3 matrix is a 2x2 matrix"
+    (is (m= [-3 2
+              0 6]
+             (matrices/submatrix [ 1 5  0
+                                  -3 2  7
+                                   0 6 -3] 0 2))))
+  (testing "a submatrix of a 4x4 matrix is a 3x3 matrix"))

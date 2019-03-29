@@ -54,7 +54,10 @@
              (line-vector-prod m# v# 3))))
 
 (defn transpose [m]
-  (reduce #(conj % (nth m %2)) []  [0 4 8 12
-                                    1 5 9 13
-                                    2 6 10 14
-                                    3 7 11 15]))
+  (reduce #(conj % (nth m %2)) [] [0 4 8 12
+                                   1 5 9 13
+                                   2 6 10 14
+                                   3 7 11 15]))
+
+(defn det [m]
+  (- (* (nth m 0) (nth m 3)) (* (nth m 1) (nth m 2))))
