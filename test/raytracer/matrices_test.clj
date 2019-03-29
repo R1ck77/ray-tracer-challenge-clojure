@@ -131,3 +131,7 @@
                                           4  42  5  6
                                           42 42 42 42
                                           7  42  8  9] 4 2 1)))))
+
+(deftest test-minor
+  (testing "calculating a minor of a 3x3 matrix"
+    (is (eps= 25 (matrices/minor [3 5 0 2 -1 -7 6 -1 5] 3 1 0)))))

@@ -70,6 +70,7 @@
   (for [i (range n) j (range n)]
     (vector i j)))
 
+;;; TODO/FIXME what a nice place for an object this would be…
 (defn submatrix [m n row column]
   (let [get-f #(get-n m n % %2)]
     (vec
@@ -77,3 +78,6 @@
           (filter (fn [[i j]]
                     (and (not= i row) (not= j column)))
                   (cells-indices-seq n))))))
+
+(defn minor [m n row column]
+  (det (submatrix m n row column)))
