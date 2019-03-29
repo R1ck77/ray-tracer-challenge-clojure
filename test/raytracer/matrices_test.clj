@@ -112,9 +112,9 @@
     (is (matrices/m= matrices/identity-matrix
                      (matrices/transpose matrices/identity-matrix)))))
 
-(deftest test-det
+(deftest test-det2
   (testing "2x2 matrix determinant"
-    (is (eps= 17 (matrices/det [1 5 -3 2])))))
+    (is (eps= 17 (matrices/det2 [1 5 -3 2])))))
 
 (deftest test-submatrix
   (testing "a submatrix of a 3x3 matrix is a 2x2 matrix"
@@ -143,3 +143,14 @@
              6 -1  5]]
       (is (eps= -12 (matrices/cofactor m 3 0 0)))
       (is (eps= -25 (matrices/cofactor m 3 1 0))))))
+
+(deftest test-determinant
+  (testing "calculating the determinant of a 3x3 matrix"
+    (is (eps= -196 (matrices/det [ 1 2  6
+                                  -5 8 -4
+                                  2 6  4] 3))))
+  (testing "calculating the determinant of a 4x4 matrix"
+    (is (eps= -4071 (matrices/det [-2 -8  3  5
+                                   -3  1  7  3
+                                    1  2 -9  6
+                                   -6  7  7 -9] 4)))))

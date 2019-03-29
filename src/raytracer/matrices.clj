@@ -62,10 +62,6 @@
                                    2 6 10 14
                                    3 7 11 15]))
 
-(defn det [m]
-  (- (* (nth m 0) (nth m 3))
-     (* (nth m 1) (nth m 2))))
-
 (defn cells-indices-seq [n]
   (for [i (range n) j (range n)]
     (vector i j)))
@@ -79,9 +75,25 @@
                     (and (not= i row) (not= j column)))
                   (cells-indices-seq n))))))
 
+(def det)
+
 (defn minor [m n row column]
-  (det (submatrix m n row column)))
+  (det (submatrix m n row column) (dec n)))
 
 (defn cofactor [m n row column]
   (* (if (odd? (+ row column)) -1 1)
      (minor m n row column)))
+
+(defn det2 [m]
+  (- (* (nth m 0) (nth m 3))
+     (* (nth m 1) (nth m 2))))
+
+(defn- det-n [m n]
+  (apply + (map #(cofactor m n 0 %) (range n))))
+
+(defn det [m n]
+  (println "n " n)
+  (case n
+    1 (first m)
+    2 (det2 m)
+    (det-n m n)))
