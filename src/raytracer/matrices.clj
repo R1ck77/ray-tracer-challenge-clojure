@@ -97,3 +97,6 @@
     1 (first m)
     2 (det2 m)
     (det-n m n)))
+
+(defn is-invertible? [m n]
+  (not (eps= 0 (det m n))))

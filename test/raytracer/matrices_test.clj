@@ -154,3 +154,17 @@
                                    -3  1  7  3
                                     1  2 -9  6
                                    -6  7  7 -9] 4)))))
+
+(deftest test-is-invertible?
+  (testing "positive case"
+    (is (matrices/is-invertible? [6  4 4  4
+                                  5  5 7  6
+                                  4 -9 3 -7
+                                  9  1 7 -6] 4)))
+  (testing "negative case"
+    (is (not (matrices/is-invertible? [-4  2 -2 -3
+                                        9  6  2  6
+                                        0 -5  1 -5
+                                        0  0  0  0] 4)))))
+
+
