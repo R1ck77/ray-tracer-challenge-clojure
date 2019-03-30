@@ -107,8 +107,13 @@
             (cofactor-f i j))
           (cells-indices-seq n)))))
 
+(defn print
+  "Quick and dirty print function. Not pretty"
+  [matrix m]
+  (for [i (range 0 (* m m) m)]
+    (apply println (subvec matrix i (+ i m)))))
 
 ;;; TODO/FIXME this would really need some optimization
 (defn invert [m n]
   (vec (map float (div (transpose (cofactor-matrix m n ))
-                   (det m n)))))
+                       (det m n)))))
