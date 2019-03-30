@@ -1,6 +1,6 @@
 (ns demo.projectile
   (:require [clojure.test :refer :all]
-            [raytracer.tuples :refer [eps= eps4=]]
+            [raytracer.test-utils :refer [eps= eps4=]]
             [raytracer.svector :refer :all]
             [raytracer.point :refer :all]
             [raytracer.canvas :refer :all]))

@@ -1,6 +1,7 @@
-(ns raytracer.tuples-test
+(ns raytracer.tuple-test
   (:require [clojure.test :refer :all]
-            [raytracer.tuples :refer :all]
+            [raytracer.test-utils :refer :all]
+            [raytracer.tuple :refer :all]
             [raytracer.svector :refer [svector]]
             [raytracer.point :refer [point]]))
 
@@ -15,19 +16,19 @@
 
 
 (deftest test-eps4=
-  (testing "eps4= returns true for very similar tuples"
+  (testing "eps4= returns true for very similar tuple"
     (is (eps4= [4.3 2.3 6.7 1.3] [4.3 2.3 6.7 1.3]))
     (let [small-eps (/ eps 100)]
       (is (eps4= [4.3 2.3 6.7 1] (map #(+ small-eps %) [4.3 2.3 6.7 1])))
       (is (eps4= [0 0 0 0] [small-eps small-eps small-eps small-eps]))))
-  (testing "eps4= returns false for tuples that are too dissimilar"
+  (testing "eps4= returns false for tuple that are too dissimilar"
     (is (not (eps4= [0 0 0 0] [eps 0 0 0])))
     (is (not (eps4= [0 0 0 0] [0 eps 0 0])))
     (is (not (eps4= [0 0 0 0] [0 0 eps 0])))
     (is (not (eps4= [0 0 0 0] [0 0 0 eps])))))
 
 (deftest test-add
-  (testing "adding two tuples"
+  (testing "adding two tuple"
     (is (eps4= [1 1 6 1] (add [3 -2 5 1] [-2 3 1 0])))
     (is (eps4= [11 102 203 0] (add [1 2 3 0] [10 100 200 0])))))
 

@@ -1,5 +1,7 @@
-(ns raytracer.matrices
-  (:require [raytracer.tuples :refer [eps= div]]))
+(ns raytracer.matrix
+  (:require [raytracer.tuple :refer [div]]))
+
+(def ^:private max-error 0.0001)
 
 (def identity-matrix [1 0 0 0
                       0 1 0 0
@@ -17,9 +19,6 @@
 
 (defn get2 [matrix i j]
   (get-n matrix 2 i j))
-
-(defn m= [a b]
-  (reduce #(and % %2) (map eps= a b)))
 
 (defmacro cell4 [a row column columns]
   `(nth ~a ~(+ column (* columns row))))
@@ -99,7 +98,7 @@
     (det-n m n)))
 
 (defn is-invertible? [m n]
-  (not (eps= 0 (det m n))))
+  (> (Math/abs (det m n)) max-error))
 
 (defn- cofactor-matrix [m n]
   (vec

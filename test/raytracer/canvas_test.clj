@@ -1,7 +1,7 @@
 (ns raytracer.canvas-test
   (:require [clojure.test :refer :all]
             [clojure.string :as string]
-            [raytracer.tuples :refer [eps3=]]
+            [raytracer.test-utils :refer [eps3=]]
             [raytracer.canvas :as canvas]))
 
 (def red [1 0 0])

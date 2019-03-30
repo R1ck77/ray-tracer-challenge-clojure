@@ -1,6 +1,6 @@
 (ns raytracer.colors-test
   (:require [clojure.test :refer :all]
-            [raytracer.tuples :refer [eps3=]]
+            [raytracer.test-utils :refer [eps3=]]
             [raytracer.colors :refer :all]))
 
 (deftest test-add-color

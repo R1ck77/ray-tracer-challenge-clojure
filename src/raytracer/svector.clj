@@ -1,17 +1,20 @@
 (ns raytracer.svector
-  (:require [raytracer.tuples :as tuples :refer [eps=]]))
+  (:require [raytracer.tuple :as tuple]))
+
+(def ^:private max-error 0.001)
 
 (defn svector? [tuple]
-  (eps= (nth tuple 3) 0))
+  (< (Math/abs (- (nth tuple 3) 0))
+     max-error))
 
 (defn svector [x y z]
   (vector x y z 0))
 
 (defn add [a b]
-  (tuples/add a b))
+  (tuple/add a b))
 
 (defn sub [a b]
-  (tuples/sub a b))
+  (tuple/sub a b))
 
 (defn mul [[x y z w] s]
   (vector (* x s)
@@ -20,7 +23,7 @@
           (* w s)))
 
 (defn div [v s]
-  (tuples/div v s))
+  (tuple/div v s))
 
 (defn mag [[x y z w]]
   (Math/sqrt (float (+ (* x x)

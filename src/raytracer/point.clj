@@ -1,8 +1,11 @@
 (ns raytracer.point
-  (:require [raytracer.tuples :refer :all]))
+  (:require [raytracer.tuple :refer :all]))
+
+(def ^:private max-error 0.001)
 
 (defn point? [tuple]
-  (eps= (nth tuple 3) 1))
+  (< (Math/abs (- (nth tuple 3) 1))
+     max-error))
 
 (defn point [x y z]
   (vector x y z 1))

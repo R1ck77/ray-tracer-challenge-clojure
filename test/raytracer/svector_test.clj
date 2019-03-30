@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [raytracer.svector :refer :all]
             [raytracer.point :refer [point?]]
-            [raytracer.tuples :refer [eps= eps4= eps]]))
+            [raytracer.test-utils :refer [eps= eps4=]]))
 
 (def inv-sqrt-3 (/ (Math/sqrt 3)))
 
@@ -12,14 +12,14 @@
     (is (not (point? (svector 4 1 2))))))
 
 (deftest test-svector?
-  (testing "svector? returns true for tuples when w is 0"
+  (testing "svector? returns true for tuple when w is 0"
     (is (svector? [3.5 1.2 5.4 0.0]))
-    (is (svector? [32 12.0 -19.0 (/ eps 2)]))
-    (is (svector? [3.5 1.2 5.4 (- (/ eps 2))])))
-  (testing "svector? returns false for tuples with w not 0"
+    (is (svector? [32 12.0 -19.0 0.0005]))
+    (is (svector? [3.5 1.2 5.4 (- 0.0005)])))
+  (testing "svector? returns false for tuple with w not 0"
     (is (not (svector? [3.5 1.2 5.4 1])))
-    (is (not (svector? [32 12.0 -19.0 eps])))
-    (is (not (svector? [3.5 1.2 5.4 eps])))))
+    (is (not (svector? [32 12.0 -19.0 0.001])))
+    (is (not (svector? [3.5 1.2 5.4 0.001])))))
 
 (deftest test-mul
   (testing "multiplying a tuple by a scalar"

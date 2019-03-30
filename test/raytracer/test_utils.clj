@@ -1,4 +1,4 @@
-(ns raytracer.tuples)
+(ns raytracer.test-utils)
 
 (def eps 1e-6)
 
@@ -15,22 +15,5 @@
        (eps= a2 b2)
        (eps= a3 b3)
        (eps= a4 b4)))
-
-(defn add [a b]
-  (vec (map + a b)))
-
-(defn sub [a b]
-  (vec (map - a b)))
-
-(defn neg [xn]
-  (vec (map - xn)))
-
-(defn div [v s]
-  (vec (map #(/ % s) v)))
-
-
-
-
-
 
 
