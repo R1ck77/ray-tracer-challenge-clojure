@@ -25,6 +25,10 @@
 (defn neg [xn]
   (vec (map - xn)))
 
+(defn div [v s]
+  (vec (map #(/ % s) v)))
+
+
 
 
 

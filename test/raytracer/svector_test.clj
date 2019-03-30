@@ -27,11 +27,6 @@
   (testing "multiplying a tuple by a fraction"
     (eps4= [0.5 -1 1.5 -2] (mul [1 -2 3 -4] 0.5))))
 
-(deftest test-div
-  (testing "dividing a tuple by a scalar"
-    (eps4= [0.5 -1 1.5 -2]
-        (div [1 -2 3 -4] 2))))
-
 (defmacro do-test-mag [expected v]
   `(testing ~(str "computing the magnitude of " v)
      (is (eps= ~expected (mag ~(apply svector v))))))

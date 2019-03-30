@@ -1,5 +1,5 @@
 (ns raytracer.matrices
-  (:require [raytracer.tuples :refer [eps=]]))
+  (:require [raytracer.tuples :refer [eps= div]]))
 
 (def identity-matrix [1 0 0 0
                       0 1 0 0
@@ -100,3 +100,16 @@
 
 (defn is-invertible? [m n]
   (not (eps= 0 (det m n))))
+
+(defn- cofactor-matrix [m n]
+  (vec
+   (let [cofactor-f (partial cofactor m n)]
+     (map (fn [[i j]]
+            (cofactor-f i j))
+          (cells-indices-seq n)))))
+
+
+;;; TODO/FIXME this would really need some optimization
+(defn invert [m n]
+  (vec (map float (div (transpose (cofactor-matrix m n ))
+                   (det m n)))))

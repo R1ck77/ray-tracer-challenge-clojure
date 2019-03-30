@@ -19,11 +19,8 @@
           (* z s)
           (* w s)))
 
-(defn div [[x y z w] s]
-  (vector (/ x s)
-          (/ y s)
-          (/ z s)
-          (/ w s)))
+(defn div [v s]
+  (tuples/div v s))
 
 (defn mag [[x y z w]]
   (Math/sqrt (float (+ (* x x)

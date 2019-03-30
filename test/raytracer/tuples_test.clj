@@ -53,3 +53,9 @@
     (is (eps4= [-1 2 -3 4]
             (neg (vector 1 -2 3 -4))))))
 
+
+(deftest test-div
+  (testing "dividing a tuple by a scalar"
+    (eps4= [0.5 -1 1.5 -2]
+        (div [1 -2 3 -4] 2))))
+
