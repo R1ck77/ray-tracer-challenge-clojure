@@ -1,9 +1,21 @@
-(ns raytracer.test-utils)
+(ns raytracer.test-utils
+  (:require [clojure.test :refer :all]))
 
-(def eps 1e-6)
+(def ^:private eps 1e-6)
+(def ^:private max-percent-error 0.001)
+
+(defn- absolute-error [a b]
+  (< (Math/abs (double (- a b)))
+     eps))
+
+(defn- relative-error [a b]
+  (< (/ (Math/abs (double (- a b))) a)
+     max-percent-error))
 
 (defn eps= [a b]
-  (< (Math/abs (double (- a b))) eps))
+  (if (= a 0)
+    (absolute-error a b)
+    (relative-error a b)))
 
 (defn eps3= [[a1 a2 a3] [b1 b2 b3]]
   (and (eps= a1 b1)
@@ -17,3 +29,20 @@
        (eps= a4 b4)))
 
 
+(deftest test-eps=
+  (testing "general cases"
+    (is (eps= 1 1))
+    (is (eps= 12 12.0000000000000000001))
+    (is (eps= (/ 1 3) (/ (* 3 (/ 1 3)) 3)))))
+
+(deftest test-eps4=
+  (testing "eps4= returns true for very similar tuple"
+    (is (eps4= [4.3 2.3 6.7 1.3] [4.3 2.3 6.7 1.3]))
+    (let [small-eps 1e-7]
+      (is (eps4= [4.3 2.3 6.7 1] (map #(+ small-eps %) [4.3 2.3 6.7 1])))
+      (is (eps4= [0 0 0 0] [small-eps small-eps small-eps small-eps]))))
+  (testing "eps4= returns false for tuple that are too dissimilar"
+    (is (not (eps4= [0 0 0 0] [eps 0 0 0])))
+    (is (not (eps4= [0 0 0 0] [0 eps 0 0])))
+    (is (not (eps4= [0 0 0 0] [0 0 eps 0])))
+    (is (not (eps4= [0 0 0 0] [0 0 0 eps])))))
