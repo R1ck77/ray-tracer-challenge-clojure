@@ -148,7 +148,7 @@
   (testing "calculating the determinant of a 3x3 matrix"
     (is (eps= -196 (matrices/det [ 1 2  6
                                   -5 8 -4
-                                  2 6  4] 3))))
+                                   2 6  4] 3))))
   (testing "calculating the determinant of a 4x4 matrix"
     (is (eps= -4071 (matrices/det [-2 -8  3  5
                                    -3  1  7  3

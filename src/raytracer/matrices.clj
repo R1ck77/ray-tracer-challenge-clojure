@@ -89,10 +89,10 @@
      (* (nth m 1) (nth m 2))))
 
 (defn- det-n [m n]
-  (apply + (map #(cofactor m n 0 %) (range n))))
+  (apply + (map #(* (get-n m n 0 %)
+                    (cofactor m n 0 %)) (range n))))
 
 (defn det [m n]
-  (println "n " n)
   (case n
     1 (first m)
     2 (det2 m)
