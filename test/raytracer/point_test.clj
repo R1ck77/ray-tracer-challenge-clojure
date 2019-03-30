@@ -1,14 +1,13 @@
 (ns raytracer.point-test
   (:require [clojure.test :refer :all]
             [raytracer.point :refer :all]
-            [raytracer.svector :refer [svector?]]
-            [raytracer.test-utils :refer [eps]]))
+            [raytracer.svector :refer [svector?]]))
 
 (deftest test-point?
   (testing "point? returns true for tuple when w is 1"
     (is (point? [3.5 1.2 5.4 1.0]))
-    (is (point? [32 12.0 -19.0 (+ 1 (/ eps 2))]))
-    (is (point? [3.5 1.2 5.4 (- 1 (/ eps 2))])))
+    (is (point? [32 12.0 -19.0 (+ 1 1e-7)]))
+    (is (point? [3.5 1.2 5.4 (- 1 1e-7)])))
   (testing "point? returns false for tuple with w not 1"
     (is (not (point? [3.5 1.2 5.4 0])))
     (is (not (point? [32 12.0 -19.0 (+ 1 0.002)])))

@@ -14,8 +14,8 @@
 (deftest test-svector?
   (testing "svector? returns true for tuple when w is 0"
     (is (svector? [3.5 1.2 5.4 0.0]))
-    (is (svector? [32 12.0 -19.0 0.0005]))
-    (is (svector? [3.5 1.2 5.4 (- 0.0005)])))
+    (is (svector? [32 12.0 -19.0 1e-7]))
+    (is (svector? [3.5 1.2 5.4 -1e-7])))
   (testing "svector? returns false for tuple with w not 0"
     (is (not (svector? [3.5 1.2 5.4 1])))
     (is (not (svector? [32 12.0 -19.0 0.001])))
