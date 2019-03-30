@@ -12,3 +12,11 @@
    0 sy 0 0
    0 0 sz 0
    0 0 0 1])
+
+(defn rotation-x [angle-rad]
+  (let [cos (Math/cos angle-rad)
+        sin (Math/sin angle-rad)]
+    [1 0 0 0
+     0 cos (- sin) 0
+     0 sin cos 0
+     0 0 0 1]))

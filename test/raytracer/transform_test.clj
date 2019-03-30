@@ -6,6 +6,8 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]))
 
+(def half-√2 (/ (Math/sqrt 2) 2))
+
 (deftest test-translate
   (testing "translation"
     (is (eps4= (point/point 7 -2 9)
@@ -38,3 +40,18 @@
                (matrix/transform (transform/scaling -1 1 1)
                                  (point/point 2 3 4))))))
 
+(deftest test-rotation-x
+  (testing "various x axis rotation"
+    (is (eps4= (point/point 0 half-√2 half-√2)
+               (matrix/transform (transform/rotation-x (/ Math/PI 4))
+                                 (point/point 0 1 0))))
+    (is (eps4= (point/point 0 0 1)
+               (matrix/transform (transform/rotation-x (/ Math/PI 2))
+                                 (point/point 0 1 0)))))
+  (testing "inverse of various x axis rotation"
+    (is (eps4= (point/point 0 1 0)
+               (matrix/transform (matrix/invert (transform/rotation-x (/ Math/PI 4)) 4)
+                                 (point/point 0 half-√2 half-√2))))
+    (is (eps4= (point/point 0 1 0)
+               (matrix/transform (matrix/invert (transform/rotation-x (/ Math/PI 2)) 4)
+                                 (point/point 0 0 1))))))
