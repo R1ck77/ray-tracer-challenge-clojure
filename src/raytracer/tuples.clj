@@ -1,6 +1,6 @@
 (ns raytracer.tuples)
 
-(def eps 1e-8)
+(def eps 1e-6)
 
 (defn eps= [a b]
   (< (Math/abs (double (- a b))) eps))
