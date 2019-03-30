@@ -1,4 +1,4 @@
-(ns raytracer.colors
+(ns raytracer.color
   (:require [raytracer.tuple :as tuple]))
 
 (defn add [a b]
