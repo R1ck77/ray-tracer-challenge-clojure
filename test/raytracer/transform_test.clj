@@ -55,3 +55,36 @@
     (is (eps4= (point/point 0 1 0)
                (matrix/transform (matrix/invert (transform/rotation-x (/ Math/PI 2)) 4)
                                  (point/point 0 0 1))))))
+
+(deftest test-rotation-y
+  (testing "various y axis rotation"
+    (is (eps4= (point/point half-√2 0 half-√2)
+               (matrix/transform (transform/rotation-y (/ Math/PI 4))
+                                 (point/point 0 0 1))))
+    (is (eps4= (point/point 1 0 0)
+               (matrix/transform (transform/rotation-y (/ Math/PI 2))
+                                 (point/point 0 0 1)))))
+  (testing "inverse of various y axis rotation"
+    (is (eps4= (point/point 0 0 1)
+               (matrix/transform (matrix/invert (transform/rotation-y (/ Math/PI 4)) 4)
+                                 (point/point half-√2 0 half-√2))))
+    (is (eps4= (point/point 0 0 1)
+               (matrix/transform (matrix/invert (transform/rotation-y (/ Math/PI 2)) 4)
+                                 (point/point 1 0 0))))))
+
+(deftest test-rotation-z
+  (testing "various z axis rotation"
+    (is (eps4= (point/point (- half-√2) half-√2 0)
+               (matrix/transform (transform/rotation-z (/ Math/PI 4))
+                                 (point/point 0 1 0))))
+    (is (eps4= (point/point -1 0 0)
+               (matrix/transform (transform/rotation-z (/ Math/PI 2))
+                                 (point/point 0 1 0)))))
+  (testing "inverse of various z axis rotation"
+    (is (eps4= (point/point 0 1 0)
+               (matrix/transform (matrix/invert (transform/rotation-z (/ Math/PI 4)) 4)
+                                 (point/point (- half-√2) half-√2 0))))
+    (is (eps4= (point/point 0 1 0)
+               (matrix/transform (matrix/invert (transform/rotation-z (/ Math/PI 2)) 4)
+                                 (point/point -1 0 0))))))
+
