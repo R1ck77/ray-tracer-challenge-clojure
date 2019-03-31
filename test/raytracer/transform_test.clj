@@ -101,3 +101,17 @@
     (test-one-shearing 0 0 0 1 0 0 [2 3 4] [2 7 4])
     (test-one-shearing 0 0 0 0 1 0 [2 3 4] [2 3 6])
     (test-one-shearing 0 0 0 0 0 1 [2 3 4] [2 3 7])))
+
+(deftest test-chaining
+  (testing "transforms chaining"
+    (let [translation (transform/translation 10 5 7)
+          scaling (transform/scaling 5 5 5)
+          rotation (transform/rotation-x (/ Math/PI 2))]
+      (is (eps4= (matrix/transform translation
+                                   (matrix/transform scaling
+                                                     (matrix/transform rotation
+                                                                       (point/point 1 0 1))))
+                 (matrix/transform (matrix/mul4 translation
+                                                (matrix/mul4 scaling
+                                                             rotation))
+                                   (point/point 1 0 1)))))))

@@ -1,10 +1,7 @@
 (ns raytracer.matrix-test
   (:require [clojure.test :refer :all]
-            [raytracer.test-utils :refer [eps= eps4=]]
+            [raytracer.test-utils :refer [eps= eps4= m=]]
             [raytracer.matrix :as matrix]))
-
-(defn m= [a b]
-  (reduce #(and % %2) (map eps= a b)))
 
 ;;; TODO/FIXME trying hard not to use types
 (deftest test-construction
@@ -196,6 +193,4 @@
              6 -2 0 5]
           C (matrix/mul4 A B)]
       (is (m= A
-              (matrix/mul4 C (matrix/invert B 4))))))
-  
-  )
+              (matrix/mul4 C (matrix/invert B 4)))))))
