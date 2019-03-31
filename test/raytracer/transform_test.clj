@@ -88,3 +88,16 @@
                (matrix/transform (matrix/invert (transform/rotation-z (/ Math/PI 2)) 4)
                                  (point/point -1 0 0))))))
 
+(defmacro test-one-shearing [xy xz yx yz zx zy point-in result]
+  `(is (eps4= (apply point/point ~result)
+              (matrix/transform (transform/shearing ~xy ~xz ~yx ~yz ~zx ~zy)
+                                (apply point/point ~point-in)))))
+
+(deftest test-shearing
+  (testing "single component shearings"
+    (test-one-shearing 1 0 0 0 0 0 [2 3 4] [5 3 4])
+    (test-one-shearing 0 1 0 0 0 0 [2 3 4] [6 3 4])
+    (test-one-shearing 0 0 1 0 0 0 [2 3 4] [2 5 4])
+    (test-one-shearing 0 0 0 1 0 0 [2 3 4] [2 7 4])
+    (test-one-shearing 0 0 0 0 1 0 [2 3 4] [2 3 6])
+    (test-one-shearing 0 0 0 0 0 1 [2 3 4] [2 3 7])))

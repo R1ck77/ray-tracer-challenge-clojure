@@ -36,3 +36,10 @@
      sin     cos 0 0
        0       0 1 0
        0       0 0 1]))
+
+(defn shearing
+  [x-y x-z y-x y-z z-x z-y]
+  [1 x-y x-z 0
+   y-x 1 y-z 0
+   z-x z-y 1 0
+   0     0 0 1])
