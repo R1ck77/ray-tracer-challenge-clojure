@@ -13,9 +13,12 @@
      max-percent-error))
 
 (defn eps= [a b]
-  (if (= a 0)
+  (if (< (Math/abs (double a)) eps)
     (absolute-error a b)
     (relative-error a b)))
+
+(defn m= [a b]
+  (reduce #(and % %2) (map eps= a b)))
 
 (defn eps3= [[a1 a2 a3] [b1 b2 b3]]
   (and (eps= a1 b1)
