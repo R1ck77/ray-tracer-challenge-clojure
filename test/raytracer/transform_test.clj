@@ -111,7 +111,7 @@
                                    (matrix/transform scaling
                                                      (matrix/transform rotation
                                                                        (point/point 1 0 1))))
-                 (matrix/transform (matrix/mul4 translation
-                                                (matrix/mul4 scaling
-                                                             rotation))
+                 (matrix/transform (transform/translate 10 5 7
+                                                        (transform/scale 5 5 5
+                                                                         (transform/rotate-x (/ Math/PI 2))))
                                    (point/point 1 0 1)))))))

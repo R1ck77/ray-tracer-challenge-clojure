@@ -1,6 +1,8 @@
 (ns raytracer.transform
   (:require [raytracer.matrix :as matrix]))
 
+;;; TODO/FIXME what a nice, nice place for some polymorphism
+
 (defn- translation [tx ty tz]
   [1 0 0 tx
    0 1 0 ty
@@ -10,8 +12,8 @@
 (defn translate
   ([tx ty tz]
    (translation tx ty tz))
-  ([m tx ty tz]
-   (matrix/mul4 (scaling tx ty tz) m)))
+  ([tx ty tz m]
+   (matrix/mul4 (translate tx ty tz) m)))
 
 (defn- scaling [sx sy sz]
   [sx 0 0 0
@@ -22,9 +24,8 @@
 (defn scale
   ([sx sy sz]
    (scaling sx sy sz))
-  ([m sx sy sz]
-   (matrix/mul4 (scaling sx sy sz)
-                m)))
+  ([sx sy sz m]
+   (matrix/mul4 (scaling sx sy sz) m)))
 
 (defn- rotation-x [angle-rad]
   (let [cos (Math/cos angle-rad)
@@ -37,9 +38,8 @@
 (defn rotate-x
   ([angle-rad]
    (rotation-x angle-rad))
-  ([m angle-rad]
-   (matrix/mul4 (rotation-x angle-rad)
-                m)))
+  ([angle-rad m]
+   (matrix/mul4 (rotation-x angle-rad) m)))
 
 (defn- rotation-y [angle-rad]
   (let [cos (Math/cos angle-rad)
@@ -52,9 +52,8 @@
 (defn rotate-y
   ([angle-rad]
    (rotation-y angle-rad))
-  ([m angle-rad]
-   (matrix/mul4 (rotation-y angle-rad)
-                m)))
+  ([angle-rad m]
+   (matrix/mul4 (rotation-y angle-rad) m)))
 
 (defn- rotation-z [angle-rad]
   (let [cos (Math/cos angle-rad)
@@ -62,14 +61,13 @@
     [cos (- sin) 0 0
      sin     cos 0 0
        0       0 1 0
-     0       0 0 1]))
+       0       0 0 1]))
 
 (defn rotate-z
   ([angle-rad]
    (rotation-z angle-rad))
-  ([m angle-rad]
-   (matrix/mul4 (rotation-z angle-rad)
-                m)))
+  ([angle-rad m]
+   (matrix/mul4 (rotation-z angle-rad) m)))
 
 (defn- shearing
   [x-y x-z y-x y-z z-x z-y]
@@ -81,6 +79,5 @@
 (defn shear
   ([x-y x-z y-x y-z z-x z-y]
    (shearing x-y x-z y-x y-z z-x z-y))
-  ([m x-y x-z y-x y-z z-x z-y]
-   (matrix/mul4 (shearing m x-y x-z y-x y-z z-x z-y)
-                m)))
+  ([x-y x-z y-x y-z z-x z-y m]
+   (matrix/mul4 (shearing m x-y x-z y-x y-z z-x z-y) m)))
