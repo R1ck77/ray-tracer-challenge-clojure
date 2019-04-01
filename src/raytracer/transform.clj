@@ -13,7 +13,7 @@
   ([tx ty tz]
    (translation tx ty tz))
   ([tx ty tz m]
-   (matrix/mul4 (translate tx ty tz) m)))
+   (matrix/mul4 (translation tx ty tz) m)))
 
 (defn- scaling [sx sy sz]
   [sx 0 0 0
