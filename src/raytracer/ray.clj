@@ -14,7 +14,6 @@
   (tuple/add (:origin ray)
              (svector/mul (:direction ray) t)))
 
-
 (defn sphere []
   {:center [0 0 0 1]
    :radius 1.0})
@@ -32,7 +31,10 @@
 (defn intersect [ray sphere]
   (let [[a b c discriminant] (ray-sphere-discriminant ray sphere)]
     (if (< discriminant 0)
-      {:count 0}
+      {:count 0
+       :values []}
       {:count 2
-       :values [(/ (- (- b) (Math/sqrt discriminant)) (* 2 a))
-                (/ (+ (- b) (Math/sqrt discriminant)) (* 2 a))]})))
+       :values [(/ (- (- b) (Math/sqrt discriminant))
+                   (* 2 a))
+                (/ (+ (- b) (Math/sqrt discriminant))
+                   (* 2 a))]})))

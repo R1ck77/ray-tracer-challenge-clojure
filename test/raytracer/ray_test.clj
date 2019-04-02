@@ -35,15 +35,13 @@
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps= 4.0 (first (:values intersection))))
-      (is (eps= 6.0 (second (:values intersection))))))
+      (is (eps2= [4 6] (:values intersection)))))
   (testing "a ray intersects a sphere at a tangent"
     (let [intersection (ray/intersect (ray/create (point/point 0 1 -5)
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps= 5.0 (first (:values intersection))))
-      (is (eps= 5.0 (second (:values intersection))))))
+      (is (eps2= [5 5] (:values intersection)))))
   (testing "a ray misses a sphere"
     (let [intersection (ray/intersect (ray/create (point/point 0 2 -5)
                                                   (svector/svector 0 0 1))
@@ -54,12 +52,10 @@
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps= -1.0 (first (:values intersection))))
-      (is (eps= 1.0 (second (:values intersection))))))
+      (is (eps2= [-1 1] (:values intersection)))))
   (testing "a sphere is behind a ray"
     (let [intersection (ray/intersect (ray/create (point/point 0 0 5)
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps= -6.0 (first (:values intersection))))
-      (is (eps= -4.0 (second (:values intersection)))))))
+      (is (eps2= [-6 -4] (:values intersection))))))

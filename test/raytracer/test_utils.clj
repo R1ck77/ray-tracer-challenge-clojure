@@ -20,6 +20,10 @@
 (defn m= [a b]
   (reduce #(and % %2) (map eps= a b)))
 
+(defn eps2= [[a1 a2] [b1 b2]]
+  (and (eps= a1 b1)
+       (eps= a2 b2)))
+
 (defn eps3= [[a1 a2 a3] [b1 b2 b3]]
   (and (eps= a1 b1)
        (eps= a2 b2)
