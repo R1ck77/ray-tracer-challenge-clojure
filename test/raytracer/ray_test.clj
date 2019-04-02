@@ -42,7 +42,7 @@
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps= 4.0 (first (:values intersection))))
+      (is (eps= 5.0 (first (:values intersection))))
       (is (eps= 5.0 (second (:values intersection))))))
   (testing "a ray misses a sphere"
     (let [intersection (ray/intersect (ray/create (point/point 0 2 -5)
@@ -62,4 +62,4 @@
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
       (is (eps= -6.0 (first (:values intersection))))
-      (is (eps= 4.0 (second (:values intersection)))))))
+      (is (eps= -4.0 (second (:values intersection)))))))
