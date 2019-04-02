@@ -17,16 +17,16 @@
   (let [ray (ray/create (point/point 2 3 4)
                         (svector/svector 1 0 0))]
   (testing "t=0"
-    (is (eps4= (point/point 2 3 4)
+    (is (v= (point/point 2 3 4)
                (ray/position ray 0))))
   (testing "t=1"
-    (is (eps4= (point/point 3 3 4)
+    (is (v= (point/point 3 3 4)
                (ray/position ray 1))))
   (testing "t=-1"
-    (is (eps4= (point/point 1 3 4)
+    (is (v= (point/point 1 3 4)
                (ray/position ray -1))))
   (testing "t=2.5"
-    (is (eps4= (point/point 4.5 3 4)
+    (is (v= (point/point 4.5 3 4)
                (ray/position ray 2.5))))))
 
 (deftest test-sphere-intersection
@@ -35,13 +35,13 @@
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps2= [4 6] (:values intersection)))))
+      (is (v= [4 6] (:values intersection)))))
   (testing "a ray intersects a sphere at a tangent"
     (let [intersection (ray/intersect (ray/create (point/point 0 1 -5)
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps2= [5 5] (:values intersection)))))
+      (is (v= [5 5] (:values intersection)))))
   (testing "a ray misses a sphere"
     (let [intersection (ray/intersect (ray/create (point/point 0 2 -5)
                                                   (svector/svector 0 0 1))
@@ -52,10 +52,10 @@
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps2= [-1 1] (:values intersection)))))
+      (is (v= [-1 1] (:values intersection)))))
   (testing "a sphere is behind a ray"
     (let [intersection (ray/intersect (ray/create (point/point 0 0 5)
                                                   (svector/svector 0 0 1))
                                       (ray/sphere))]
       (is (= 2 (:count intersection)))
-      (is (eps2= [-6 -4] (:values intersection))))))
+      (is (v= [-6 -4] (:values intersection))))))

@@ -1,6 +1,6 @@
 (ns raytracer.matrix-test
   (:require [clojure.test :refer :all]
-            [raytracer.test-utils :refer [eps= eps4= m=]]
+            [raytracer.test-utils :refer [v= eps=]]
             [raytracer.matrix :as matrix]))
 
 ;;; TODO/FIXME trying hard not to use types
@@ -36,7 +36,7 @@
 
 (deftest test-equality
   (testing "equal matrix"
-    (is (m= [1 2 3 4
+    (is (v= [1 2 3 4
              5 6 7 8
              9 8 7 6
              5 4 3 2]
@@ -45,7 +45,7 @@
              9 8 7 6
              5 4 3 2])))
   (testing "different matrix"
-    (is (not (m= [1 2 3 4
+    (is (not (v= [1 2 3 4
                   5 6 7 8
                   9 8 7 6
                   5 4 3 2]
@@ -53,7 +53,7 @@
                   5 6 7 8.6
                   9 8 7 6
                   5 4 3 2])))
-    (is (not (m= [1 2 3 4
+    (is (not (v= [1 2 3 4
                   5 6 7 8
                   9 8 7 6
                   5 4 3 2]
@@ -76,7 +76,7 @@
                     44 54 114 108
                     40 58 110 102
                     16 26 46 42]]
-      (is (m= expected (matrix/mul4 m1 m2)))))
+      (is (v= expected (matrix/mul4 m1 m2)))))
   (testing "the identity matrix is the identity element"
     (let [m1 [1 2 3 4
               5 6 7 8
@@ -86,7 +86,7 @@
                     44 54 114 108
                     40 58 110 102
                     16 26 46 42]]
-      (is (m= m1 (matrix/mul4 m1 matrix/identity-matrix))))))
+      (is (v= m1 (matrix/mul4 m1 matrix/identity-matrix))))))
 
 (deftest test-transform
   (testing "matrix multiplied by a tuple"
@@ -95,12 +95,12 @@
              8 6 4 1
              0 0 0 1]
           b [1 2 3 1]]
-      (is (eps4= [18 24 33 1]
+      (is (v= [18 24 33 1]
                  (matrix/transform a b))))))
 
 (deftest test-transpose
   (testing "transposing a matrix"
-    (is (m= [ 1  2  3  4
+    (is (v= [ 1  2  3  4
              5  6  7  8
              9 10 11 12
              13 14 15 16]
@@ -109,7 +109,7 @@
                                3 7 11 15
                                4 8 12 16]))))
   (testing "transposing the identity yields identity"
-    (is (m= matrix/identity-matrix
+    (is (v= matrix/identity-matrix
             (matrix/transpose matrix/identity-matrix)))))
 
 (deftest test-det2
@@ -118,13 +118,13 @@
 
 (deftest test-submatrix
   (testing "a submatrix of a 3x3 matrix is a 2x2 matrix"
-    (is (m= [-3 2
+    (is (v= [-3 2
              0 6]
             (matrix/submatrix [ 1 5  0
                                -3 2  7
                                0 6 -3] 3 0 2))))
   (testing "a submatrix of a 4x4 matrix is a 3x3 matrix"
-    (is (m= [1 2 3
+    (is (v= [1 2 3
              4 5 6
              7 8 9]
             (matrix/submatrix [1  42  2  3
@@ -173,14 +173,14 @@
              1 -5  1  8
              7  7 -6 -7
              1 -3  7  4]]
-      (is (m= matrix/identity-matrix 
+      (is (v= matrix/identity-matrix 
               (matrix/mul4 A (matrix/invert A 4))))))
   (testing "inversion 2"
     (let [A [8 -5 9 2
              7 5 6 1
              -6 0 9 6
              -3 0 -9 -4]]
-      (is (m= matrix/identity-matrix 
+      (is (v= matrix/identity-matrix 
               (matrix/mul4 A (matrix/invert A 4))))))
   (testing "inversion 3"
     (let [A [3 -9 7 3
@@ -192,5 +192,5 @@
              7 0 5 4
              6 -2 0 5]
           C (matrix/mul4 A B)]
-      (is (m= A
+      (is (v= A
               (matrix/mul4 C (matrix/invert B 4)))))))

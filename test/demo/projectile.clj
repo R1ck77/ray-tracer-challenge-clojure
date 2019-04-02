@@ -1,6 +1,6 @@
 (ns demo.projectile
   (:require [clojure.test :refer :all]
-            [raytracer.test-utils :refer [eps= eps4=]]
+            [raytracer.test-utils :refer [eps= v=]]
             [raytracer.svector :refer :all]
             [raytracer.point :refer :all]
             [raytracer.canvas :refer :all]))
@@ -43,8 +43,8 @@
     :velocity (add v (mul forces dt))}))
 
 (defn- eq-obj [a b]
-  (and (eps4= (:position a) (:position b))
-       (eps4= (:velocity a) (:velocity b))))
+  (and (v= (:position a) (:position b))
+       (v= (:velocity a) (:velocity b))))
 
 (deftest test-eq-obj
   (testing "similar object"

@@ -10,88 +10,88 @@
 
 (deftest test-translate
   (testing "translation"
-    (is (eps4= (point/point 7 -2 9)
-               (matrix/transform (transform/translate 5 -3 2 )
-                                 (point/point 2 1 7 )))))
+    (is (v= (point/point 7 -2 9)
+            (matrix/transform (transform/translate 5 -3 2 )
+                              (point/point 2 1 7 )))))
   (testing "inverse of a translation"
-    (is (eps4= (point/point -8 7 3)
-               (matrix/transform (matrix/invert (transform/translate 5 -3 2) 4)
-                                 (point/point -3 4 5)))))
+    (is (v= (point/point -8 7 3)
+            (matrix/transform (matrix/invert (transform/translate 5 -3 2) 4)
+                              (point/point -3 4 5)))))
   (testing "translation on vector"
-    (is (eps4= (svector/svector -3 4 5)
-               (matrix/transform (transform/translate 5 -3 2)
-                                 (svector/svector -3 4 5))))))
+    (is (v= (svector/svector -3 4 5)
+            (matrix/transform (transform/translate 5 -3 2)
+                              (svector/svector -3 4 5))))))
 
 (deftest test-scale
   (testing "scaling"
-    (is (eps4= (point/point -8 18 32)
-               (matrix/transform (transform/scale 2 3 4)
-                                 (point/point -4 6 8)))))
+    (is (v= (point/point -8 18 32)
+            (matrix/transform (transform/scale 2 3 4)
+                              (point/point -4 6 8)))))
   (testing "inverse of a scaling"
-    (is (eps4= (svector/svector -2 2 2)
-               (matrix/transform (matrix/invert (transform/scale 2 3 4) 4)
-                                 (svector/svector -4 6 8)))))
+    (is (v= (svector/svector -2 2 2)
+            (matrix/transform (matrix/invert (transform/scale 2 3 4) 4)
+                              (svector/svector -4 6 8)))))
   (testing "scaling on vector"
-    (is (eps4= (svector/svector -8 18 32)
-               (matrix/transform (transform/scale 2 3 4)
-                                 (svector/svector -4 6 8)))))
-    (testing "scaling by negative index"
-    (is (eps4= (point/point -2 3 4)
-               (matrix/transform (transform/scale -1 1 1)
-                                 (point/point 2 3 4))))))
+    (is (v= (svector/svector -8 18 32)
+            (matrix/transform (transform/scale 2 3 4)
+                              (svector/svector -4 6 8)))))
+  (testing "scaling by negative index"
+    (is (v= (point/point -2 3 4)
+            (matrix/transform (transform/scale -1 1 1)
+                              (point/point 2 3 4))))))
 
 (deftest test-rotation-x
   (testing "various x axis rotation"
-    (is (eps4= (point/point 0 half-√2 half-√2)
-               (matrix/transform (transform/rotate-x (/ Math/PI 4))
-                                 (point/point 0 1 0))))
-    (is (eps4= (point/point 0 0 1)
-               (matrix/transform (transform/rotate-x (/ Math/PI 2))
-                                 (point/point 0 1 0)))))
+    (is (v= (point/point 0 half-√2 half-√2)
+            (matrix/transform (transform/rotate-x (/ Math/PI 4))
+                              (point/point 0 1 0))))
+    (is (v= (point/point 0 0 1)
+            (matrix/transform (transform/rotate-x (/ Math/PI 2))
+                              (point/point 0 1 0)))))
   (testing "inverse of various x axis rotation"
-    (is (eps4= (point/point 0 1 0)
-               (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 4)) 4)
-                                 (point/point 0 half-√2 half-√2))))
-    (is (eps4= (point/point 0 1 0)
-               (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 2)) 4)
-                                 (point/point 0 0 1))))))
+    (is (v= (point/point 0 1 0)
+            (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 4)) 4)
+                              (point/point 0 half-√2 half-√2))))
+    (is (v= (point/point 0 1 0)
+            (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 2)) 4)
+                              (point/point 0 0 1))))))
 
 (deftest test-rotation-y
   (testing "various y axis rotation"
-    (is (eps4= (point/point half-√2 0 half-√2)
-               (matrix/transform (transform/rotate-y (/ Math/PI 4))
-                                 (point/point 0 0 1))))
-    (is (eps4= (point/point 1 0 0)
-               (matrix/transform (transform/rotate-y (/ Math/PI 2))
-                                 (point/point 0 0 1)))))
+    (is (v= (point/point half-√2 0 half-√2)
+            (matrix/transform (transform/rotate-y (/ Math/PI 4))
+                              (point/point 0 0 1))))
+    (is (v= (point/point 1 0 0)
+            (matrix/transform (transform/rotate-y (/ Math/PI 2))
+                              (point/point 0 0 1)))))
   (testing "inverse of various y axis rotation"
-    (is (eps4= (point/point 0 0 1)
-               (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 4)) 4)
-                                 (point/point half-√2 0 half-√2))))
-    (is (eps4= (point/point 0 0 1)
-               (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 2)) 4)
-                                 (point/point 1 0 0))))))
+    (is (v= (point/point 0 0 1)
+            (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 4)) 4)
+                              (point/point half-√2 0 half-√2))))
+    (is (v= (point/point 0 0 1)
+            (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 2)) 4)
+                              (point/point 1 0 0))))))
 
 (deftest test-rotation-z
   (testing "various z axis rotation"
-    (is (eps4= (point/point (- half-√2) half-√2 0)
-               (matrix/transform (transform/rotate-z (/ Math/PI 4))
-                                 (point/point 0 1 0))))
-    (is (eps4= (point/point -1 0 0)
-               (matrix/transform (transform/rotate-z (/ Math/PI 2))
-                                 (point/point 0 1 0)))))
+    (is (v= (point/point (- half-√2) half-√2 0)
+            (matrix/transform (transform/rotate-z (/ Math/PI 4))
+                              (point/point 0 1 0))))
+    (is (v= (point/point -1 0 0)
+            (matrix/transform (transform/rotate-z (/ Math/PI 2))
+                              (point/point 0 1 0)))))
   (testing "inverse of various z axis rotation"
-    (is (eps4= (point/point 0 1 0)
-               (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 4)) 4)
-                                 (point/point (- half-√2) half-√2 0))))
-    (is (eps4= (point/point 0 1 0)
-               (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 2)) 4)
-                                 (point/point -1 0 0))))))
+    (is (v= (point/point 0 1 0)
+            (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 4)) 4)
+                              (point/point (- half-√2) half-√2 0))))
+    (is (v= (point/point 0 1 0)
+            (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 2)) 4)
+                              (point/point -1 0 0))))))
 
 (defmacro test-one-shearing [xy xz yx yz zx zy point-in result]
-  `(is (eps4= (apply point/point ~result)
-              (matrix/transform (transform/shear ~xy ~xz ~yx ~yz ~zx ~zy)
-                                (apply point/point ~point-in)))))
+  `(is (v= (apply point/point ~result)
+           (matrix/transform (transform/shear ~xy ~xz ~yx ~yz ~zx ~zy)
+                             (apply point/point ~point-in)))))
 
 (deftest test-shearing
   (testing "single component shearings"
@@ -107,11 +107,11 @@
     (let [translation (transform/translate 10 5 7)
           scaling (transform/scale 5 5 5)
           rotation (transform/rotate-x (/ Math/PI 2))]
-      (is (eps4= (matrix/transform translation
-                                   (matrix/transform scaling
-                                                     (matrix/transform rotation
-                                                                       (point/point 1 0 1))))
-                 (matrix/transform (transform/translate 10 5 7
-                                                        (transform/scale 5 5 5
-                                                                         (transform/rotate-x (/ Math/PI 2))))
-                                   (point/point 1 0 1)))))))
+      (is (v= (matrix/transform translation
+                                (matrix/transform scaling
+                                                  (matrix/transform rotation
+                                                                    (point/point 1 0 1))))
+              (matrix/transform (transform/translate 10 5 7
+                                                     (transform/scale 5 5 5
+                                                                      (transform/rotate-x (/ Math/PI 2))))
+                                (point/point 1 0 1)))))))

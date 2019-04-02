@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [raytracer.svector :refer :all]
             [raytracer.point :refer [point?]]
-            [raytracer.test-utils :refer [eps= eps4=]]))
+            [raytracer.test-utils :refer [eps= v=]]))
 
 (def inv-sqrt-3 (/ (Math/sqrt 3)))
 
@@ -23,9 +23,9 @@
 
 (deftest test-mul
   (testing "multiplying a tuple by a scalar"
-    (eps4= [3.5 -7 10.5 -14] (mul [1 -2 3 -4] 3.5)))
+    (v= [3.5 -7 10.5 -14] (mul [1 -2 3 -4] 3.5)))
   (testing "multiplying a tuple by a fraction"
-    (eps4= [0.5 -1 1.5 -2] (mul [1 -2 3 -4] 0.5))))
+    (v= [0.5 -1 1.5 -2] (mul [1 -2 3 -4] 0.5))))
 
 (defmacro do-test-mag [expected v]
   `(testing ~(str "computing the magnitude of " v)
@@ -41,7 +41,7 @@
 (defmacro do-test-norm [expected v]
   `(testing ~(str "normalizing " v)
      (let [res# (norm (apply svector ~v))]
-       (is (eps4= (apply svector ~expected) res#))
+       (is (v= (apply svector ~expected) res#))
        (is (eps= 1 (mag res#))))))
 
 (deftest test-norm
@@ -56,9 +56,9 @@
                       (svector 2 3 4)))))
 
 (deftest test-cross
-  (is (eps4= (svector -1 2 -1)
+  (is (v= (svector -1 2 -1)
           (cross (svector 1 2 3) (svector 2 3 4))))
-  (is (eps4= (svector 1 -2 1)
+  (is (v= (svector 1 -2 1)
           (cross (svector 2 3 4) (svector 1 2 3))))
   (is (eps= 0 (dot (svector -34 54 124)
                    (cross (svector -34 54 124) (svector 34 12 1))))))

@@ -1,7 +1,7 @@
 (ns raytracer.canvas-test
   (:require [clojure.test :refer :all]
             [clojure.string :as string]
-            [raytracer.test-utils :refer [eps3=]]
+            [raytracer.test-utils :refer [v=]]
             [raytracer.canvas :as canvas]))
 
 (def red [1 0 0])
@@ -22,8 +22,8 @@
   (testing "canvas starting color is black"
     (let [canvas (canvas/create-canvas 10 20)]
       (for-each-pixel 10 20
-                      #(eps3= black
-                              (canvas/read canvas % %2))))))
+                      #(v= black
+                           (canvas/read canvas % %2))))))
 
 (deftest test-write-pixel
   (testing "pixel are written as expected"

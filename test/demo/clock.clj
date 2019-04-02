@@ -1,6 +1,5 @@
 (ns demo.clock
-  (:require [raytracer.test-utils :refer [eps= eps4=]]
-            [raytracer.svector :refer :all]
+  (:require [raytracer.svector :refer :all]
             [raytracer.point :refer :all]
             [raytracer.canvas :refer :all]
             [raytracer.matrix :refer :all]            
