@@ -30,32 +30,61 @@
                (ray/position ray 2.5))))))
 
 (deftest test-sphere-intersection
-  (testing "a ray intersects a sphere at two points"
-    (let [intersection (ray/intersect (ray/create (point/point 0 0 -5)
-                                                  (svector/svector 0 0 1))
-                                      (ray/sphere))]
-      (is (= 2 (:count intersection)))
-      (is (v= [4 6] (:values intersection)))))
-  (testing "a ray intersects a sphere at a tangent"
-    (let [intersection (ray/intersect (ray/create (point/point 0 1 -5)
-                                                  (svector/svector 0 0 1))
-                                      (ray/sphere))]
-      (is (= 2 (:count intersection)))
-      (is (v= [5 5] (:values intersection)))))
-  (testing "a ray misses a sphere"
-    (let [intersection (ray/intersect (ray/create (point/point 0 2 -5)
-                                                  (svector/svector 0 0 1))
-                                      (ray/sphere))]
-      (is (= 0 (:count intersection)))))
-  (testing "a ray originates inside a sphere"
-    (let [intersection (ray/intersect (ray/create (point/point 0 0 0)
-                                                  (svector/svector 0 0 1))
-                                      (ray/sphere))]
-      (is (= 2 (:count intersection)))
-      (is (v= [-1 1] (:values intersection)))))
-  (testing "a sphere is behind a ray"
-    (let [intersection (ray/intersect (ray/create (point/point 0 0 5)
-                                                  (svector/svector 0 0 1))
-                                      (ray/sphere))]
-      (is (= 2 (:count intersection)))
-      (is (v= [-6 -4] (:values intersection))))))
+  (let [sphere (ray/sphere)]
+    (testing "a ray intersects a sphere at two points"
+      (let [intersections (ray/intersect (ray/create (point/point 0 0 -5)
+                                                     (svector/svector 0 0 1))
+                                         sphere)]
+        (is (= 2 (:count intersections)))
+        (is (identical? sphere (:object (first (:values intersections)))))
+        (is (identical? sphere (:object (second (:values intersections)))))
+        (is (eps= 4 (:t (first (:values intersections)))))
+        (is (eps= 6 (:t (second (:values intersections)))))))
+    (testing "a ray intersects a sphere at a tangent"
+      (let [intersections (ray/intersect (ray/create (point/point 0 1 -5)
+                                                     (svector/svector 0 0 1))
+                                         sphere)]
+        (is (= 2 (:count intersections)))
+        (is (identical? sphere (:object (first (:values intersections)))))
+        (is (identical? sphere (:object (second (:values intersections)))))
+        (is (eps= 5 (:t (first (:values intersections)))))
+        (is (eps= 5 (:t (second (:values intersections)))))))
+    (testing "a ray misses a sphere"
+      (let [intersections (ray/intersect (ray/create (point/point 0 2 -5)
+                                                     (svector/svector 0 0 1))
+                                         sphere)]
+        (is (= 0 (:count intersections)))))
+    (testing "a ray originates inside a sphere"
+      (let [intersections (ray/intersect (ray/create (point/point 0 0 0)
+                                                     (svector/svector 0 0 1))
+                                         sphere)]
+        (is (= 2 (:count intersections)))
+        (is (identical? sphere (:object (first (:values intersections)))))
+        (is (identical? sphere (:object (second (:values intersections)))))
+        (is (eps= -1 (:t (first (:values intersections)))))
+        (is (eps= 1 (:t (second (:values intersections)))))))
+    (testing "a sphere is behind a ray"
+      (let [intersections (ray/intersect (ray/create (point/point 0 0 5)
+                                                     (svector/svector 0 0 1))
+                                         sphere)]
+        (is (= 2 (:count intersections)))
+        (is (identical? sphere (:object (first (:values intersections)))))
+        (is (identical? sphere (:object (second (:values intersections)))))
+        (is (eps= -6 (:t (first (:values intersections)))))
+        (is (eps= -4 (:t (second (:values intersections)))))))))
+
+(deftest test-intersection
+  (testing "create new intersection"
+    (let [sphere (ray/sphere)
+          intersection (ray/intersection 2.4 sphere)]
+      (is (identical? sphere (:object intersection)))
+      (is (= 2.4 (:t intersection))))))
+
+(deftest test-intersections
+  (testing "exciting \"intersections\" function"
+      (let [i1 (ray/intersection 2.4 (ray/sphere))
+             i2 (ray/intersection 2.8 (ray/sphere))
+            intersections (ray/intersections i1 i2)]
+        (is (= 2 (count intersections)))
+        (is (identical? i1 (first intersections)))
+        (is (identical? i2 (second intersections))))))

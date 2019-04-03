@@ -3,8 +3,6 @@
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]))
 
-
-
 (defrecord Ray [origin direction])
 
 (defn create [origin direction]
@@ -34,7 +32,17 @@
       {:count 0
        :values []}
       {:count 2
-       :values [(/ (- (- b) (Math/sqrt discriminant))
-                   (* 2 a))
-                (/ (+ (- b) (Math/sqrt discriminant))
-                   (* 2 a))]})))
+       :values [(intersection (/ (- (- b) (Math/sqrt discriminant))
+                                 (* 2 a))
+                              sphere)
+                (intersection (/ (+ (- b) (Math/sqrt discriminant))
+                                 (* 2 a))
+                              sphere)]})))
+
+(defrecord Intersection [t object])
+
+(defn intersection [t object]
+  (->Intersection t object))
+
+(defn intersections [ & args]
+  (vec args)) ;;; TODO/FIXME Wow! Remove…
