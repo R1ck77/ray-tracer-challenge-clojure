@@ -85,7 +85,23 @@
         (is (identical? sphere (:object (first (:values intersections)))))
         (is (identical? sphere (:object (second (:values intersections)))))
         (is (eps= -6 (:t (first (:values intersections)))))
-        (is (eps= -4 (:t (second (:values intersections)))))))))
+        (is (eps= -4 (:t (second (:values intersections)))))))
+    (testing "intersecting a scaled sphere with a ray"
+      (let [ray (ray/create (point/point 0 0 -5)
+                            (svector/svector 0 0 1))
+            sphere (ray/change-transform (ray/sphere)
+                                         (transform/scale 2 2 2))
+            intersections (ray/intersect ray sphere)]
+        (is (= 2 (count intersections)))
+        (is (eps= 3 (first (:values intersections))))
+        (is (eps= 7 (second (:values intersections))))))
+    (testing "intersecting a translated sphere with a ray"
+      (let [ray (ray/create (point/point 0 0 -5)
+                            (svector/svector 0 0 1))
+            sphere (ray/change-transform (ray/sphere)
+                                         (transform/translate 5 0 0))
+            intersections (ray/intersect ray sphere)]
+        (is (= 0 (count intersections)))))))
 
 (deftest test-intersection
   (testing "create new intersection"

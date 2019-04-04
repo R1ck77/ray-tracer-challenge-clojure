@@ -36,18 +36,23 @@
 (defn intersection [t object]
   (->Intersection t object))
 
+(defn transform [ray matrix]
+  (create (matrix/transform matrix (:origin ray))
+          (matrix/transform matrix (:direction ray))))
+
 (defn intersect [ray sphere]
-  (let [[a b c discriminant] (ray-sphere-discriminant ray sphere)]
-    (if (< discriminant 0)
-      {:count 0
-       :values []}
-      {:count 2
-       :values [(intersection (/ (- (- b) (Math/sqrt discriminant))
-                                 (* 2 a))
-                              sphere)
-                (intersection (/ (+ (- b) (Math/sqrt discriminant))
-                                 (* 2 a))
-                              sphere)]})))
+  (let [ray (transform ray (matrix/invert (:transform sphere) 4))]
+    (let [[a b c discriminant] (ray-sphere-discriminant ray sphere)]
+      (if (< discriminant 0)
+        {:count 0
+         :values []}
+        {:count 2
+         :values [(intersection (/ (- (- b) (Math/sqrt discriminant))
+                                   (* 2 a))
+                                sphere)
+                  (intersection (/ (+ (- b) (Math/sqrt discriminant))
+                                   (* 2 a))
+                                sphere)]}))))
 
 (defn intersections [ & args]
   (vec args))
@@ -57,7 +62,3 @@
 
 (defn hit [xinters]
   (first (sort-by #(:t %) (filter non-backward? xinters))))
-
-(defn transform [ray matrix]
-  (create (matrix/transform matrix (:origin ray))
-          (matrix/transform matrix (:direction ray))))
