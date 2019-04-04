@@ -18,18 +18,18 @@
 (deftest test-position
   (let [ray (ray/create (point/point 2 3 4)
                         (svector/svector 1 0 0))]
-  (testing "t=0"
-    (is (v= (point/point 2 3 4)
-               (ray/position ray 0))))
-  (testing "t=1"
-    (is (v= (point/point 3 3 4)
-               (ray/position ray 1))))
-  (testing "t=-1"
-    (is (v= (point/point 1 3 4)
-               (ray/position ray -1))))
-  (testing "t=2.5"
-    (is (v= (point/point 4.5 3 4)
-            (ray/position ray 2.5))))))
+    (testing "t=0"
+      (is (v= (point/point 2 3 4)
+              (ray/position ray 0))))
+    (testing "t=1"
+      (is (v= (point/point 3 3 4)
+              (ray/position ray 1))))
+    (testing "t=-1"
+      (is (v= (point/point 1 3 4)
+              (ray/position ray -1))))
+    (testing "t=2.5"
+      (is (v= (point/point 4.5 3 4)
+              (ray/position ray 2.5))))))
 
 (deftest test-sphere
   (testing "create a sphere"
@@ -92,16 +92,17 @@
             sphere (ray/change-transform (ray/sphere)
                                          (transform/scale 2 2 2))
             intersections (ray/intersect ray sphere)]
-        (is (= 2 (count intersections)))
-        (is (eps= 3 (first (:values intersections))))
-        (is (eps= 7 (second (:values intersections))))))
+        (is (= 2 (:count intersections)))
+        (is (eps= 3 (:t (first (:values intersections)))))
+        (is (eps= 7 (:t (second (:values intersections)))))))
     (testing "intersecting a translated sphere with a ray"
       (let [ray (ray/create (point/point 0 0 -5)
                             (svector/svector 0 0 1))
             sphere (ray/change-transform (ray/sphere)
                                          (transform/translate 5 0 0))
             intersections (ray/intersect ray sphere)]
-        (is (= 0 (count intersections)))))))
+        (is (= 0 (:count intersections)))))    
+    ))
 
 (deftest test-intersection
   (testing "create new intersection"
@@ -112,12 +113,12 @@
 
 (deftest test-intersections
   (testing "exciting \"intersections\" function"
-      (let [i1 (ray/intersection 2.4 (ray/sphere))
-             i2 (ray/intersection 2.8 (ray/sphere))
-            intersections (ray/intersections i1 i2)]
-        (is (= 2 (count intersections)))
-        (is (identical? i1 (first intersections)))
-        (is (identical? i2 (second intersections))))))
+    (let [i1 (ray/intersection 2.4 (ray/sphere))
+          i2 (ray/intersection 2.8 (ray/sphere))
+          intersections (ray/intersections i1 i2)]
+      (is (= 2 (count intersections)))
+      (is (identical? i1 (first intersections)))
+      (is (identical? i2 (second intersections))))))
 
 
 (defmacro hit-testcase [ & {:keys [message intersections-t expected]}]
