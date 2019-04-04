@@ -3,6 +3,7 @@
             [raytracer.test-utils :refer :all]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]            
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]))
 
@@ -28,7 +29,19 @@
                (ray/position ray -1))))
   (testing "t=2.5"
     (is (v= (point/point 4.5 3 4)
-               (ray/position ray 2.5))))))
+            (ray/position ray 2.5))))))
+
+(deftest test-sphere
+  (testing "create a sphere"
+    (let [sphere (ray/sphere)]
+      (is (v= [0 0 0 1] (:center sphere)))
+      (is (eps= 1.0 (:radius sphere)))
+      (is (identical? matrix/identity-matrix (:transform sphere)))))
+  (testing "update a sphere's transformation"
+    (let [transform (transform/translate 2 3 4)
+          new-sphere (ray/change-transform (ray/sphere) transform)]
+      (is (identical? transform
+                      (:transform new-sphere))))))
 
 (deftest test-sphere-intersection
   (let [sphere (ray/sphere)]

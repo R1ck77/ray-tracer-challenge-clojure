@@ -15,7 +15,11 @@
 
 (defn sphere []
   {:center [0 0 0 1]
-   :radius 1.0})
+   :radius 1.0
+   :transform matrix/identity-matrix})
+
+(defn change-transform [sphere new-transform]
+  (assoc sphere :transform new-transform))
 
 (defn ray-sphere-discriminant [ray sphere]
   (let [sphere-to-ray (tuple/sub (:origin ray)
