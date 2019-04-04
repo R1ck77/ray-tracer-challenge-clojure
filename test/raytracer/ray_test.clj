@@ -88,3 +88,27 @@
         (is (= 2 (count intersections)))
         (is (identical? i1 (first intersections)))
         (is (identical? i2 (second intersections))))))
+
+
+(defmacro hit-testcase [ & {:keys [message intersections-t expected]}]
+  `(testing ~message
+     (let [sphere# (ray/sphere)
+           intersections# (apply ray/intersections (map #(ray/intersection % sphere#) ~intersections-t))
+           hit# (ray/hit intersections#)]
+       (is (or (and (not ~expected) (not hit#))
+               (= (:t (nth intersections# ~expected)) (:t hit#)))))))
+
+(deftest test-hit
+  (hit-testcase :message "the hit, when all intersections have positive t"
+                :intersections-t [1 2]
+                :expected 0)
+  (hit-testcase :message "the hit, when some intersections have negative t"
+                :intersections-t [-1 1]
+                :expected 1)
+  (hit-testcase :message "the hit, when all intersections have negative t"
+                :intersections-t [-2 -1]
+                :expected nil)
+  (hit-testcase :message "the hit is always the lowest nonnegative intersection"
+                :intersections-t [5 7 -3 2 4]
+                :expected 3))
+

@@ -26,6 +26,11 @@
         c (- (svector/dot sphere-to-ray sphere-to-ray) 1)]
     [a b c (- (* b b ) (* 4 a c))]))
 
+(defrecord Intersection [t object])
+
+(defn intersection [t object]
+  (->Intersection t object))
+
 (defn intersect [ray sphere]
   (let [[a b c discriminant] (ray-sphere-discriminant ray sphere)]
     (if (< discriminant 0)
@@ -39,10 +44,11 @@
                                  (* 2 a))
                               sphere)]})))
 
-(defrecord Intersection [t object])
-
-(defn intersection [t object]
-  (->Intersection t object))
-
 (defn intersections [ & args]
-  (vec args)) ;;; TODO/FIXME Wow! Remove…
+  (vec args))
+
+(defn- non-backward? [intersection]
+  (>= (:t intersection) 0))
+
+(defn hit [xinters]
+  (first (sort-by #(:t %) (filter non-backward? xinters))))
