@@ -1,7 +1,8 @@
 (ns raytracer.ray
   (:require [raytracer.utils :as utils]
             [raytracer.tuple :as tuple]
-            [raytracer.svector :as svector]))
+            [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]))
 
 (defrecord Ray [origin direction])
 
@@ -52,3 +53,7 @@
 
 (defn hit [xinters]
   (first (sort-by #(:t %) (filter non-backward? xinters))))
+
+(defn transform [ray matrix]
+  (create (matrix/transform matrix (:origin ray))
+          (matrix/transform matrix (:direction ray))))

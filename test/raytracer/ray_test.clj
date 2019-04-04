@@ -3,7 +3,8 @@
             [raytracer.test-utils :refer :all]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
-            [raytracer.ray :as ray]))
+            [raytracer.ray :as ray]
+            [raytracer.transform :as transform]))
 
 (deftest test-ray
   (testing "ray creation"
@@ -111,4 +112,16 @@
   (hit-testcase :message "the hit is always the lowest nonnegative intersection"
                 :intersections-t [5 7 -3 2 4]
                 :expected 3))
+
+(deftest test-transform
+  (let [ray (ray/create (point/point 1 2 3)
+                        (svector/svector 0 1 0))]
+    (testing "translating a ray"
+      (let [result (ray/transform ray (transform/translate 3 4 5))]
+        (is (v= [4 6 8 1] (:origin result)))
+        (is (v= [0 1 0 0] (:direction result)))))
+    (testing "scaling a ray"
+      (let [result (ray/transform ray (transform/scale 2 3 4))]
+        (is (v= [2 6 12 1] (:origin result)))
+        (is (v= [0 3 0 0] (:direction result)))))))
 
