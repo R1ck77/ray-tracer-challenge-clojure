@@ -6,6 +6,7 @@
 
 (defrecord Ray [origin direction])
 
+;;; TODO/FIXME use ray/ray instead (as for other objects)
 (defn create [origin direction]
   (->Ray origin direction))
 
@@ -44,7 +45,7 @@
   (let [[a b c discriminant]
         (ray-sphere-discriminant ray-in-sphere-space sphere)]
     (if (< discriminant 0)
-      {:count 0
+      {:count 0   ;;; TODO/FIXME :count is bad for clarity. Use :n instead or :n-int, or something else
        :values []}
       {:count 2
        :values [(intersection (/ (- (- b) (Math/sqrt discriminant))
