@@ -17,8 +17,13 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :objects [{:object (ray/change-transform (ray/sphere) (transform/scale 7 7 7))
-              :color [1 0 0]}]
+   :objects [{:object (ray/change-transform (ray/sphere) (transform/scale 5 5 5))
+              :color [1 0 0]}
+             {:object (ray/change-transform (ray/change-transform (ray/sphere)
+                                                                  (transform/translate 0.1 0 0)
+                                                                  )
+                                            (transform/scale 5 5 5))
+              :color [0 1 0]}]
    :screen-z 0})
 
 (defn- adjust-canvas [[x y]]
@@ -44,17 +49,20 @@
                           (tuple/sub (pixel-to-coord-f pixel)
                                      (:camera scene)))}))))
 
+(defn get-best-t [x-t-color]
+  (second
+   (first
+    (sort-by first  (filter #(> (first %) 0) x-t-color)))))
 
-
+  ;;; Easy peasy. Good look reading this in a month…
 (defn- compute-pixel [scene canvas {pixel :pixel, ray :ray}]
-  ;;; COLOR missing! TODO/FIXME
   (let [t-list (mapcat (fn [{obj :object, color :color}]
-                         (map :t (:values (ray/intersect ray obj))))
+                         (map #(vector (:t %) color) (:values (ray/intersect ray obj))))
                        (:objects scene))]
     (if (not (empty? t-list))
       (canvas/write canvas
                     (first pixel) (second pixel)
-                    [255 0 0])
+                    (get-best-t t-list))
       canvas)))
 
 (defn render-scene [scene]
