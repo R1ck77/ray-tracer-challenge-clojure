@@ -94,13 +94,13 @@
                     (cofactor m n 0 %)) (range n))))
 
 (defn det [m n]
-  (case n
+  (case (int n)
     1 (first m)
     2 (det2 m)
     (det-n m n)))
 
 (defn is-invertible? [m n]
-  (> (Math/abs (det m n)) max-error))
+  (> (Math/abs (double (det m n))) max-error))
 
 (defn- cofactor-matrix [m n]
   (vec

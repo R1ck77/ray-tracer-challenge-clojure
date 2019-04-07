@@ -60,7 +60,7 @@
   (cond
       (<= component 0) 0
       (>= component 1) max-value
-      :default (Math/round (* component max-value))))
+      :default (Math/round (double (* component max-value)))))
 
 (defn- format-color [color]
   (map color-to-ppm color))

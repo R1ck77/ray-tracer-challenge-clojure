@@ -4,7 +4,7 @@
 (def ^:private max-error 1e-6)
 
 (defn point? [tuple]
-  (< (Math/abs (- (nth tuple 3) 1))
+  (< (Math/abs (double (- (nth tuple 3) 1)))
      max-error))
 
 (defn point [x y z]

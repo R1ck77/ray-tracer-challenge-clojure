@@ -6,7 +6,7 @@
 (def ^:private max-error 1e-6)
 
 (defn svector? [tuple]
-  (< (Math/abs (- (nth tuple 3) 0))
+  (< (Math/abs (double (- (nth tuple 3) 0)))
      max-error))
 
 (defn svector [x y z]
