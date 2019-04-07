@@ -63,18 +63,13 @@
                                    2 6 10 14
                                    3 7 11 15]))
 
-(defn cells-indices-seq [n]
-  (for [i (range n) j (range n)]
-    (vector i j)))
-
-;;; TODO/FIXME what a nice place for an object this would be…
 (defn submatrix [m n row column]
-  (let [get-f #(get-n m n % %2)]
-    (vec
-     (map #(apply get-f %)
-          (filter (fn [[i j]]
-                    (and (not= i row) (not= j column)))
-                  (cells-indices-seq n))))))
+  (let [get-f #(get-n m n % %2)
+        result (atom (transient []))]
+    (doseq [i (range n) j (range n)]
+      (when (and (not= i row) (not= j column))
+        (swap! result #(conj! % (get-f i j)))))
+    (persistent! @result)))
 
 (def det)
 
@@ -101,6 +96,11 @@
 
 (defn is-invertible? [m n]
   (> (Math/abs (double (det m n))) max-error))
+
+
+(defn cells-indices-seq [n]
+  (for [i (range n) j (range n)]
+    (vector i j)))
 
 (defn- cofactor-matrix [m n]
   (vec
