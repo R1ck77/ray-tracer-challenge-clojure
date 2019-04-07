@@ -1,5 +1,7 @@
 (ns raytracer.tuple)
 
+(set! *unchecked-math* true)
+
 (defn add [a b]
   (vec (map + a b)))
 

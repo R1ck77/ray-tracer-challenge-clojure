@@ -1,6 +1,8 @@
 (ns raytracer.matrix
   (:require [raytracer.tuple :refer [div]]))
 
+(set! *unchecked-math* true)
+
 (def ^:private max-error 0.0001)
 
 (def identity-matrix [1 0 0 0

@@ -4,6 +4,8 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]))
 
+(set! *unchecked-math* true)
+
 (defrecord Ray [origin direction])
 
 ;;; TODO/FIXME use ray/ray instead (as for other objects)

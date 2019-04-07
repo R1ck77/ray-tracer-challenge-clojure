@@ -1,6 +1,8 @@
 (ns raytracer.svector
   (:require [raytracer.tuple :as tuple]))
 
+(set! *unchecked-math* true)
+
 (def ^:private max-error 1e-6)
 
 (defn svector? [tuple]
