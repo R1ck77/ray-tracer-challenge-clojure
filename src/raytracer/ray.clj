@@ -1,6 +1,7 @@
 (ns raytracer.ray
   (:require [raytracer.utils :as utils]
             [raytracer.tuple :as tuple]
+            [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]))
 
@@ -16,16 +17,32 @@
   (tuple/add (:origin ray)
              (svector/mul (:direction ray) t)))
 
+(defn as-point [[x y z _]]
+  (point/point x y z))
+
+(defn as-vector [[x y z _]]
+  (svector/svector x y z))
+
+(defn create-compute-normal-f [sphere]
+  (fn [point]
+    (svector/norm
+     (as-vector
+      (matrix/transform (matrix/transpose (:inverse-transform sphere))
+                        (tuple/sub (matrix/transform (:inverse-transform sphere) point)
+                                   (point/point 0 0 0)))))))
+
+(defn- add-normal-f [sphere]
+  (assoc sphere :normal (create-compute-normal-f sphere)))
+
 (defn sphere []
-  {:center [0 0 0 1]
-   :radius 1.0
-   :transform matrix/identity-matrix
-   :inverse-transform matrix/identity-matrix
-   :normal (fn [x] (assoc x 3 0))}) ;;; TODO/FIXME very bad implementation!
+  (add-normal-f {:center [0 0 0 1]
+                 :radius 1.0
+                 :transform matrix/identity-matrix
+                 :inverse-transform matrix/identity-matrix}))
 
 (defn change-transform [sphere new-transform]
-  (merge sphere {:transform new-transform
-                 :inverse-transform (matrix/invert new-transform 4)}))
+  (add-normal-f (merge sphere {:transform new-transform
+                               :inverse-transform (matrix/invert new-transform 4)})))
 
 (defn ray-sphere-discriminant [ray sphere]
   (let [sphere-to-ray (tuple/sub (:origin ray)

@@ -1,7 +1,7 @@
 (ns raytracer.svector-test
   (:require [clojure.test :refer :all]
             [raytracer.svector :refer :all]
-            [raytracer.point :refer [point?]]
+            [raytracer.point :as point]
             [raytracer.test-utils :refer [eps= v=]]))
 
 (def inv-sqrt-3 (/ (Math/sqrt 3)))
@@ -9,7 +9,7 @@
 (deftest test-vector
   (testing "svector creates a tuple with w == 0"
     (is (svector? (svector 1 2 3)))
-    (is (not (point? (svector 4 1 2))))))
+    (is (not (point/point? (svector 4 1 2))))))
 
 (deftest test-svector?
   (testing "svector? returns true for tuple when w is 0"
@@ -52,8 +52,8 @@
 
 (deftest test-dot
   (is (eps= 20
-                 (dot (svector 1 2 3)
-                      (svector 2 3 4)))))
+            (dot (svector 1 2 3)
+                 (svector 2 3 4)))))
 
 (deftest test-cross
   (is (v= (svector -1 2 -1)

@@ -1,5 +1,6 @@
 (ns raytracer.svector
-  (:require [raytracer.tuple :as tuple]))
+  (:require [raytracer.tuple :as tuple]
+            [raytracer.point :as point]))
 
 (set! *unchecked-math* true)
 
