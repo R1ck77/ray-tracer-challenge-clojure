@@ -22,7 +22,8 @@
    :transform matrix/identity-matrix})
 
 (defn change-transform [sphere new-transform]
-  (assoc sphere :transform new-transform))
+  (merge sphere {:transform new-transform
+                 :inverse-transform (matrix/invert new-transform 4)}))
 
 (defn ray-sphere-discriminant [ray sphere]
   (let [sphere-to-ray (tuple/sub (:origin ray)
@@ -58,9 +59,7 @@
                               sphere)]})))
 
 (defn intersect [ray sphere]
-  (intersect-sphere-space (transform ray
-                                     (matrix/invert (:transform sphere)
-                                                    4))
+  (intersect-sphere-space (transform ray (:inverse-transform sphere))
                           sphere))
 
 (defn intersections [ & args]
