@@ -20,7 +20,8 @@
   {:center [0 0 0 1]
    :radius 1.0
    :transform matrix/identity-matrix
-   :inverse-transform matrix/identity-matrix})
+   :inverse-transform matrix/identity-matrix
+   :normal (fn [x] (assoc x 3 0))}) ;;; TODO/FIXME very bad implementation!
 
 (defn change-transform [sphere new-transform]
   (merge sphere {:transform new-transform

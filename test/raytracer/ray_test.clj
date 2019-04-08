@@ -155,3 +155,19 @@
         (is (v= [2 6 12 1] (:origin result)))
         (is (v= [0 3 0 0] (:direction result)))))))
 
+(deftest test-sphere-normal
+  (let [sphere (ray/sphere)
+        √3 (Math/sqrt 3)
+        tmp (/ √3 3)]
+    (testing "The normal on a sphere at a point on the x axis"
+      (is (v= (svector/svector 1, 0, 0)
+              ((:normal sphere) (point/point 1, 0, 0)))))
+    (testing "The normal on a sphere at a point on the y axis"
+      (is (v= (svector/svector 0 1 0)
+              ((:normal sphere) (point/point 0 1 0)))))
+    (testing "The normal on a sphere at a point on the z axis"
+      (is (v= (svector/svector 0 0 1)
+              ((:normal sphere) (point/point 0 0 1)))))
+    (testing "The normal on a sphere at a nonaxial point"
+      (is (v= (svector/svector tmp tmp tmp)
+              ((:normal sphere) (point/point tmp tmp tmp)))))))
