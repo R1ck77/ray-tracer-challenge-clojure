@@ -8,8 +8,8 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]))
 
-(def canvas-size {:width 32, :height 20})
-(def canvas-scale [1 1])
+(def canvas-size {:width 320, :height 200})
+(def canvas-scale [0.1 0.1])
 (def color [255 0 0])
 
 (defn- create-simple-scene
