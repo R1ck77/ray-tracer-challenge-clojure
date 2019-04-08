@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.9.0"]]
   :main ^:skip-aot raytracer.core
   :target-path "target/%s"
-  :aot :all
+  ;;; :aot :all
   :global-vars {*warn-on-reflection* true}
   :jvm-opts ["-Dcom.sun.management.jmxremote"
            "-Dcom.sun.management.jmxremote.ssl=false"
