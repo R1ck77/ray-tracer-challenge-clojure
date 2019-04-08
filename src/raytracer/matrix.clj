@@ -63,13 +63,29 @@
                                    2 6 10 14
                                    3 7 11 15]))
 
-(defn submatrix [m n row column]
+(defn submatrix-fast [m n row column]
   (let [get-f #(get-n m n % %2)
         result (atom (transient []))]
     (doseq [i (range n) j (range n)]
       (when (and (not= i row) (not= j column))
         (swap! result #(conj! % (get-f i j)))))
     (persistent! @result)))
+
+(defn cells-indices-seq [n]
+  (for [i (range n) j (range n)]
+    (vector i j)))
+
+(defn submatrix-slow [m n row column]
+  (vec (let [get-f #(get-n m n % %2)]
+     (map (fn [[i j]]
+            (get-f i j))
+          (filter (fn [[i j]]
+                    (and (not= i row) (not= j column)))
+                  (cells-indices-seq n))))))
+
+;;; TODO/FIXME let's see how many of those I'll have to use before throwing the fast version away
+(def submatrix submatrix-slow)
+
 
 (def det)
 
@@ -97,11 +113,6 @@
 (defn is-invertible? [m n]
   (> (Math/abs (double (det m n))) max-error))
 
-
-(defn cells-indices-seq [n]
-  (for [i (range n) j (range n)]
-    (vector i j)))
-
 (defn- cofactor-matrix [m n]
   (vec
    (let [cofactor-f (partial cofactor m n)]
@@ -112,10 +123,10 @@
 (defn print
   "Quick and dirty print function. Not pretty"
   [matrix m]
-  (for [i (range 0 (* m m) m)]
+  (doseq [i (range 0 (* m m) m)]
     (apply println (subvec matrix i (+ i m)))))
 
-;;; TODO/FIXME this would really need some optimization
 (defn invert [m n]
-  (vec (map float (div (transpose (cofactor-matrix m n ))
-                       (det m n)))))
+  (vec
+   (map float (div (transpose (cofactor-matrix m n ))
+                   (det m n)))))
