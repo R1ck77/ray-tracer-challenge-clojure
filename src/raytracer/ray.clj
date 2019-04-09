@@ -89,3 +89,6 @@
 
 (defn hit [xinters]
   (first (sort-by #(:t %) (filter non-backward? xinters))))
+
+(defn reflect [v normal]
+  (svector/sub v (svector/mul normal (* 2 (svector/dot normal v)))))

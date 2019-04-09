@@ -166,7 +166,7 @@
 (deftest test-sphere-normal
   (let [sphere (ray/sphere)
         √2 (Math/sqrt 2)
-        half√2 (/ √2 2)        
+        half√2 (/ √2 2)
         √3 (Math/sqrt 3)
         third√3 (/ √3 3)]
     (testing "The normal on a sphere at a point on the x axis"
@@ -190,3 +190,15 @@
             transformed-sphere (ray/change-transform sphere new-transform)]
         (is (v= (svector/svector 0 0.97014 -0.24254)
                 ((:normal transformed-sphere) (point/point 0 half√2 (- half√2)))))))))
+
+(deftest test-reflection
+  (testing "Reflecting a vector approaching at 45°"
+    (is (v= (svector/svector 1 1 0)
+            (ray/reflect (svector/svector 1 -1 0)
+                         (svector/svector 0 1 0)))))
+  (testing "Reflecting a vector off a slanted surface"
+    (let [√2 (Math/sqrt 2)
+          half√2 (/ √2 2)]
+      (is (v= (svector/svector 1 0 0)
+              (ray/reflect (svector/svector 0 -1 0)
+                           (svector/svector half√2 half√2 0)))))))
