@@ -38,16 +38,16 @@
   (do-test-mag (Math/sqrt 14) [1 2 3])
   (do-test-mag (Math/sqrt 14) [-1 -2 -3]))
 
-(defmacro do-test-norm [expected v]
+(defmacro do-test-normalize [expected v]
   `(testing ~(str "normalizing " v)
-     (let [res# (norm (apply svector ~v))]
+     (let [res# (normalize (apply svector ~v))]
        (is (v= (apply svector ~expected) res#))
        (is (eps= 1 (mag res#))))))
 
-(deftest test-norm
-  (do-test-norm [1 0 0] [4 0 0])
-  (do-test-norm [inv-sqrt-3 inv-sqrt-3 inv-sqrt-3] [4 4 4])
-  (do-test-norm [(/ (Math/sqrt 14)) (/ 2 (Math/sqrt 14)) (/ 3 (Math/sqrt 14))]
+(deftest test-normalize
+  (do-test-normalize [1 0 0] [4 0 0])
+  (do-test-normalize [inv-sqrt-3 inv-sqrt-3 inv-sqrt-3] [4 4 4])
+  (do-test-normalize [(/ (Math/sqrt 14)) (/ 2 (Math/sqrt 14)) (/ 3 (Math/sqrt 14))]
                 [1 2 3]))
 
 (deftest test-dot

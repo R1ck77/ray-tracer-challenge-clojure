@@ -26,7 +26,7 @@
 
 (defn create-compute-normal-f [sphere]
   (fn [point]
-    (svector/norm
+    (svector/normalize
      (as-vector
       (matrix/transform (matrix/transpose (:inverse-transform sphere))
                         (tuple/sub (matrix/transform (:inverse-transform sphere) point)

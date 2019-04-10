@@ -1,6 +1,8 @@
 (ns raytracer.color
   (:require [raytracer.tuple :as tuple]))
 
+(def black [0 0 0])
+
 (defn add [a b]
   (tuple/add a b))
 

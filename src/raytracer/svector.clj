@@ -34,7 +34,7 @@
                        (* z z)
                        (* w w)))))
 
-(defn norm [[x y z w :as v]]
+(defn normalize [[x y z w :as v]]
   (let [m (mag v)]
     (vector (/ x m)
             (/ y m)

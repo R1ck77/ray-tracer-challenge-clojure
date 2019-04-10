@@ -14,6 +14,8 @@
 (defn div [v s]
   (vec (map #(/ % s) v)))
 
+(defn mul [v s]
+  (vec (map #(* % s) v)))
 
 
 
