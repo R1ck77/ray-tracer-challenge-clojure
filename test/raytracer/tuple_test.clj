@@ -8,7 +8,13 @@
 (deftest test-add
   (testing "adding two tuple"
     (is (v= [1 1 6 1] (tuple/add [3 -2 5 1] [-2 3 1 0])))
-    (is (v= [11 102 203 0] (tuple/add [1 2 3 0] [10 100 200 0])))))
+    (is (v= [11 102 203 0] (tuple/add [1 2 3 0] [10 100 200 0]))))
+  (testing "add more tuples"
+    (is (v= [8 8 8 8 8]
+            (tuple/add [1 2 1 2 1]
+                       [2 1 2 1 2]
+                       [1 1 1 1 1]
+                       [4 4 4 4 4])))))
 
 (deftest test-sub
   (testing "subtracting two points"

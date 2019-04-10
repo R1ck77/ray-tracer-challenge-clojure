@@ -2,8 +2,8 @@
 
 (set! *unchecked-math* true)
 
-(defn add [a b]
-  (vec (map + a b)))
+(defmacro add [& args]
+  `(vec (map + ~@args)))
 
 (defn sub [a b]
   (vec (map - a b)))
