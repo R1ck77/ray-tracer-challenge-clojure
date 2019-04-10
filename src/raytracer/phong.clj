@@ -4,26 +4,33 @@
             [raytracer.color :as color]
             [raytracer.ray :as ray]))
 
+(defn- compute-if-positive [value function]
+  (if (< value 0)
+    color/black
+    (function value)))
+
 (defn- compute-specular-factor [material reflect-dot-eye]
   (Math/pow reflect-dot-eye
             (:shiness material)))
 
+(defn- compute-specular-value [reflect-dot-normal light-source material]
+  (tuple/mul (:intensity light-source)
+             (* (:specular material)
+                (compute-specular-factor material reflect-dot-normal))))
+
 (defn- compute-specular [light-dot-normal neg-light light-source normal eye material]
   (if (< light-dot-normal 0)
     color/black
-    (let [reflect-dot-eye (svector/dot (ray/reflect neg-light normal)
-                                       eye)]
-      (if (< reflect-dot-eye 0)
-        color/black
-        (tuple/mul (:intensity light-source)
-                   (* (:specular material)
-                      (compute-specular-factor material reflect-dot-eye)))))))
+    (compute-if-positive (svector/dot (ray/reflect neg-light normal) eye)
+                         #(compute-specular-value % light-source material))))
+
+(defn- compute-diffuse-value [light-dot-normal effective-color material]
+  (tuple/mul effective-color (* (:diffuse material)
+                                light-dot-normal)))
 
 (defn- compute-diffuse [light-dot-normal effective-color material]
-  (if (< light-dot-normal 0)
-    color/black
-    (tuple/mul effective-color (* (:diffuse material)
-                                  light-dot-normal))))
+  (compute-if-positive light-dot-normal
+                       #(compute-diffuse-value % effective-color material)))
 
 (defn- compute-ambient [effective-color material]
   (tuple/mul effective-color (:ambient material)))
@@ -34,9 +41,9 @@
                                    (:intensity light-source))
         light (svector/normalize (tuple/sub (:position light-source) position))
         light-dot-normal (svector/dot light normal)]
-    (tuple/add (tuple/add (compute-ambient effective-color material)
-                (compute-diffuse light-dot-normal effective-color material))
-                (compute-specular light-dot-normal
+    (tuple/add (compute-ambient effective-color material)
+               (compute-diffuse light-dot-normal effective-color material)
+               (compute-specular light-dot-normal
                                   (svector/mul light -1)
                                   light-source
                                   normal eye material))))
