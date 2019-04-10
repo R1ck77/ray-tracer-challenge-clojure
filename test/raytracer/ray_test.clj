@@ -5,7 +5,8 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]            
             [raytracer.ray :as ray]
-            [raytracer.transform :as transform]))
+            [raytracer.transform :as transform]
+            [raytracer.materials :as materials]))
 
 (deftest test-ray
   (testing "ray creation"
@@ -32,16 +33,21 @@
               (ray/position ray 2.5))))))
 
 (deftest test-sphere
-  (testing "create a sphere"
-    (let [sphere (ray/sphere)]
+  (let [sphere (ray/sphere)]
+    (testing "create a sphere"
       (is (v= [0 0 0 1] (:center sphere)))
       (is (eps= 1.0 (:radius sphere)))
-      (is (identical? matrix/identity-matrix (:transform sphere)))))
-  (testing "update a sphere's transformation"
-    (let [transform (transform/translate 2 3 4)
-          new-sphere (ray/change-transform (ray/sphere) transform)]
-      (is (identical? transform
-                      (:transform new-sphere))))))
+      (is (= (materials/material) (:material sphere)))
+      (is (identical? matrix/identity-matrix (:transform sphere))))
+    (testing "update a sphere's transformation"
+      (let [transform (transform/translate 2 3 4)
+            new-sphere (ray/change-transform sphere transform)]
+        (is (identical? transform
+                        (:transform new-sphere)))))
+    (testing "a sphere may be assigned a material"
+      (let [new-material (assoc (materials/material) :ambient 0.25)]
+        (is (= new-material
+               (:material (ray/change-material sphere new-material))))))))
 
 (deftest test-sphere-intersection
   (let [sphere (ray/sphere)]

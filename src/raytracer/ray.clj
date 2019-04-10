@@ -3,7 +3,8 @@
             [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
-            [raytracer.matrix :as matrix]))
+            [raytracer.matrix :as matrix]
+            [raytracer.materials :as materials]))
 
 (set! *unchecked-math* true)
 
@@ -37,12 +38,16 @@
 (defn sphere []
   (add-normal-f {:center [0 0 0 1]
                  :radius 1.0
+                 :material (materials/material)
                  :transform matrix/identity-matrix
                  :inverse-transform matrix/identity-matrix}))
 
 (defn change-transform [sphere new-transform]
   (add-normal-f (merge sphere {:transform new-transform
                                :inverse-transform (matrix/invert new-transform 4)})))
+
+(defn change-material [sphere new-material]
+  (assoc sphere :material new-material))
 
 (defn ray-sphere-discriminant [ray sphere]
   (let [sphere-to-ray (tuple/sub (:origin ray)
