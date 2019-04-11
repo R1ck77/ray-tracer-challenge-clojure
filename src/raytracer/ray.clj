@@ -14,6 +14,10 @@
 (defn create [origin direction]
   (->Ray origin direction))
 
+(defn normalize [ray]
+  (assoc ray
+         :direction (svector/normalize (:direction ray))))
+
 (defn position [ray t]
   (tuple/add (:origin ray)
              (svector/mul (:direction ray) t)))

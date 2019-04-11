@@ -35,7 +35,6 @@
 (defn- compute-ambient [effective-color material]
   (tuple/mul effective-color (:ambient material)))
 
-;;; TODO/FIXME compute color material ambient
 (defn lighting [material light-source position eye normal]
   (let [effective-color (color/mul (:color material)
                                    (:intensity light-source))
