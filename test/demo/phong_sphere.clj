@@ -48,16 +48,21 @@
                                        (tuple/sub (pixel-to-coord-f i j)
                                                   (:camera scene))))})))
 
-(defn- compute-pixel [object canvas {pixel :pixel, ray :ray}]
-  (if (not
-       (empty?
-        (map :t  (:values (ray/intersect ray object)))))
-    (canvas/write canvas (first pixel) (second pixel) color)
-    canvas))
+(defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
+  (let [hit (ray/hit (:values (ray/intersect ray object)))]
+    (if hit
+      (let [point (ray/position ray (:t hit))
+            color (phong/lighting (:material object)
+                                  light-source
+                                  point
+                                  (svector/neg (:direction ray))
+                                  ((:normal object) point))]
+       (canvas/write canvas (first pixel) (second pixel) color))
+      canvas)))
 
 (defn render-scene [scene]
   (spit "output.ppm"
-        (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene))
+        (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene) (:light-source scene))
                                       (canvas/create-canvas (:width canvas-size)
                                                             (:height canvas-size))
                                       (seq-ray scene)))))

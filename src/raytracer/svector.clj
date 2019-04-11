@@ -16,6 +16,9 @@
 (defn add [a b]
   (tuple/add a b))
 
+(defn neg [a]
+  (tuple/neg a))
+
 (defn sub [a b]
   (tuple/sub a b))
 

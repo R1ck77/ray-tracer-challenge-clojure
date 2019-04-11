@@ -4,6 +4,9 @@
             [raytracer.point :as point]
             [raytracer.test-utils :refer [eps= v=]]))
 
+;;; TODO/FIXME all tests comparing with [] are implementation dependent!!!!
+;;; TODO/FIXME some tests are not on real vectors!!!
+
 (def inv-sqrt-3 (/ (Math/sqrt 3)))
 
 (deftest test-vector
@@ -26,6 +29,11 @@
     (v= [3.5 -7 10.5 -14] (mul [1 -2 3 -4] 3.5)))
   (testing "multiplying a tuple by a fraction"
     (v= [0.5 -1 1.5 -2] (mul [1 -2 3 -4] 0.5))))
+
+(deftest test-neg
+  (testing "negating a vector"
+    (v= (svector -1 2 3) (neg (svector 1 -2 3)))))
+
 
 (defmacro do-test-mag [expected v]
   `(testing ~(str "computing the magnitude of " v)
