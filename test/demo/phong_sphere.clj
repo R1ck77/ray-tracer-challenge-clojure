@@ -44,9 +44,9 @@
     (for [j (range (:height canvas-size))
           i (range (:width canvas-size))]
       {:pixel [i j]
-       :ray (ray/normalize (ray/create (:camera scene)
-                                       (tuple/sub (pixel-to-coord-f i j)
-                                                  (:camera scene))))})))
+       :ray (ray/normalize (ray/ray (:camera scene)
+                                    (tuple/sub (pixel-to-coord-f i j)
+                                               (:camera scene))))})))
 
 (defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
   (let [hit (ray/hit (:values (ray/intersect ray object)))]

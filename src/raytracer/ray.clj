@@ -11,7 +11,7 @@
 (defrecord Ray [origin direction])
 
 ;;; TODO/FIXME use ray/ray instead (as for other objects)
-(defn create [origin direction]
+(defn ray [origin direction]
   (->Ray origin direction))
 
 (defn normalize [ray]
@@ -74,9 +74,9 @@
 (defn intersection [t object]
   (->Intersection t object))
 
-(defn transform [ray matrix]
-  (create (matrix/transform matrix (:origin ray))
-          (matrix/transform matrix (:direction ray))))
+(defn transform [input-ray matrix]
+  (ray (matrix/transform matrix (:origin input-ray))
+       (matrix/transform matrix (:direction input-ray))))
 
 (defn intersect-sphere-space [ray-in-sphere-space sphere]
   (let [[a b c discriminant]

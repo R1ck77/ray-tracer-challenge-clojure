@@ -36,9 +36,9 @@
     (for [j (range (:height canvas-size))
           i (range (:width canvas-size))]
       {:pixel [i j]
-       :ray (ray/create (:camera scene)
-                        (tuple/sub (pixel-to-coord-f i j)
-                                   (:camera scene)))})))
+       :ray (ray/ray (:camera scene)
+                     (tuple/sub (pixel-to-coord-f i j)
+                                (:camera scene)))})))
 
 (defn- compute-pixel [object canvas {pixel :pixel, ray :ray}]
   (if (not
