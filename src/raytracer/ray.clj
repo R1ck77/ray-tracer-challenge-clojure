@@ -83,15 +83,13 @@
   (let [[a b c discriminant]
         (ray-sphere-discriminant ray-in-sphere-space sphere)]
     (if (< discriminant 0)
-      {:count 0   ;;; TODO/FIXME :count is bad for clarity. Use :n instead or :n-int, or something else
-       :values []}
-      {:count 2
-       :values [(intersection (/ (- (- b) (Math/sqrt discriminant))
+      []
+      [(intersection (/ (- (- b) (Math/sqrt discriminant))
                                  (* 2 a))
                               sphere)
                 (intersection (/ (+ (- b) (Math/sqrt discriminant))
                                  (* 2 a))
-                              sphere)]})))
+                              sphere)])))
 
 (defn intersect [ray sphere]
   (intersect-sphere-space (transform ray (:inverse-transform sphere))

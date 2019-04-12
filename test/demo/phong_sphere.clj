@@ -49,7 +49,7 @@
                                                (:camera scene))))})))
 
 (defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
-  (let [hit (ray/hit (:values (ray/intersect ray object)))]
+  (let [hit (ray/hit (ray/intersect ray object))]
     (if hit
       (let [point (ray/position ray (:t hit))
             color (phong/lighting (:material object)

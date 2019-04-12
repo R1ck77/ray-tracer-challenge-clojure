@@ -41,11 +41,10 @@
                                 (:camera scene)))})))
 
 (defn- compute-pixel [object canvas {pixel :pixel, ray :ray}]
-  (if (not
-       (empty?
-        (map :t  (:values (ray/intersect ray object)))))
-    (canvas/write canvas (first pixel) (second pixel) color)
-    canvas))
+  (if (empty?
+       (map :t (ray/intersect ray object)))
+    canvas
+    (canvas/write canvas (first pixel) (second pixel) color)))
 
 (defn render-scene [scene]
   (spit "output.ppm"
