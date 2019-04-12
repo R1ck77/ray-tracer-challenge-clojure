@@ -32,3 +32,14 @@
     (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                         [1 1 1]))))
 
+(defn- unsorted-optimizations [world ray]
+  (flatten
+   (persistent!
+    (reduce (fn [acc object]
+              (conj! acc (:values (ray/intersect ray object))))
+            (transient [])
+            (:objects world)))))
+
+(defn intersect [world ray]
+  (sort-by :t (unsorted-optimizations world ray)))
+

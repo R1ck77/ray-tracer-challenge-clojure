@@ -1,7 +1,9 @@
 (ns raytracer.world-test
   (:require [clojure.test :refer :all]
+            [raytracer.test-utils :refer :all]
             [raytracer.world :as world]
             [raytracer.point :as point]
+            [raytracer.svector :as svector]
             [raytracer.ray :as ray]
             [raytracer.materials :as materials]
             [raytracer.transform :as transform]
@@ -27,3 +29,11 @@
                                                        [1 1 1])))
       (is (some #(ray/same-sphere? expected-sphere1 %) (:objects world)))
       (is (some #(ray/same-sphere? expected-sphere2 %) (:objects world))))))
+
+(deftest test-intersect
+  (testing "Intersect a world with a ray"
+    (let [world (world/default-world)
+          ray (ray/ray (point/point 0 0 -5)
+                       (svector/svector 0 0 1))]
+      (is (v= [4 4.5 5.5 6]
+              (map :t (world/intersect world ray)))))))
