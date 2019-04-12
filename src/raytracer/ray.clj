@@ -78,6 +78,7 @@
   (ray (matrix/transform matrix (:origin input-ray))
        (matrix/transform matrix (:direction input-ray))))
 
+;;; TODO/FIXME count/values is completely useless!!!
 (defn intersect-sphere-space [ray-in-sphere-space sphere]
   (let [[a b c discriminant]
         (ray-sphere-discriminant ray-in-sphere-space sphere)]
