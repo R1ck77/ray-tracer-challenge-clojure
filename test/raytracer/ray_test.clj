@@ -49,6 +49,20 @@
         (is (= new-material
                (:material (ray/change-material sphere new-material))))))))
 
+(deftest test-same-sphere?
+  (testing "returns the first argument if true, nil otherwise"
+    (let [a (ray/change-transform (ray/sphere) (transform/scale 2 2 2))
+          b (ray/change-transform (ray/sphere) (transform/scale 2 2 2))]
+      (is (not (identical? a b)))
+      (is (identical? a (ray/same-sphere? a b)))
+      (is (nil? (ray/same-sphere? a (ray/sphere))))))
+  (testing "two spheres are equal when they receive the same transform"
+    (is (ray/same-sphere? (ray/change-transform (ray/sphere) (transform/scale 2 2 2))
+                          (ray/change-transform (ray/sphere) (transform/scale 2 2 2)))))
+  (testing "different transforms, different sphere"
+    (is (not (ray/same-sphere? (ray/change-transform (ray/sphere) (transform/scale 2 2 3))
+                               (ray/change-transform (ray/sphere) (transform/scale 2 2 2)))))))
+
 (deftest test-sphere-intersection
   (let [sphere (ray/sphere)]
     (testing "a ray intersects a sphere at two points"

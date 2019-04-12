@@ -46,6 +46,12 @@
                  :transform matrix/identity-matrix
                  :inverse-transform matrix/identity-matrix}))
 
+(defn same-sphere? [a b]
+  (if (= (merge a {:normal nil})
+         (merge b {:normal nil}))
+    a
+    nil))
+
 (defn change-transform [sphere new-transform]
   (add-normal-f (merge sphere {:transform new-transform
                                :inverse-transform (matrix/invert new-transform 4)})))
