@@ -9,7 +9,7 @@
      eps))
 
 (defn- relative-error [a b]
-  (< (/ (Math/abs (double (- a b))) a)
+  (< (Math/abs (/ (double (- a b)) a))
      max-percent-error))
 
 (defn eps= [a b]
