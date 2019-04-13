@@ -5,7 +5,8 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.materials :as materials]
-            [raytracer.light-sources :as light-sources]))
+            [raytracer.light-sources :as light-sources]
+            [raytracer.phong :as phong]))
 
 (defn create []
   {:objects []
@@ -18,7 +19,7 @@
   (update world :light-sources #(conj % light-source)))
 
 (defn set-light-sources [world & light-sources]
-  (assoc world :light-source (vec light-sources)))
+  (assoc world :light-sources (vec light-sources)))
 
 (defn default-world
   "A world used for testing.
@@ -28,12 +29,12 @@
   \"The Book made me do it.\""
   []
   (-> (create)
-    (add-object (ray/change-transform (ray/sphere)
-                                      (transform/scale 0.5 0.5 0.5)))
     (add-object (ray/change-material (ray/sphere)
                                      (materials/material :color [0.8 1.0 0.6]
                                                          :diffuse 0.7
                                                          :specular 0.2)))
+    (add-object (ray/change-transform (ray/sphere)
+                                      (transform/scale 0.5 0.5 0.5)))    
     (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                         [1 1 1]))))
 
@@ -67,5 +68,8 @@
      :normal-v (if inside (svector/neg normal-v) normal-v)}))
 
 (defn shade-hit [world intermediate-result]
-  [0 0 0]
-  )
+  (phong/lighting (-> intermediate-result :object :material)
+                  (first (:light-sources world)) ;;; first light source, for now
+                  (:point intermediate-result)
+                  (:eye-v intermediate-result)
+                  (:normal-v intermediate-result)))

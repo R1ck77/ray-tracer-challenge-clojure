@@ -18,12 +18,12 @@
 (deftest test-default-world
   (testing "The default world"
     (let [world (world/default-world)
-          expected-sphere1 (ray/change-transform (ray/sphere)
-                                                 (transform/scale 0.5 0.5 0.5))
-          expected-sphere2 (ray/change-material (ray/sphere)
+          expected-sphere1 (ray/change-material (ray/sphere)
                                                 (materials/material :color [0.8 1.0 0.6]
                                                                     :diffuse 0.7
-                                                                    :specular 0.2))]
+                                                                    :specular 0.2))
+          expected-sphere2 (ray/change-transform (ray/sphere)
+                                                 (transform/scale 0.5 0.5 0.5))]
       (is (contains? (:light-sources world)
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        [1 1 1])))
@@ -69,19 +69,21 @@
 
 (deftest test-shade-hit
   (testing "Shading an intersection"
-    (let [intermediate (world/prepare-computations (ray/ray (point/point 0 0 -5)
+    (let [world (world/default-world)
+          intermediate (world/prepare-computations (ray/ray (point/point 0 0 -5)
                                                             (svector/svector 0 0 1))
-                                                   (ray/intersection 4 (ray/sphere)))]
+                                                   (ray/intersection 4 (first (:objects world))))]
       (is (v= [0.38066 0.47583 0.2855]
-              (world/shade-hit (world/default-world)
+              (world/shade-hit world
                                intermediate)))))
   (testing "Shading an intersection from the inside"
     (let [world (world/set-light-sources (world/default-world)
-                                         (light-sources/create-point-light (point/point 0 0.25 0) [1 1 1]))
+                                         (light-sources/create-point-light (point/point 0 0.25 0)
+                                                                           [1 1 1]))
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
-                                                   (ray/intersection 0.5 (second (:objects world)))
-                                                   )]
+                                                   (ray/intersection 0.5 (second (:objects world))))]
+      (clojure.pprint/pprint world)
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
                                intermediate))))))
