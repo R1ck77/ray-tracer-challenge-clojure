@@ -21,6 +21,9 @@
 (defn set-light-sources [world & light-sources]
   (assoc world :light-sources (vec light-sources)))
 
+(defn set-objects [world & objects]
+  (assoc world :objects (vec objects)))
+
 (defn default-world
   "A world used for testing.
 
@@ -73,3 +76,10 @@
                   (:point intermediate-result)
                   (:eye-v intermediate-result)
                   (:normal-v intermediate-result)))
+
+(defn color-at [world ray]
+  (let [intersections (intersect world ray)]
+    (clojure.pprint/pprint intersections)
+    (if (empty? intersections)
+      [0 0 0]
+      (shade-hit world (prepare-computations ray (first intersections))))))

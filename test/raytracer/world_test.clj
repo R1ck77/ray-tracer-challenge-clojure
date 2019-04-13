@@ -83,7 +83,28 @@
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
                                                    (ray/intersection 0.5 (second (:objects world))))]
-      (clojure.pprint/pprint world)
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
                                intermediate))))))
+
+(defn reset-ambient-color [object]
+  (let [new-material (assoc (:material object) :ambient 1)]
+   (assoc object :material new-material)))
+
+(deftest test-color-at
+  (testing "The color when a ray misses"
+    (is (v= [0 0 0]
+            (world/color-at (world/default-world)
+                            (ray/ray (point/point 0 0 -5)
+                                     (svector/svector 0 1 0))))))
+  (testing "The color when a ray hits"
+    (is (v= [0.38066 0.47583 0.2855]
+            (world/color-at (world/default-world)
+                            (ray/ray (point/point 0 0 -5)
+                                     (svector/svector 0 0 1))))))
+  (testing "The color with an intersection behind the ray"
+    (let [world (world/set-objects (world/default-world) (map reset-ambient-color (:objects (world/default-world))))]
+      (is (v= (:material (second (:objects world)))
+              (world/color-at world
+                              (ray/ray (point/point 0 0 0.75)
+                                       (svector/svector 0 0 -1))))))))
