@@ -4,6 +4,7 @@
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
+            [raytracer.matrix :as matrix]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
@@ -82,3 +83,15 @@
     (if (empty? intersections)
       [0 0 0]
       (shade-hit world (prepare-computations ray (ray/hit intersections))))))
+
+(defn view-transform [[from-x from-y from-z _ :as from] to up]
+  (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
+        [left-x left-y left-z _ :as left] (svector/cross forward (svector/normalize up))
+        [true-up-x true-up-y true-up-z _ :as true-up] (svector/cross left forward)]
+    (matrix/mul4 (vector    left-x    left-y    left-z 0
+                         true-up-x true-up-y true-up-z 0
+                         (- fwd-x) (- fwd-y) (- fwd-z) 0
+                                 0         0         0 1)
+                 (transform/translate (- from-x)
+                                      (- from-y)
+                                      (- from-z)))))

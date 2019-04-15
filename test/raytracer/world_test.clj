@@ -4,6 +4,7 @@
             [raytracer.world :as world]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
             [raytracer.materials :as materials]
             [raytracer.transform :as transform]
@@ -89,7 +90,7 @@
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
-   (assoc object :material new-material)))
+    (assoc object :material new-material)))
 
 (deftest test-color-at
   (testing "The color when a ray misses"
@@ -109,3 +110,31 @@
       (is (v= (:color (:material (second (:objects world))))
               (world/color-at world ray))))))
 
+(deftest test-view-transform
+  (testing "The transformation matrix for the default orientation"
+    (let [from (point/point 0 0 0)
+          to (point/point 0 0 -1)
+          up (svector/svector 0 1 0)]
+      (is (v= matrix/identity-matrix
+              (world/view-transform from to up)))))
+  (testing "A view transformation matrix looking in positive z direction"
+    (let [from (point/point 0 0 0)
+          to (point/point 0 0 1)
+          up (svector/svector 0 1 0)]
+      (is (v= (transform/scale -1 1 -1)
+              (world/view-transform from to up)))))
+  (testing "The view transformation moves the world"
+    (let [from (point/point 0 0 8)
+          to (point/point 0 0 0)
+          up (svector/svector 0 1 0)]
+      (is (v= (transform/translate 0 0 -8)
+              (world/view-transform from to up)))))
+  (testing "An arbitrary view transformation"
+    (let [from (point/point 1 3 2)
+          to (point/point 4 -2 8)
+          up (svector/svector 1 1 0)]
+      (is (v= [-0.50709 0.50709 0.67612 -2.36643
+               0.76772 0.60609 0.12122 -2.82843
+               -0.35857 0.59761 -0.71714 0.00000
+               0.00000 0.00000 0.00000 1.00000]
+              (world/view-transform from to up))))))
