@@ -21,7 +21,7 @@
 (defn set-light-sources [world & light-sources]
   (assoc world :light-sources (vec light-sources)))
 
-(defn set-objects [world & objects]
+(defn set-objects [world objects]
   (assoc world :objects (vec objects)))
 
 (defn default-world

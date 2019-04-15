@@ -103,8 +103,9 @@
                             (ray/ray (point/point 0 0 -5)
                                      (svector/svector 0 0 1))))))
   (testing "The color with an intersection behind the ray"
-    (let [world (world/set-objects (world/default-world) (map reset-ambient-color (:objects (world/default-world))))]
-      (is (v= (:material (second (:objects world)))
-              (world/color-at world
-                              (ray/ray (point/point 0 0 0.75)
-                                       (svector/svector 0 0 -1))))))))
+    (let [world (world/set-objects (world/default-world)
+                                   (map reset-ambient-color (:objects (world/default-world))))
+          ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
+      (is (v= (:color (:material (second (:objects world))))
+              (world/color-at world ray))))))
+
