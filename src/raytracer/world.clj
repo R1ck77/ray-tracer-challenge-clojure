@@ -41,7 +41,7 @@
     (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                         [1 1 1]))))
 
-(defn- unsorted-optimizations [world ray]
+(defn- unsorted-intersections [world ray]
   (flatten
    (persistent!
     (reduce (fn [acc object]
@@ -50,7 +50,7 @@
             (:objects world)))))
 
 (defn intersect [world ray]
-  (sort-by :t (unsorted-optimizations world ray)))
+  (sort-by :t (unsorted-intersections world ray)))
 
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
@@ -79,7 +79,6 @@
 
 (defn color-at [world ray]
   (let [intersections (intersect world ray)]
-    (clojure.pprint/pprint intersections)
     (if (empty? intersections)
       [0 0 0]
       (shade-hit world (prepare-computations ray (first intersections))))))
