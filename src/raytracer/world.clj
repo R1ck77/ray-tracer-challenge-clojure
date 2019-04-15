@@ -81,4 +81,4 @@
   (let [intersections (intersect world ray)]
     (if (empty? intersections)
       [0 0 0]
-      (shade-hit world (prepare-computations ray (first intersections))))))
+      (shade-hit world (prepare-computations ray (ray/hit intersections))))))
