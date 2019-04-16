@@ -46,7 +46,17 @@
     (ray/ray origin
              (svector/normalize (tuple/sub pixel origin)))))
 
+(defn- seq-pixels [width height]
+  (for [j (range height)
+        i (range width)]
+    (vector i j)))
+
+(defn- render-pixel [canvas [px py]]
+  )
+
 (defn render [camera world]
-  (let [canvas (canvas/create-canvas (:h-size camera)
-                                     (:v-size camera))]
-    canvas))
+  (let [width (:h-size camera)
+        height (:v-size camera)]
+    (reduce render-pixel
+            (canvas/create-canvas width height)
+            (seq-pixels width height))))
