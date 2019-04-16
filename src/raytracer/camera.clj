@@ -3,6 +3,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
+            [raytracer.canvas :as canvas]
             [raytracer.ray :as ray]))
 
 (defn- compute-pixels [partial-camera]
@@ -29,12 +30,15 @@
            {:transform transform-matrix
             :inverse-transform inverse-transform})))
 
-;;; TODO/FIXME sucks big time
+(defn- compute-offset [pixel-size v]
+  (* (+ v 0.5)
+     pixel-size))
+
 (defn ray-for-pixel [camera x y]
-  (let [x-offset (* (+ x 0.5) (:pixel-size camera))
-        y-offset (* (+ y 0.5) (:pixel-size camera))
-        world-x (- (:half-width camera) x-offset)
-        world-y (- (:half-height camera) y-offset)
+  (let [world-x (- (:half-width camera)
+                   (compute-offset (:pixel-size camera) x))
+        world-y (- (:half-height camera)
+                   (compute-offset (:pixel-size camera) y))
         pixel (matrix/transform (:inverse-transform camera)
                                 (point/point world-x world-y -1))
         origin (matrix/transform (:inverse-transform camera)
@@ -43,4 +47,6 @@
              (svector/normalize (tuple/sub pixel origin)))))
 
 (defn render [camera world]
-  [0 0 0])
+  (let [canvas (canvas/create-canvas (:h-size camera)
+                                     (:v-size camera))]
+    canvas))
