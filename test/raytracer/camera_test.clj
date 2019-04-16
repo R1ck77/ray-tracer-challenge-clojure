@@ -6,6 +6,7 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]            
+            [raytracer.canvas :as canvas]
             [raytracer.world :as world]))
 
 (def halfπ (/ Math/PI 2))
@@ -20,7 +21,8 @@
       (is (= {:h-size h-size
               :v-size v-size
               :fov fov
-              :transform matrix/identity-matrix}
+              :transform matrix/identity-matrix
+              :inverse-transform matrix/identity-matrix}
              (dissoc (camera/camera h-size v-size fov)
                      :pixel-size
                      :half-width
@@ -39,6 +41,11 @@
     (let [new-transform-matrix (transform/translate 1 2 3)]
       (is (= new-transform-matrix
              (:transform (camera/set-transform (camera/camera 1 2 3)
+                                               new-transform-matrix))))))
+  (testing "Changing the transform matrix also computes the inverse"
+        (let [new-transform-matrix (transform/translate 1 2 3)]
+      (is (= (matrix/invert new-transform-matrix 4)
+             (:inverse-transform (camera/set-transform (camera/camera 1 2 3)
                                                new-transform-matrix)))))))
 
 (deftest test-ray-for-pixel
@@ -74,5 +81,5 @@
                                           (point/point 0 0 0)
                                           (svector/svector 0 1 0))]
       (v= [0.38066 0.47583 0.2855]
-          (read (camera/render camera world) 5 5)))))
+          (canvas/read (camera/render camera world) 5 5)))))
 

@@ -10,3 +10,5 @@
 (defn point [x y z]
   (vector x y z 1))
 
+(def origin (point 0 0 0))
+

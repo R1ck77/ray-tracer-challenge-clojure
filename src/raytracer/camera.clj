@@ -1,5 +1,9 @@
 (ns raytracer.camera
-  (:require [raytracer.matrix :as matrix]))
+  (:require [raytracer.tuple :as tuple]
+            [raytracer.point :as point]
+            [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]
+            [raytracer.ray :as ray]))
 
 (defn- compute-pixels [partial-camera]
   (let [half-view (Math/tan (/ (:fov partial-camera) 2.0))
@@ -15,13 +19,28 @@
   (let [partial-camera {:h-size h-size
                         :v-size v-size
                         :fov field-of-view
-                        :transform matrix/identity-matrix}]
+                        :transform matrix/identity-matrix
+                        :inverse-transform matrix/identity-matrix}]
     (merge partial-camera (compute-pixels partial-camera))))
 
 (defn set-transform [camera transform-matrix]
-  (assoc camera :transform transform-matrix))
+  (let [inverse-transform (matrix/invert transform-matrix 4)]
+    (merge camera
+           {:transform transform-matrix
+            :inverse-transform inverse-transform})))
 
-(defn ray-for-pixel [camera x y])
+;;; TODO/FIXME sucks big time
+(defn ray-for-pixel [camera x y]
+  (let [x-offset (* (+ x 0.5) (:pixel-size camera))
+        y-offset (* (+ y 0.5) (:pixel-size camera))
+        world-x (- (:half-width camera) x-offset)
+        world-y (- (:half-height camera) y-offset)
+        pixel (matrix/transform (:inverse-transform camera)
+                                (point/point world-x world-y -1))
+        origin (matrix/transform (:inverse-transform camera)
+                                 point/origin)]
+    (ray/ray origin
+             (svector/normalize (tuple/sub pixel origin)))))
 
-(defn render [camera world])
-
+(defn render [camera world]
+  [0 0 0])
