@@ -21,7 +21,10 @@
               :v-size v-size
               :fov fov
               :transform matrix/identity-matrix}
-             (camera/camera h-size v-size fov)))))
+             (dissoc (camera/camera h-size v-size fov)
+                     :pixel-size
+                     :half-width
+                     :half-height)))))
   (testing "The pixel size for a horizontal canvas"
     (is (eps= 0.01
               (:pixel-size (camera/camera 200 125 halfπ)))))
