@@ -71,6 +71,7 @@
      :eye-v eye-v
      :normal-v (if inside (svector/neg normal-v) normal-v)}))
 
+;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
   (phong/lighting (-> intermediate-result :object :material)
                   (first (:light-sources world)) ;;; first light source, for now

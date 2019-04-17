@@ -1,4 +1,4 @@
-(ns raytracer.materials)
+(ns raytracer.materials) ;;;TODO/FIXME change the name to material
 
 (defn material
   ([]
