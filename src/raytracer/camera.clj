@@ -4,7 +4,8 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.canvas :as canvas]
-            [raytracer.ray :as ray]))
+            [raytracer.ray :as ray]
+            [raytracer.world :as world]))
 
 (defn- compute-pixels [partial-camera]
   (let [half-view (Math/tan (/ (:fov partial-camera) 2.0))
@@ -47,16 +48,18 @@
              (svector/normalize (tuple/sub pixel origin)))))
 
 (defn- seq-pixels [width height]
-  (for [j (range height)
-        i (range width)]
-    (vector i j)))
+  (for [py (range height)
+        px (range width)]
+    (vector px py)))
 
-(defn- render-pixel [canvas [px py]]
-  )
+(defn- render-pixel [camera world canvas [px py]]
+  (let [ray (ray-for-pixel camera px py)]
+    (canvas/write canvas px py (world/color-at world ray))))
 
 (defn render [camera world]
   (let [width (:h-size camera)
-        height (:v-size camera)]
-    (reduce render-pixel
+        height (:v-size camera)
+        render-pixel-f (partial render-pixel camera world)]
+    (reduce render-pixel-f            
             (canvas/create-canvas width height)
             (seq-pixels width height))))
