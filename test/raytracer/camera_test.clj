@@ -76,10 +76,11 @@
 (deftest test-render
   (testing "Rendering a world with a camera"
     (let [world (world/default-world)
-          camera (camera/camera 11 11 halfπ)
           transform (world/view-transform (point/point 0 0 -5)
                                           (point/point 0 0 0)
-                                          (svector/svector 0 1 0))]
+                                          (svector/svector 0 1 0))
+          camera (camera/set-transform (camera/camera 11 11 halfπ)
+                                       transform)]
       (is (v= [0.38066 0.47583 0.2855]
               (canvas/read (camera/render camera world) 5 5))))))
 

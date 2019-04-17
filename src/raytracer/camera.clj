@@ -53,13 +53,13 @@
     (vector px py)))
 
 (defn- render-pixel [camera world canvas [px py]]
-  (let [ray (ray-for-pixel camera px py)]
-    (canvas/write canvas px py (world/color-at world ray))))
+  (canvas/write canvas
+                px py
+                (world/color-at world (ray-for-pixel camera px py))))
 
 (defn render [camera world]
   (let [width (:h-size camera)
-        height (:v-size camera)
-        render-pixel-f (partial render-pixel camera world)]
-    (reduce render-pixel-f            
+        height (:v-size camera)]
+    (reduce (partial render-pixel camera world)
             (canvas/create-canvas width height)
             (seq-pixels width height))))
