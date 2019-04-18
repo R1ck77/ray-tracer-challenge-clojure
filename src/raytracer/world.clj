@@ -96,3 +96,13 @@
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))
+
+(defn is-shadowed? [world point]
+  (let [light-source (first (:light-sources world)) ;;; first light source only
+        tmp (tuple/sub (:position light-source) point)
+        light-vector (svector/normalize tmp)
+        light-pos-distance (svector/mag tmp)
+        intersections (intersect world (ray/ray point light-vector))]
+    (and (not (empty? intersections ))
+         (< (:t (first intersections)) light-pos-distance)
+         (>= (:t (first intersections)) 0))))

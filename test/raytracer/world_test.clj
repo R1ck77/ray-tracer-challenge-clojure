@@ -138,3 +138,14 @@
                -0.35857 0.59761 -0.71714 0.00000
                0.00000 0.00000 0.00000 1.00000]
               (world/view-transform from to up))))))
+
+(deftest test-is-shadowed?
+  (let [world (world/default-world)]
+    (testing "There is no shadow when nothing is collinear with point and light"      
+      (is (not (world/is-shadowed? world (point/point 0 10 0)))))
+    (testing "The shadow when an object is between the point and the light"
+      (is (world/is-shadowed? world (point/point 10 -10 10))))
+    (testing "There is no shadow when an object is behind the light"
+      (is (not (world/is-shadowed? world (point/point -20 20 -20)))))
+    (testing "There is no shadow when an object is behind the point"
+      (is (not (world/is-shadowed? world (point/point -2 2 -2)))))))
