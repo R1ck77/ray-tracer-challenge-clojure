@@ -86,7 +86,22 @@
                                                    (ray/intersection 0.5 (second (:objects world))))]
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
-                               intermediate))))))
+                               intermediate)))))
+
+
+  (testing "shade_hit() is given an intersection in shadow"
+    (let [ sphere1 (ray/sphere)
+          sphere2 (ray/change-transform (ray/sphere)
+                                        (transform/translate 0 0 10))
+          world (-> (world/create)
+                    (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) [1 1 1]))
+                    (world/set-objects [sphere1 sphere2]))
+          ray (ray/ray (point/point 0 0 5)
+                       (svector/svector 0 0 1))
+          intersection (ray/intersection 4 sphere2)
+          comp (world/prepare-computations ray intersection)
+          color (world/shade-hit world comp)]
+      (is (v= [0.1 0.1 0.1] color)))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
