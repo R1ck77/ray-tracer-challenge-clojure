@@ -35,14 +35,21 @@
 (defn- compute-ambient [effective-color material]
   (tuple/mul effective-color (:ambient material)))
 
-(defn lighting [material light-source position eye normal]
-  (let [effective-color (color/mul (:color material)
-                                   (:intensity light-source))
-        light-vector (svector/normalize (tuple/sub (:position light-source) position))
-        light-dot-normal (svector/dot light-vector normal)]
-    (tuple/add (compute-ambient effective-color material)
-               (compute-diffuse light-dot-normal effective-color material)
-               (compute-specular light-dot-normal
-                                  (svector/mul light-vector -1)
-                                  light-source
-                                  normal eye material))))
+;;; TODO/FIXME hideous. Split in two methods lighting and shadow-lighting
+(defn lighting
+  ([material light-source position eye normal]
+   (lighting material light-source position eye normal false))
+  ([material light-source position eye normal in-shadow]
+   (let [effective-color (color/mul (:color material)
+                                    (:intensity light-source))
+         ambient-color (compute-ambient effective-color material)]
+     (if in-shadow
+       ambient-color
+     (let [light-vector (svector/normalize (tuple/sub (:position light-source) position))
+           light-dot-normal (svector/dot light-vector normal)]
+       (tuple/add ambient-color
+                  (compute-diffuse light-dot-normal effective-color material)
+                  (compute-specular light-dot-normal
+                                    (svector/mul light-vector -1)
+                                    light-source
+                                    normal eye material)))))))

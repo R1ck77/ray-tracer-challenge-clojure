@@ -18,6 +18,12 @@
           light (light-sources/create-point-light (point/point 0 0 -10) [1 1 1])]
       (is (v= [1.9 1.9 1.9]
               (phong/lighting material light position eye normal)))))
+  (testing "Lighting with the surface in shadow"
+    (let [eye (svector/svector 0 0 -1)
+          normal (svector/svector 0 0 -1)
+          light (light-sources/create-point-light (point/point 0 0 -10) [1 1 1])]
+      (is (v= [0.1 0.1 0.1]
+              (phong/lighting material light position eye normal true)))))
   (testing "Lighting with the eye between light and surface eye offset 45°"
     (let [eye (svector/svector 0 half√2 (- half√2))
           normal (svector/svector 0 0 -1)
