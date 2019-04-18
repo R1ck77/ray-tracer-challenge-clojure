@@ -9,18 +9,18 @@
             [raytracer.camera :as camera]
             [raytracer.world :as world]))
 
-(def width 100)
-(def height 50)
+(def width 400)
+(def height 200)
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def room-material (materials/material :specular 0
+(def room-material (materials/material :specular 0.0
                                        :color [1 0.9 0.9]))
 
 (def floor (-> (ray/sphere)
                (ray/change-material room-material)
-               (ray/change-transform (transform/scale 10, 0.01 10))))
+               (ray/change-transform (transform/scale 10 0.01 10))))
 
 (def left-wall (-> (ray/sphere)
                    (ray/change-material room-material)
