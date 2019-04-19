@@ -4,6 +4,7 @@
             [raytracer.canvas :as canvas]            
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
+            [raytracer.shapes :as shapes]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
@@ -19,36 +20,36 @@
 (def room-material (materials/material :specular 0.0
                                        :color [1 0.9 0.9]))
 
-(def floor (-> (ray/sphere)
-               (ray/change-material room-material)
-               (ray/change-transform (transform/scale 10 0.01 10))))
+(def floor (-> (shapes/sphere)
+               (shapes/change-material room-material)
+               (shapes/change-transform (transform/scale 10 0.01 10))))
 
-(def left-wall (-> (ray/sphere)
-                   (ray/change-material room-material)
-                   (ray/change-transform (->> (transform/scale 10 0.01 10)
+(def left-wall (-> (shapes/sphere)
+                   (shapes/change-material room-material)
+                   (shapes/change-transform (->> (transform/scale 10 0.01 10)
                                               (transform/rotate-x halfπ)
                                               (transform/rotate-y (- partπ))
                                               (transform/translate 0 0 5)))))
 
-(def right-wall (-> (ray/sphere)
-                    (ray/change-material room-material)
-                    (ray/change-transform (->> (transform/scale 10 0.01 10)
+(def right-wall (-> (shapes/sphere)
+                    (shapes/change-material room-material)
+                    (shapes/change-transform (->> (transform/scale 10 0.01 10)
                                                (transform/rotate-x halfπ)
                                                (transform/rotate-y partπ)
                                                (transform/translate 0 0 5)))))
 
-(def left-sphere (-> (ray/sphere)
-                     (ray/change-material (materials/material :color [1 0.8 0.1], :diffuse 0.7, :specular 0.3))
-                     (ray/change-transform (->> (transform/scale 0.33 0.33 0.33)
+(def left-sphere (-> (shapes/sphere)
+                     (shapes/change-material (materials/material :color [1 0.8 0.1], :diffuse 0.7, :specular 0.3))
+                     (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                                 (transform/translate -1.5 0.33 -0.75)))))
 
-(def middle-sphere (-> (ray/sphere)
-                       (ray/change-material (materials/material :color [0.1 1 0.5], :diffuse 0.7, :specular 0.3))
-                       (ray/change-transform (transform/translate -0.5 1 0.5))))
+(def middle-sphere (-> (shapes/sphere)
+                       (shapes/change-material (materials/material :color [0.1 1 0.5], :diffuse 0.7, :specular 0.3))
+                       (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
-(def right-sphere (-> (ray/sphere)
-                      (ray/change-material (materials/material :color [0.5 1 0.1], :diffuse 0.7, :specular 0.3))
-                      (ray/change-transform (->> (transform/scale 0.5 0.5 0.5)
+(def right-sphere (-> (shapes/sphere)
+                      (shapes/change-material (materials/material :color [0.5 1 0.1], :diffuse 0.7, :specular 0.3))
+                      (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (world/set-light-sources (world/set-objects (world/create) [floor left-wall right-wall

@@ -2,8 +2,8 @@
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
             [raytracer.tuple :as tuple]
-            [raytracer.svector :refer [svector]]
-            [raytracer.point :refer [point]]))
+            [raytracer.svector :as svector]
+            [raytracer.point :as point]))
 
 (deftest test-add
   (testing "adding two tuple"
@@ -18,20 +18,20 @@
 
 (deftest test-sub
   (testing "subtracting two points"
-    (is (v= (svector -2 -4 -6)
-            (tuple/sub (point 3 2 1)
-                 (point 5 6 7)))))
+    (is (v= (svector/svector -2 -4 -6)
+            (tuple/sub (point/point 3 2 1)
+                 (point/point 5 6 7)))))
   (testing "subtracting a vector from a point"
-    (is (v= (point -2 -4 -6)
-            (tuple/sub (point 3 2 1)
-                 (svector 5 6 7)))))
+    (is (v= (point/point -2 -4 -6)
+            (tuple/sub (point/point 3 2 1)
+                 (svector/svector 5 6 7)))))
   (testing "subtracting two vectors"
-    (is (v= (svector -2 -4 -6)
-            (tuple/sub (svector 3 2 1)
-                 (svector 5 6 7)))))
+    (is (v= (svector/svector -2 -4 -6)
+            (tuple/sub (svector/svector 3 2 1)
+                 (svector/svector 5 6 7)))))
   (testing "subtracting a vector from the zero vector"
-    (is (v= (svector -1 2 -3)
-            (tuple/sub (svector 0 0 0) (svector 1 -2 3))))))
+    (is (v= (svector/svector -1 2 -3)
+            (tuple/sub (svector/svector 0 0 0) (svector/svector 1 -2 3))))))
 
 (deftest test-neg
   (testing "negating a tuple"

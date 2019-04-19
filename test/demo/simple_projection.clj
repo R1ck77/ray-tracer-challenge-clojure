@@ -6,6 +6,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.canvas :as canvas]
             [raytracer.transform :as transform]
+            [raytracer.shapes :as shapes]
             [raytracer.ray :as ray]))
 
 (def canvas-size {:width 320, :height 200})
@@ -18,7 +19,8 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :object (ray/change-transform (ray/sphere) (transform/scale 5 5 5))
+   :object (shapes/change-transform (shapes/sphere)
+                                    (transform/scale 5 5 5))
    :screen-z 0})
 
 ;;; TODO/FIXME most stuff can probably be cached

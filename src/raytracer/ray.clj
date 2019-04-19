@@ -24,43 +24,6 @@
   (tuple/add (:origin ray)
              (svector/mul (:direction ray) t)))
 
-(defn as-point [[x y z _]]
-  (point/point x y z))
-
-(defn as-vector [[x y z _]]
-  (svector/svector x y z))
-
-(defn create-compute-normal-f [shape]
-  (fn [point]
-    (svector/normalize
-     (as-vector
-      (matrix/transform (matrix/transpose (:inverse-transform shape))
-                        (tuple/sub (matrix/transform (:inverse-transform shape) point)
-                                   (point/point 0 0 0)))))))
-
-(defn- add-normal-f [shape]
-  (assoc shape :normal (create-compute-normal-f shape)))
-
-(defn sphere []
-  (add-normal-f {:center [0 0 0 1]
-                 :radius 1.0
-                 :material (materials/material)
-                 :transform matrix/identity-matrix
-                 :inverse-transform matrix/identity-matrix}))
-
-(defn same-shape? [a b]
-  (if (= (merge a {:normal nil})
-         (merge b {:normal nil}))
-    a
-    nil))
-
-(defn change-transform [shape new-transform]
-  (add-normal-f (merge shape {:transform new-transform
-                               :inverse-transform (matrix/invert new-transform 4)})))
-
-(defn change-material [shape new-material]
-  (assoc shape :material new-material))
-
 (defn transform [input-ray matrix]
   (ray (matrix/transform matrix (:origin input-ray))
        (matrix/transform matrix (:direction input-ray))))
@@ -85,8 +48,8 @@
                                      (* 2 a))
                                   sphere)
        (intersection/intersection (/ (+ (- b) (Math/sqrt discriminant))
-                                 (* 2 a))
-                              sphere)])))
+                                     (* 2 a))
+                                  sphere)])))
 
 (defn intersect [ray sphere]
   (intersect-sphere-space (transform ray (:inverse-transform sphere))

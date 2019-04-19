@@ -5,6 +5,7 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]            
             [raytracer.ray :as ray]
+            [raytracer.shapes :as shapes]
             [raytracer.transform :as transform]
             [raytracer.materials :as materials]))
 
@@ -33,7 +34,7 @@
               (ray/position ray 2.5))))))
 
 (deftest test-sphere
-  (let [sphere (ray/sphere)]
+  (let [sphere (shapes/sphere)]
     (testing "create a sphere"
       (is (v= [0 0 0 1] (:center sphere)))
       (is (eps= 1.0 (:radius sphere)))
@@ -41,30 +42,30 @@
       (is (identical? matrix/identity-matrix (:transform sphere))))
     (testing "update a sphere's transformation"
       (let [transform (transform/translate 2 3 4)
-            new-sphere (ray/change-transform sphere transform)]
+            new-sphere (shapes/change-transform sphere transform)]
         (is (identical? transform
                         (:transform new-sphere)))))
     (testing "a sphere may be assigned a material"
       (let [new-material (assoc (materials/material) :ambient 0.25)]
         (is (= new-material
-               (:material (ray/change-material sphere new-material))))))))
+               (:material (shapes/change-material sphere new-material))))))))
 
 (deftest test-same-shape?
   (testing "returns the first argument if true, nil otherwise"
-    (let [a (ray/change-transform (ray/sphere) (transform/scale 2 2 2))
-          b (ray/change-transform (ray/sphere) (transform/scale 2 2 2))]
+    (let [a (shapes/change-transform (shapes/sphere) (transform/scale 2 2 2))
+          b (shapes/change-transform (shapes/sphere) (transform/scale 2 2 2))]
       (is (not (identical? a b)))
-      (is (identical? a (ray/same-shape? a b)))
-      (is (nil? (ray/same-shape? a (ray/sphere))))))
+      (is (identical? a (shapes/same-shape? a b)))
+      (is (nil? (shapes/same-shape? a (shapes/sphere))))))
   (testing "two spheres are equal when they receive the same transform"
-    (is (ray/same-shape? (ray/change-transform (ray/sphere) (transform/scale 2 2 2))
-                          (ray/change-transform (ray/sphere) (transform/scale 2 2 2)))))
+    (is (shapes/same-shape? (shapes/change-transform (shapes/sphere) (transform/scale 2 2 2))
+                            (shapes/change-transform (shapes/sphere) (transform/scale 2 2 2)))))
   (testing "different transforms, different sphere"
-    (is (not (ray/same-shape? (ray/change-transform (ray/sphere) (transform/scale 2 2 3))
-                               (ray/change-transform (ray/sphere) (transform/scale 2 2 2)))))))
+    (is (not (shapes/same-shape? (shapes/change-transform (shapes/sphere) (transform/scale 2 2 3))
+                                 (shapes/change-transform (shapes/sphere) (transform/scale 2 2 2)))))))
 
 (deftest test-sphere-intersection
-  (let [sphere (ray/sphere)]
+  (let [sphere (shapes/sphere)]
     (testing "a ray intersects a sphere at two points"
       (let [intersections (ray/intersect (ray/ray (point/point 0 0 -5)
                                                   (svector/svector 0 0 1))
@@ -109,8 +110,8 @@
     (testing "intersecting a scaled sphere with a ray"
       (let [ray (ray/ray (point/point 0 0 -5)
                          (svector/svector 0 0 1))
-            sphere (ray/change-transform (ray/sphere)
-                                         (transform/scale 2 2 2))
+            sphere (shapes/change-transform (shapes/sphere)
+                                            (transform/scale 2 2 2))
             intersections (ray/intersect ray sphere)]
         (is (= 2 (count intersections)))
         (is (eps= 3 (:t (first intersections))))
@@ -118,11 +119,10 @@
     (testing "intersecting a translated sphere with a ray"
       (let [ray (ray/ray (point/point 0 0 -5)
                          (svector/svector 0 0 1))
-            sphere (ray/change-transform (ray/sphere)
-                                         (transform/translate 5 0 0))
+            sphere (shapes/change-transform (shapes/sphere)
+                                            (transform/translate 5 0 0))
             intersections (ray/intersect ray sphere)]
-        (is (= 0 (count intersections)))))    
-    ))
+        (is (= 0 (count intersections)))))))
 
 (deftest test-transform
   (let [ray (ray/ray (point/point 1 2 3)
@@ -136,16 +136,8 @@
         (is (v= [2 6 12 1] (:origin result)))
         (is (v= [0 3 0 0] (:direction result)))))))
 
-(deftest test-as-point
-  (is (v= (point/point 1 2 3)
-          (ray/as-point (svector/svector 1 2 3)))))
-
-(deftest test-as-vector
-  (is (v= (svector/svector 1 2 3)
-          (ray/as-vector (point/point 1 2 3)))))
-
 (deftest test-sphere-normal
-  (let [sphere (ray/sphere)
+  (let [sphere (shapes/sphere)
         √2 (Math/sqrt 2)
         half√2 (/ √2 2)
         √3 (Math/sqrt 3)
@@ -163,12 +155,12 @@
       (is (v= (svector/svector third√3 third√3 third√3)
               ((:normal sphere) (point/point third√3 third√3 third√3)))))
     (testing "Computing the normal on a translated sphere"
-      (let [transformed-sphere (ray/change-transform sphere (transform/translate 0 1 0))]
+      (let [transformed-sphere (shapes/change-transform sphere (transform/translate 0 1 0))]
         (is (v= (svector/svector 0 0.70711 -0.70711)
                 ((:normal transformed-sphere) (point/point 0 1.70711 -0.70711))))))
     (testing "Computing the normal on a transformed sphere"
       (let [new-transform (transform/scale 1 0.5 1 (transform/rotate-z (/ Math/PI 5)))
-            transformed-sphere (ray/change-transform sphere new-transform)]
+            transformed-sphere (shapes/change-transform sphere new-transform)]
         (is (v= (svector/svector 0 0.97014 -0.24254)
                 ((:normal transformed-sphere) (point/point 0 half√2 (- half√2)))))))))
 

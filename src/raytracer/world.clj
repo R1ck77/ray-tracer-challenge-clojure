@@ -4,6 +4,7 @@
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
+            [raytracer.shapes :as shapes]
             [raytracer.intersection :as intersection]
             [raytracer.matrix :as matrix]
             [raytracer.materials :as materials]
@@ -36,11 +37,11 @@
   \"The Book made me do it.\""
   []
   (-> (create)
-    (add-object (ray/change-material (ray/sphere)
-                                     (materials/material :color [0.8 1.0 0.6]
+    (add-object (shapes/change-material (shapes/sphere)
+                                        (materials/material :color [0.8 1.0 0.6]
                                                          :diffuse 0.7
                                                          :specular 0.2)))
-    (add-object (ray/change-transform (ray/sphere)
+    (add-object (shapes/change-transform (shapes/sphere)
                                       (transform/scale 0.5 0.5 0.5)))    
     (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                         [1 1 1]))))

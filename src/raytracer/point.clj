@@ -1,5 +1,4 @@
-(ns raytracer.point
-  (:require [raytracer.tuple :refer :all]))
+(ns raytracer.point)
 
 (def ^:private max-error 1e-6)
 

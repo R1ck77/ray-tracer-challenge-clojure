@@ -3,7 +3,8 @@
             [raytracer.test-utils :refer :all]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
-            [raytracer.matrix :as matrix]            
+            [raytracer.matrix :as matrix]
+            [raytracer.shapes :as shapes]
             [raytracer.intersection :as intersection]
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
@@ -11,15 +12,15 @@
 
 (deftest test-intersection
   (testing "create new intersection"
-    (let [sphere (ray/sphere)
+    (let [sphere (shapes/sphere)
           intersection (intersection/intersection 2.4 sphere)]
       (is (identical? sphere (:object intersection)))
       (is (= 2.4 (:t intersection))))))
 
 (deftest test-intersections
   (testing "exciting \"intersections\" function"
-    (let [i1 (intersection/intersection 2.4 (ray/sphere))
-          i2 (intersection/intersection 2.8 (ray/sphere))
+    (let [i1 (intersection/intersection 2.4 (shapes/sphere))
+          i2 (intersection/intersection 2.8 (shapes/sphere))
           intersections (intersection/intersections i1 i2)]
       (is (= 2 (count intersections)))
       (is (identical? i1 (first intersections)))
@@ -27,7 +28,7 @@
 
 (defmacro hit-testcase [ & {:keys [message intersections-t expected]}]
   `(testing ~message
-     (let [sphere# (ray/sphere)
+     (let [sphere# (shapes/sphere)
            intersections# (apply intersection/intersections (map #(intersection/intersection % sphere#) ~intersections-t))
            hit# (intersection/hit intersections#)]
        (is (or (and (not ~expected) (not hit#))

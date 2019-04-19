@@ -8,6 +8,7 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
+            [raytracer.shapes :as shapes]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
@@ -15,8 +16,8 @@
 (def canvas-size {:width 320, :height 200})
 (def canvas-scale [0.1 0.1])
 (def color [255 0 0])
-(def sphere-template (ray/change-material (ray/sphere)
-                                          (assoc (materials/material) :color [1 0.2 1])))
+(def sphere-template (shapes/change-material (shapes/sphere)
+                                             (assoc (materials/material) :color [1 0.2 1])))
 
 (defn- create-simple-scene
   "Naive setup: the screen position in the scene decides the FOV and VFOV
@@ -24,8 +25,8 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :object (ray/change-transform sphere-template
-                                 (transform/scale 5 5 5))
+   :object (shapes/change-transform sphere-template
+                                    (transform/scale 5 5 5))
    :screen-z 0
    :light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                    [1 1 1])})

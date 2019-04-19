@@ -7,6 +7,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
+            [raytracer.shapes :as shapes]
             [raytracer.materials :as materials]
             [raytracer.transform :as transform]
             [raytracer.light-sources :as light-sources]))
@@ -20,17 +21,17 @@
 (deftest test-default-world
   (testing "The default world"
     (let [world (world/default-world)
-          expected-sphere1 (ray/change-material (ray/sphere)
-                                                (materials/material :color [0.8 1.0 0.6]
-                                                                    :diffuse 0.7
-                                                                    :specular 0.2))
-          expected-sphere2 (ray/change-transform (ray/sphere)
-                                                 (transform/scale 0.5 0.5 0.5))]
+          expected-sphere1 (shapes/change-material (shapes/sphere)
+                                                   (materials/material :color [0.8 1.0 0.6]
+                                                                       :diffuse 0.7
+                                                                       :specular 0.2))
+          expected-sphere2 (shapes/change-transform (shapes/sphere)
+                                                    (transform/scale 0.5 0.5 0.5))]
       (is (contains? (:light-sources world)
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        [1 1 1])))
-      (is (some #(ray/same-shape? expected-sphere1 %) (:objects world)))
-      (is (some #(ray/same-shape? expected-sphere2 %) (:objects world))))))
+      (is (some #(shapes/same-shape? expected-sphere1 %) (:objects world)))
+      (is (some #(shapes/same-shape? expected-sphere2 %) (:objects world))))))
 
 (deftest test-intersect
   (testing "Intersect a world with a ray"
@@ -44,9 +45,9 @@
   (testing "Precomputing the state of an intersection"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          intersection (intersection/intersection 4 (ray/sphere))
+          intersection (intersection/intersection 4 (shapes/sphere))
           result (world/prepare-computations ray intersection)]
-      (is (ray/same-shape? (ray/sphere) (:object result)))
+      (is (shapes/same-shape? (shapes/sphere) (:object result)))
       (is (= 4 (:t result)))
       (is (v= (point/point 0 0 -1) (:point result)))
       (is (v= (svector/svector 0 0 -1) (:eye-v result)))
@@ -55,12 +56,12 @@
   (testing "The hit, when an intersection occurs on the outside"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          intersection (intersection/intersection 4 (ray/sphere))]
+          intersection (intersection/intersection 4 (shapes/sphere))]
       (is (not (:inside (world/prepare-computations ray intersection))))))
   (testing "The hit, when an intersection occurs on the inside"
     (let [ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
-          intersection (intersection/intersection 1 (ray/sphere))
+          intersection (intersection/intersection 1 (shapes/sphere))
           result (world/prepare-computations ray intersection)]
       (is (:inside result))
       (is (v= (point/point 0 0 1) (:point result)))
@@ -70,8 +71,8 @@
   (testing "The hit should offset the point"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          sphere (ray/change-transform (ray/sphere)
-                                       (transform/translate 0 0 1))
+          sphere (shapes/change-transform (shapes/sphere)
+                                          (transform/translate 0 0 1))
           intersection (intersection/intersection 5 sphere)
           intermediate (world/prepare-computations ray intersection)
           ]
@@ -100,9 +101,9 @@
               (world/shade-hit world
                                intermediate)))))
   (testing "shade_hit() is given an intersection in shadow"
-    (let [ sphere1 (ray/sphere)
-          sphere2 (ray/change-transform (ray/sphere)
-                                        (transform/translate 0 0 10))
+    (let [ sphere1 (shapes/sphere)
+          sphere2 (shapes/change-transform (shapes/sphere)
+                                           (transform/translate 0 0 10))
           world (-> (world/create)
                     (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) [1 1 1]))
                     (world/set-objects [sphere1 sphere2]))

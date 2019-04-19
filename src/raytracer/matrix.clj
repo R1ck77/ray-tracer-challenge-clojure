@@ -1,5 +1,5 @@
 (ns raytracer.matrix
-  (:require [raytracer.tuple :refer [div]]))
+  (:require [raytracer.tuple :as tuple]))
 
 (set! *unchecked-math* true)
 
@@ -128,5 +128,5 @@
 
 (defn invert [m n]
   (vec
-   (map float (div (transpose (cofactor-matrix m n ))
-                   (det m n)))))
+   (map float (tuple/div (transpose (cofactor-matrix m n ))
+                         (det m n)))))
