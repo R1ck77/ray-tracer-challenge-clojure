@@ -28,8 +28,8 @@
       (is (contains? (:light-sources world)
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        [1 1 1])))
-      (is (some #(ray/same-sphere? expected-sphere1 %) (:objects world)))
-      (is (some #(ray/same-sphere? expected-sphere2 %) (:objects world))))))
+      (is (some #(ray/same-shape? expected-sphere1 %) (:objects world)))
+      (is (some #(ray/same-shape? expected-sphere2 %) (:objects world))))))
 
 (deftest test-intersect
   (testing "Intersect a world with a ray"
@@ -45,7 +45,7 @@
                        (svector/svector 0 0 1))
           intersection (ray/intersection 4 (ray/sphere))
           result (world/prepare-computations ray intersection)]
-      (is (ray/same-sphere? (ray/sphere) (:object result)))
+      (is (ray/same-shape? (ray/sphere) (:object result)))
       (is (= 4 (:t result)))
       (is (v= (point/point 0 0 -1) (:point result)))
       (is (v= (svector/svector 0 0 -1) (:eye-v result)))
