@@ -71,13 +71,23 @@
      :eye-v eye-v
      :normal-v (if inside (svector/neg normal-v) normal-v)}))
 
+(defn is-shadowed? [world point]
+  (let [light-source (first (:light-sources world)) ;;; first light source only
+        pos->light (tuple/sub (:position light-source) point)
+        intersection (ray/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
+    (and intersection
+         (< (:t intersection) (svector/mag pos->light)))))
+
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
-  (phong/lighting (-> intermediate-result :object :material)
-                  (first (:light-sources world)) ;;; first light source, for now
-                  (:point intermediate-result)
-                  (:eye-v intermediate-result)
-                  (:normal-v intermediate-result)))
+  (let [point (:point intermediate-result)
+        shadowed (is-shadowed? world point)]
+    (phong/lighting (-> intermediate-result :object :material)
+                    (first (:light-sources world)) ;;; first light source, for now
+                    point
+                    (:eye-v intermediate-result)
+                    (:normal-v intermediate-result)
+                    shadowed)))
 
 (defn color-at [world ray]
   (let [intersections (intersect world ray)]
@@ -96,10 +106,3 @@
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))
-
-(defn is-shadowed? [world point]
-  (let [light-source (first (:light-sources world)) ;;; first light source only
-        pos->light (tuple/sub (:position light-source) point)
-        intersection (ray/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
-    (and intersection
-         (< (:t intersection) (svector/mag pos->light)))))

@@ -9,6 +9,7 @@
             [raytracer.camera :as camera]
             [raytracer.world :as world]))
 
+;;; Note: the result of this demo changes with the evolution of the underlying functions
 (def width 400)
 (def height 200)
 
@@ -49,7 +50,6 @@
                       (ray/change-material (materials/material :color [0.5 1 0.1], :diffuse 0.7, :specular 0.3))
                       (ray/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
-
 
 (def world (world/set-light-sources (world/set-objects (world/create) [floor left-wall right-wall
                                                                        left-sphere middle-sphere right-sphere])
