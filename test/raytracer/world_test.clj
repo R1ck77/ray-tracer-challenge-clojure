@@ -56,8 +56,6 @@
                        (svector/svector 0 0 1))
           intersection (ray/intersection 4 (ray/sphere))]
       (is (not (:inside (world/prepare-computations ray intersection))))))
-
-  
   (testing "The hit, when an intersection occurs on the inside"
     (let [ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
@@ -66,7 +64,20 @@
       (is (:inside result))
       (is (v= (point/point 0 0 1) (:point result)))
       (is (v= (svector/svector 0 0 -1) (:eye-v result)))
-      (is (v= (svector/svector 0 0 -1) (:normal-v result))))))
+      (is (v= (svector/svector 0 0 -1) (:normal-v result)))))
+
+  (testing "The hit should offset the point"
+    (let [ray (ray/ray (point/point 0 0 -5)
+                       (svector/svector 0 0 1))
+          sphere (ray/change-transform (ray/sphere)
+                                       (transform/translate 0 0 1))
+          intersection (ray/intersection 5 sphere)
+          intermediate (world/prepare-computations ray intersection)
+          ]
+      (is (< (nth (:over-point intermediate) 2)
+             (/ (- world/EPSILON) 2)))
+      (is (> (nth (:point intermediate) 2)
+             (nth (:over-point intermediate) 2))))))
 
 (deftest test-shade-hit
   (testing "Shading an intersection"

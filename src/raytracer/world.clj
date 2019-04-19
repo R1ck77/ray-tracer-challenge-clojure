@@ -9,6 +9,8 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
+(def EPSILON 1e-6)
+
 (defn create []
   {:objects []
    :light-sources #{}})
@@ -63,13 +65,15 @@
                                       (:t intersection)))
         eye-v (svector/neg (:direction ray))
         normal-v ((:normal (:object intersection)) point)
-        inside (is-inside? eye-v normal-v)]
+        inside (is-inside? eye-v normal-v)
+        normal-v (if inside (svector/neg normal-v) normal-v)]
     {:inside inside
      :object (:object intersection)
      :t (:t intersection)
      :point  point
+     :over-point (tuple/add point (svector/mul normal-v EPSILON))
      :eye-v eye-v
-     :normal-v (if inside (svector/neg normal-v) normal-v)}))
+     :normal-v normal-v}))
 
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
@@ -80,11 +84,10 @@
 
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
-  (let [point (:point intermediate-result)
-        shadowed (is-shadowed? world point)]
+  (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
     (phong/lighting (-> intermediate-result :object :material)
                     (first (:light-sources world)) ;;; first light source, for now
-                    point
+                    (:point intermediate-result)
                     (:eye-v intermediate-result)
                     (:normal-v intermediate-result)
                     shadowed)))
