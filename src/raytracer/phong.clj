@@ -21,7 +21,7 @@
 (defn- compute-specular [light-dot-normal neg-light-vector light-source normal eye material]
   (if (< light-dot-normal 0)
     color/black
-    (compute-if-positive (svector/dot (ray/reflect neg-light-vector normal) eye)
+    (compute-if-positive (svector/dot (svector/reflect neg-light-vector normal) eye)
                          #(compute-specular-value % light-source material))))
 
 (defn- compute-diffuse-value [light-dot-normal effective-color material]

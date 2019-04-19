@@ -55,3 +55,5 @@
            (- (* z1 x2) (* x1 z2))
            (- (* x1 y2) (* y1 x2))))
 
+(defn reflect [v normal]
+  (sub v (mul normal (* 2 (dot normal v)))))

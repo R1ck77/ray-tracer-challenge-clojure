@@ -4,6 +4,7 @@
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
+            [raytracer.intersection :as intersection]
             [raytracer.matrix :as matrix]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
@@ -78,7 +79,7 @@
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
-        intersection (ray/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
+        intersection (intersection/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
     (and intersection
          (< (:t intersection) (svector/mag pos->light)))))
 
@@ -96,7 +97,7 @@
   (let [intersections (intersect world ray)]
     (if (empty? intersections)
       [0 0 0]
-      (shade-hit world (prepare-computations ray (ray/hit intersections))))))
+      (shade-hit world (prepare-computations ray (intersection/hit intersections))))))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))

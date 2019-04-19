@@ -124,45 +124,6 @@
         (is (= 0 (count intersections)))))    
     ))
 
-(deftest test-intersection
-  (testing "create new intersection"
-    (let [sphere (ray/sphere)
-          intersection (ray/intersection 2.4 sphere)]
-      (is (identical? sphere (:object intersection)))
-      (is (= 2.4 (:t intersection))))))
-
-(deftest test-intersections
-  (testing "exciting \"intersections\" function"
-    (let [i1 (ray/intersection 2.4 (ray/sphere))
-          i2 (ray/intersection 2.8 (ray/sphere))
-          intersections (ray/intersections i1 i2)]
-      (is (= 2 (count intersections)))
-      (is (identical? i1 (first intersections)))
-      (is (identical? i2 (second intersections))))))
-
-
-(defmacro hit-testcase [ & {:keys [message intersections-t expected]}]
-  `(testing ~message
-     (let [sphere# (ray/sphere)
-           intersections# (apply ray/intersections (map #(ray/intersection % sphere#) ~intersections-t))
-           hit# (ray/hit intersections#)]
-       (is (or (and (not ~expected) (not hit#))
-               (= (:t (nth intersections# ~expected)) (:t hit#)))))))
-
-(deftest test-hit
-  (hit-testcase :message "the hit, when all intersections have positive t"
-                :intersections-t [1 2]
-                :expected 0)
-  (hit-testcase :message "the hit, when some intersections have negative t"
-                :intersections-t [-1 1]
-                :expected 1)
-  (hit-testcase :message "the hit, when all intersections have negative t"
-                :intersections-t [-2 -1]
-                :expected nil)
-  (hit-testcase :message "the hit is always the lowest nonnegative intersection"
-                :intersections-t [5 7 -3 2 4]
-                :expected 3))
-
 (deftest test-transform
   (let [ray (ray/ray (point/point 1 2 3)
                      (svector/svector 0 1 0))]
@@ -211,14 +172,3 @@
         (is (v= (svector/svector 0 0.97014 -0.24254)
                 ((:normal transformed-sphere) (point/point 0 half√2 (- half√2)))))))))
 
-(deftest test-reflection
-  (testing "Reflecting a vector approaching at 45°"
-    (is (v= (svector/svector 1 1 0)
-            (ray/reflect (svector/svector 1 -1 0)
-                         (svector/svector 0 1 0)))))
-  (testing "Reflecting a vector off a slanted surface"
-    (let [√2 (Math/sqrt 2)
-          half√2 (/ √2 2)]
-      (is (v= (svector/svector 1 0 0)
-              (ray/reflect (svector/svector 0 -1 0)
-                           (svector/svector half√2 half√2 0)))))))

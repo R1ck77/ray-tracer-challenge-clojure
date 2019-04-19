@@ -7,6 +7,7 @@
             [raytracer.canvas :as canvas]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
+            [raytracer.intersection :as intersection]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
@@ -49,7 +50,7 @@
                                                (:camera scene))))})))
 
 (defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
-  (let [hit (ray/hit (ray/intersect ray object))]
+  (let [hit (intersection/hit (ray/intersect ray object))]
     (if hit
       (let [point (ray/position ray (:t hit))
             color (phong/lighting (:material object)

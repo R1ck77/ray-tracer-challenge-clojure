@@ -6,6 +6,7 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
+            [raytracer.intersection :as intersection]
             [raytracer.materials :as materials]
             [raytracer.transform :as transform]
             [raytracer.light-sources :as light-sources]))
@@ -43,7 +44,7 @@
   (testing "Precomputing the state of an intersection"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          intersection (ray/intersection 4 (ray/sphere))
+          intersection (intersection/intersection 4 (ray/sphere))
           result (world/prepare-computations ray intersection)]
       (is (ray/same-shape? (ray/sphere) (:object result)))
       (is (= 4 (:t result)))
@@ -54,12 +55,12 @@
   (testing "The hit, when an intersection occurs on the outside"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          intersection (ray/intersection 4 (ray/sphere))]
+          intersection (intersection/intersection 4 (ray/sphere))]
       (is (not (:inside (world/prepare-computations ray intersection))))))
   (testing "The hit, when an intersection occurs on the inside"
     (let [ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
-          intersection (ray/intersection 1 (ray/sphere))
+          intersection (intersection/intersection 1 (ray/sphere))
           result (world/prepare-computations ray intersection)]
       (is (:inside result))
       (is (v= (point/point 0 0 1) (:point result)))
@@ -71,7 +72,7 @@
                        (svector/svector 0 0 1))
           sphere (ray/change-transform (ray/sphere)
                                        (transform/translate 0 0 1))
-          intersection (ray/intersection 5 sphere)
+          intersection (intersection/intersection 5 sphere)
           intermediate (world/prepare-computations ray intersection)
           ]
       (is (< (nth (:over-point intermediate) 2)
@@ -84,7 +85,7 @@
     (let [world (world/default-world)
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 -5)
                                                             (svector/svector 0 0 1))
-                                                   (ray/intersection 4 (first (:objects world))))]
+                                                   (intersection/intersection 4 (first (:objects world))))]
       (is (v= [0.38066 0.47583 0.2855]
               (world/shade-hit world
                                intermediate)))))
@@ -94,7 +95,7 @@
                                                                            [1 1 1]))
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
-                                                   (ray/intersection 0.5 (second (:objects world))))]
+                                                   (intersection/intersection 0.5 (second (:objects world))))]
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
                                intermediate)))))
@@ -107,7 +108,7 @@
                     (world/set-objects [sphere1 sphere2]))
           ray (ray/ray (point/point 0 0 5)
                        (svector/svector 0 0 1))
-          intersection (ray/intersection 4 sphere2)
+          intersection (intersection/intersection 4 sphere2)
           comp (world/prepare-computations ray intersection)
           color (world/shade-hit world comp)]
       (is (v= [0.1 0.1 0.1]

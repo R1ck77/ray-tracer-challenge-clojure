@@ -70,3 +70,15 @@
           (cross (svector 2 3 4) (svector 1 2 3))))
   (is (eps= 0 (dot (svector -34 54 124)
                    (cross (svector -34 54 124) (svector 34 12 1))))))
+
+(deftest test-reflection
+  (testing "Reflecting a vector approaching at 45°"
+    (is (v= (svector 1 1 0)
+            (reflect (svector 1 -1 0)
+                     (svector 0 1 0)))))
+  (testing "Reflecting a vector off a slanted surface"
+    (let [√2 (Math/sqrt 2)
+          half√2 (/ √2 2)]
+      (is (v= (svector 1 0 0)
+              (reflect (svector 0 -1 0)
+                       (svector half√2 half√2 0)))))))
