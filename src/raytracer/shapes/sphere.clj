@@ -1,6 +1,7 @@
 (ns raytracer.shapes.sphere
   (:require [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
+            [raytracer.point :as point]
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
             [raytracer.materials :as materials]
@@ -30,10 +31,21 @@
                                      (* 2 a))
                                   this-sphere)])))
 
+(defn create-compute-normal-f [shape]
+  (fn [point]
+    (svector/normalize
+     (shared/as-vector
+      (matrix/transform (matrix/transpose (:inverse-transform shape))
+                        (tuple/sub (matrix/transform (:inverse-transform shape) point)
+                                   (point/point 0 0 0)))))))
+
+(defn add-normal-f [shape]
+  (assoc shape :normal (create-compute-normal-f shape)))
+
 (defn sphere []
-  (shared/add-normal-f {:center [0 0 0 1]
-                        :radius 1.0
-                        :material (materials/material)
-                        :transform matrix/identity-matrix
-                        :inverse-transform matrix/identity-matrix
-                        :local-intersect intersect-sphere-space}))
+  (add-normal-f {:center [0 0 0 1]
+                 :radius 1.0
+                 :material (materials/material)
+                 :transform matrix/identity-matrix
+                 :inverse-transform matrix/identity-matrix
+                 :local-intersect intersect-sphere-space}))

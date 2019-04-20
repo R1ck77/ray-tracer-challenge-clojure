@@ -4,14 +4,11 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.sphere :as sphere-ns]))
 
-
-
 (defn same-shape? [a b]
   (if (= (merge a {:normal nil})
          (merge b {:normal nil}))
     a
     nil))
-
 
 (defn change-transform [shape new-transform]
   (shared/add-normal-f (merge shape {:transform new-transform
