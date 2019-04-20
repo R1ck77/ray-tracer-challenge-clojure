@@ -27,5 +27,5 @@
   (ray (matrix/transform matrix (:origin input-ray))
        (matrix/transform matrix (:direction input-ray))))
 
-(defn intersect [ray sphere]
-  ((:local-intersect sphere) sphere (transform ray (:inverse-transform sphere))))
+(defn intersect [ray shape]
+  ((:local-intersect shape) shape (transform ray (:inverse-transform shape))))

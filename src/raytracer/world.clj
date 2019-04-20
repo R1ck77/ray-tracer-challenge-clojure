@@ -66,11 +66,12 @@
                          (svector/mul (:direction ray)
                                       (:t intersection)))
         eye-v (svector/neg (:direction ray))
-        normal-v ((:normal (:object intersection)) point)
+        object (:object intersection)
+        normal-v ((:normal object) object point)
         inside (is-inside? eye-v normal-v)
         normal-v (if inside (svector/neg normal-v) normal-v)]
     {:inside inside
-     :object (:object intersection)
+     :object object
      :t (:t intersection)
      :point  point
      :over-point (tuple/add point (svector/mul normal-v EPSILON))
