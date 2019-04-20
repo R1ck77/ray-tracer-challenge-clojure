@@ -28,4 +28,4 @@
        (matrix/transform matrix (:direction input-ray))))
 
 (defn intersect [ray sphere]
-  ((:local-intersect sphere) (transform ray (:inverse-transform sphere))))
+  ((:local-intersect sphere) sphere (transform ray (:inverse-transform sphere))))

@@ -32,12 +32,6 @@
                                      (* 2 a))
                                   this-sphere)])))
 
-(defn- add-local-intersect-f [sphere]
-  (assoc sphere
-         :local-intersect (partial intersect-sphere-space sphere)))
-
-
-;;; This is the 
 (defn as-point [[x y z _]]
   (point/point x y z))
 
@@ -56,12 +50,12 @@
   (assoc shape :normal (create-compute-normal-f shape)))
 
 (defn sphere []
-  (add-local-intersect-f
-   (add-normal-f {:center [0 0 0 1]
-                  :radius 1.0
-                  :material (materials/material)
-                  :transform matrix/identity-matrix
-                  :inverse-transform matrix/identity-matrix})))
+  (add-normal-f {:center [0 0 0 1]
+                 :radius 1.0
+                 :material (materials/material)
+                 :transform matrix/identity-matrix
+                 :inverse-transform matrix/identity-matrix
+                 :local-intersect intersect-sphere-space}))
 
 (defn same-shape? [a b]
   (if (= (merge a {:normal nil, :local-intersect nil})
