@@ -12,7 +12,6 @@
 
 (defrecord Ray [origin direction])
 
-;;; TODO/FIXME use ray/ray instead (as for other objects)
 (defn ray [origin direction]
   (->Ray origin direction))
 
