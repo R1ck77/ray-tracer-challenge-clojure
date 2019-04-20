@@ -17,8 +17,8 @@
 (defn- intersect-plane-space [this-plane ray-in-plane-space]
   (if (< (Math/abs (second (:direction ray-in-plane-space))) EPSILON)
     []
-    (vector {:t (xz-plane-intersection ray-in-plane-space)
-             :object this-plane})))
+    (vector (intersection/intersection  (xz-plane-intersection ray-in-plane-space)
+                                        this-plane))))
 
 (defn plane []
   {:material (materials/material)
