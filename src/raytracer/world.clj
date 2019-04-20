@@ -37,14 +37,14 @@
   \"The Book made me do it.\""
   []
   (-> (create)
-    (add-object (shapes/change-material (shapes/sphere)
-                                        (materials/material :color [0.8 1.0 0.6]
-                                                         :diffuse 0.7
-                                                         :specular 0.2)))
-    (add-object (shapes/change-transform (shapes/sphere)
-                                      (transform/scale 0.5 0.5 0.5)))    
-    (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
-                                                        [1 1 1]))))
+      (add-object (shapes/change-material (shapes/sphere)
+                                          (materials/material :color [0.8 1.0 0.6]
+                                                              :diffuse 0.7
+                                                              :specular 0.2)))
+      (add-object (shapes/change-transform (shapes/sphere)
+                                           (transform/scale 0.5 0.5 0.5)))    
+      (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
+                                                          [1 1 1]))))
 
 (defn- unsorted-intersections [world ray]
   (flatten
@@ -96,19 +96,19 @@
                     shadowed)))
 
 (defn color-at [world ray]
-  (let [intersections (intersect world ray)]
-    (if (empty? intersections)
-      [0 0 0]
-      (shade-hit world (prepare-computations ray (intersection/hit intersections))))))
+  (let [intersection (intersection/hit (intersect world ray))]
+    (if intersection
+      (shade-hit world (prepare-computations ray intersection))
+      [0 0 0])))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
         [left-x left-y left-z _ :as left] (svector/cross forward (svector/normalize up))
         [true-up-x true-up-y true-up-z _ :as true-up] (svector/cross left forward)]
     (matrix/mul4 (vector    left-x    left-y    left-z 0
-                         true-up-x true-up-y true-up-z 0
-                         (- fwd-x) (- fwd-y) (- fwd-z) 0
-                                 0         0         0 1)
+                            true-up-x true-up-y true-up-z 0
+                            (- fwd-x) (- fwd-y) (- fwd-z) 0
+                            0         0         0 1)
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))
