@@ -71,8 +71,8 @@
                                                   (svector/svector 0 0 1))
                                          sphere)]
         (is (= 2 (count intersections)))
-        (is (identical? sphere (:object (first intersections))))
-        (is (identical? sphere (:object (second intersections))))
+        (is (shapes/same-shape? sphere (:object (first intersections))))
+        (is (shapes/same-shape? sphere (:object (second intersections))))
         (is (eps= 4 (:t (first intersections))))
         (is (eps= 6 (:t (second intersections))))))
     (testing "a ray intersects a sphere at a tangent"
@@ -80,8 +80,8 @@
                                                   (svector/svector 0 0 1))
                                          sphere)]
         (is (= 2 (count intersections)))
-        (is (identical? sphere (:object (first intersections))))
-        (is (identical? sphere (:object (second intersections))))
+        (is (shapes/same-shape? sphere (:object (first intersections))))
+        (is (shapes/same-shape? sphere (:object (second intersections))))
         (is (eps= 5 (:t (first intersections))))
         (is (eps= 5 (:t (second intersections))))))
     (testing "a ray misses a sphere"
@@ -94,8 +94,8 @@
                                                   (svector/svector 0 0 1))
                                          sphere)]
         (is (= 2 (count intersections)))
-        (is (identical? sphere (:object (first intersections))))
-        (is (identical? sphere (:object (second intersections))))
+        (is (shapes/same-shape? sphere (:object (first intersections))))
+        (is (shapes/same-shape? sphere (:object (second intersections))))
         (is (eps= -1 (:t (first intersections))))
         (is (eps= 1 (:t (second intersections))))))
     (testing "a sphere is behind a ray"
@@ -103,8 +103,8 @@
                                                   (svector/svector 0 0 1))
                                          sphere)]
         (is (= 2 (count intersections)))
-        (is (identical? sphere (:object (first intersections))))
-        (is (identical? sphere (:object (second intersections))))
+        (is (shapes/same-shape? sphere (:object (first intersections))))
+        (is (shapes/same-shape? sphere (:object (second intersections))))
         (is (eps= -6 (:t (first intersections))))
         (is (eps= -4 (:t (second intersections))))))
     (testing "intersecting a scaled sphere with a ray"
