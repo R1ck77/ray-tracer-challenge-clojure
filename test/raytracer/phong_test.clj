@@ -5,6 +5,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.materials :as materials]
+            [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]))
 
 (def half√2 (/ (Math/sqrt 2) 2))
@@ -47,4 +48,15 @@
       normal (svector/svector 0 0 -1)
       light (light-sources/create-point-light (point/point 0 0 10) [1 1 1])]
       (is (v= [0.1 0.1 0.1]
-              (phong/lighting material light position eye normal))))))
+              (phong/lighting material light position eye normal)))))
+  (testing "Lighting with a pattern applied"
+    (let [material (materials/material :ambient 1, :diffuse 0, :specular 0,
+                                       :pattern (pattern/stripe [1 1 1] [0 0 0]))
+          eye (svector/svector 0 0 -1)
+          normal (svector/svector 0 0 -1)
+          light (light-sources/create-point-light (point/point 0 0 -10)
+                                                  [1 1 1])]
+      (is (v= [1 1 1]
+              (phong/lighting material light (point/point 0.9 0 0) eye normal false)))
+      (is (v= [0 0 0]
+              (phong/lighting material light (point/point 1.1 0 0) eye normal false))))))
