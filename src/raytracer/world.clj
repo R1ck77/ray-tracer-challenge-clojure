@@ -88,7 +88,7 @@
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
   (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
-    (phong/lighting (-> intermediate-result :object :material)
+    (phong/lighting (:object intermediate-result)
                     (first (:light-sources world)) ;;; first light source, for now
                     (:point intermediate-result)
                     (:eye-v intermediate-result)
