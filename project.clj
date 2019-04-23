@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.9.0"]]
   :main ^:skip-aot raytracer.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all
+  :profiles {:demo-coverage {:main ^:skip-aot demo.all-demos}
+             :uberjar {:aot :all
                        :global-vars {*warn-on-reflection* true}}             
              :visual-vm {
                          :jvm-opts ["-Dcom.sun.management.jmxremote"

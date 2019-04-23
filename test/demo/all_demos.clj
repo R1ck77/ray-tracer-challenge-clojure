@@ -7,16 +7,25 @@
             [demo.phong-scene :as phong-scene]
             [demo.plane-demo :as plane-demo]))
 
-(deftest test-demo
-  (testing "projectile demo"
+
+(defmacro run-demo [name demo-code]
+  `(do
+     (println ~name)
+     ~demo-code))
+
+(defn run-all-demos []
+  (run-demo "projectile demo"
     (projectile/simulate-dragless-cannon 45 23))
-  (testing "clock demo"
+  (run-demo "clock demo"
     (clock/render-demo))
-  (testing "simple projection demo"
+  (run-demo "simple projection demo"
     (simple-projection/render-demo))
-  (testing "tiny phong sphere demo"
-    (phong-sphere/render-demo 32 20))
-  (testing "tiny phong scene demo"
-    (phong-scene/render-demo 40 20))
-  (testing "tiny plane demo"
-    (plane-demo/render-demo 40 20)))
+  (run-demo "tiny phong sphere demo"
+    (phong-sphere/render-demo 8 4))
+  (run-demo "tiny phong scene demo"
+    (phong-scene/render-demo 10 5))
+  (run-demo "tiny plane demo"
+    (plane-demo/render-demo 10 5)))
+
+(defn -main [& args]
+  (run-all-demos))

@@ -6,13 +6,15 @@
             [raytracer.transform :refer :all]))
 
 
-(def canvas-size [800 600])
+(def canvas-size [40 30])
 
-(def clock-radius 250)
+(def clock-radius 10)
 
 (defn clock-position [angle-rad]
   ;;; TODO/FIXME some multiplications could be cached. Whatever
-  (transform (translate 400 300 0
+  (transform (translate (/ (first canvas-size) 2)
+                        (/ (second canvas-size) 2)
+                        0
                         (scale -1 -1 1
                                (rotate-z angle-rad
                                          (translate 0 clock-radius 0))))
