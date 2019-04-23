@@ -2,6 +2,7 @@
   (:require [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.color :as color]
+            [raytracer.materials :as materials]
             [raytracer.ray :as ray]))
 
 (defn- compute-if-positive [value function]
@@ -40,7 +41,7 @@
   ([material light-source position eye normal]
    (lighting material light-source position eye normal false))
   ([material light-source position eye normal in-shadow]
-   (let [effective-color (color/mul (:color material)
+   (let [effective-color (color/mul (materials/get-color material position)
                                     (:intensity light-source))
          ambient-color (compute-ambient effective-color material)]
      (if in-shadow

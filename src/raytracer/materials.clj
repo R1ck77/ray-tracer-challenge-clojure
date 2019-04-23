@@ -1,4 +1,5 @@
-(ns raytracer.materials) ;;;TODO/FIXME change the name to material
+(ns raytracer.materials
+  (:require [raytracer.pattern :as pattern])) ;;;TODO/FIXME change the name to material
 
 (defn material
   ([]
@@ -12,4 +13,9 @@
   ([& {:as args}]
    (merge (material) args)))
 
+
+(defn get-color [material point]
+  (if-let [pattern (:pattern material)]
+    (pattern/color-at-object pattern nil point)
+    (:color material)))
 
