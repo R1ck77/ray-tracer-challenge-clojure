@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
             [raytracer.point :as point]
+            [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
             [raytracer.pattern :as pattern]))
@@ -15,20 +16,31 @@
       (is (= {:a white, :b black}
              (select-keys stripe [:a :b]))))
     (testing "A stripe pattern is constant in y"
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 0 0))))
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 1 0))))
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 2 0)))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 0 0))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 1 0))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 2 0)))))
     (testing "A stripe pattern is constant in z"
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 0 0))))
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 0 1))))
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 0 2)))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 0 0))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 0 1))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 0 2)))))
     (testing "A stripe pattern alternates in x"
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0 0 0))))
-      (is (v= white ((:stripe-at stripe) stripe (point/point 0.9 0 0))))
-      (is (v= black ((:stripe-at stripe) stripe (point/point 1 0 0)))))
-    (is (v= black ((:stripe-at stripe) stripe (point/point -0.1 0 0))))
-    (is (v= black ((:stripe-at stripe) stripe (point/point -1 0 0))))
-    (is (v= white ((:stripe-at stripe) stripe (point/point -1.1 0 2))))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0 0 0))))
+      (is (v= white ((:color-at stripe) stripe (point/point 0.9 0 0))))
+      (is (v= black ((:color-at stripe) stripe (point/point 1 0 0)))))
+    (is (v= black ((:color-at stripe) stripe (point/point -0.1 0 0))))
+    (is (v= black ((:color-at stripe) stripe (point/point -1 0 0))))
+    (is (v= white ((:color-at stripe) stripe (point/point -1.1 0 2))))))
+
+(deftest test-gradient-pattern
+  (let [gradient (pattern/gradient white black)]
+    (testing "A gradient linearly interpolates between colors"
+      (is (v= white ((:color-at gradient) gradient (point/point 0 0 0))))
+      (is (v= [0.75 0.75 0.75] ((:color-at gradient) gradient (point/point 0.25 0 0))))
+      (is (v= [0.5 0.5 0.5] ((:color-at gradient) gradient (point/point 0.5 0 0))))
+      (is (v= [0.25 0.25 0.25] ((:color-at gradient) gradient (point/point 0.75 0 0)))))
+    (testing "A gradient pattern has a default transformation"
+      (is (v= matrix/identity-matrix (:transform gradient)))
+      (is (v= matrix/identity-matrix (:inverse-transform gradient))))))
 
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"

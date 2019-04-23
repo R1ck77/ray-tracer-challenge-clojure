@@ -5,7 +5,8 @@
             [demo.simple-projection :as simple-projection]
             [demo.phong-sphere :as phong-sphere]
             [demo.phong-scene :as phong-scene]
-            [demo.plane-demo :as plane-demo]))
+            [demo.plane-demo :as plane-demo]
+            [demo.pattern-demo :as pattern-demo]))
 
 
 (defmacro run-demo [name demo-code]
@@ -25,7 +26,9 @@
   (run-demo "tiny phong scene demo"
     (phong-scene/render-demo 10 5))
   (run-demo "tiny plane demo"
-    (plane-demo/render-demo 10 5)))
+            (plane-demo/render-demo 10 5))
+  (run-demo "tiny pattern demo"
+            (pattern-demo/render-demo 10 5)))
 
 (defn -main [& args]
   (run-all-demos))
