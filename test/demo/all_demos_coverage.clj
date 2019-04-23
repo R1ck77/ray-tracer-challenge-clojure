@@ -1,4 +1,4 @@
-(ns demo.all-demos
+(ns demo.all-demos-coverage
   (:require [clojure.test :refer :all]
             [demo.projectile :as projectile]
             [demo.clock :as clock]
