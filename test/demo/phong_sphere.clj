@@ -54,11 +54,11 @@
   (let [hit (intersection/hit (ray/intersect ray object))]
     (if hit
       (let [point (ray/position ray (:t hit))
-            color (phong/lighting (:material object)
+            color (phong/lighting object
                                   light-source
                                   point
                                   (svector/neg (:direction ray))
-                                  ((:normal object) point))]
+                                  ((:normal object) object point))]
        (canvas/write canvas (first pixel) (second pixel) color))
       canvas)))
 
