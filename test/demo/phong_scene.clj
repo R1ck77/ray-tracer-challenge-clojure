@@ -11,8 +11,6 @@
             [raytracer.world :as world]))
 
 ;;; Note: the result of this demo changes with the evolution of the underlying functions
-(def width 400)
-(def height 200)
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -57,11 +55,16 @@
                                     (light-sources/create-point-light (point/point -10 10 -10)
                                                                       [1 1 1])))
 
-(def camera (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                                  (world/view-transform (point/point 0 1.5 -5)
-                                                        (point/point 0 1 0)
-                                                        (svector/svector 0 1 0))))
+(defn create-camera [width height]
+  (camera/set-transform (camera/camera width height (/ Math/PI 3))
+                        (world/view-transform (point/point 0 1.5 -5)
+                                              (point/point 0 1 0)
+                                              (svector/svector 0 1 0))))
 
-(defn render-demo []
-  (spit "output.ppm"
-        (canvas/canvas-to-ppm (camera/render camera world))))
+(defn render-demo
+  ([] (render-demo 400 200))
+  ([width height]
+   (let [camera ()]
+     (spit "phong-scene.ppm"
+           (canvas/canvas-to-ppm (camera/render (create-camera width height)
+                                                world))))))

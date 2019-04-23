@@ -9,8 +9,8 @@
             [raytracer.shapes :as shapes]
             [raytracer.ray :as ray]))
 
-(def canvas-size {:width 320, :height 200})
-(def canvas-scale [0.1 0.1])
+(def canvas-size {:width 160, :height 100})
+(def canvas-scale [0.2 0.2])
 (def color [255 0 0])
 
 (defn- create-simple-scene
@@ -49,10 +49,12 @@
     (canvas/write canvas (first pixel) (second pixel) color)))
 
 (defn render-scene [scene]
-  (spit "output.ppm"
+  (spit "simple-projection.ppm"
         (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene))
                                       (canvas/create-canvas (:width canvas-size)
                                                             (:height canvas-size))
                                       (seq-ray scene)))))
 
+(defn render-demo []
+  (render-scene (create-simple-scene)))
 

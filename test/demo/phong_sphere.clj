@@ -13,8 +13,8 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
-(def canvas-size {:width 320, :height 200})
-(def canvas-scale [0.1 0.1])
+(def ^:dynamic canvas-size {:width 320, :height 200})
+(def ^:dynamic canvas-scale [0.1 0.1])
 (def color [255 0 0])
 (def sphere-template (shapes/change-material (shapes/sphere)
                                              (assoc (materials/material) :color [1 0.2 1])))
@@ -63,10 +63,17 @@
       canvas)))
 
 (defn render-scene [scene]
-  (spit "output.ppm"
+  (spit "phong-sphere.ppm"
         (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene) (:light-source scene))
                                       (canvas/create-canvas (:width canvas-size)
                                                             (:height canvas-size))
                                       (seq-ray scene)))))
 
-
+(defn render-demo
+  ([width height]
+   (let [width-ratio (/ (:width canvas-size) width)
+         height-ratio (/ (:height canvas-size) height)]
+     (binding [canvas-size {:width width, :height height}
+               canvas-scale [(* (first canvas-scale) width-ratio)
+                             (* (second canvas-scale) height-ratio)]]
+       (render-scene (create-simple-scene))))))

@@ -107,7 +107,7 @@
 (defn save-to-file [width height data]
   (let [ppm-content (canvas-to-ppm
                      (write-to-canvas (create-canvas width height) data))]
-    (spit "output.ppm" ppm-content)))
+    (spit "projectile.ppm" ppm-content)))
 
 (defn create-canvas-writer [width height]
   (let [data (atom [])]

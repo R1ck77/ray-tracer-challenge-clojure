@@ -25,10 +25,9 @@
 (defn compute-clock-positions []
   (map clock-position (clock-angles-seq)))
 
-(defn draw-clock []
+(defn render-demo []
   (spit "sad_clock.ppm"
         (canvas-to-ppm (reduce (fn [canvas [x y _ _]]
                                  (write canvas (int x) (int y) [1 1 1]))
                                (apply create-canvas canvas-size)          
                                (compute-clock-positions)))))
-
