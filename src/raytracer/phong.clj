@@ -38,10 +38,11 @@
 
 ;;; TODO/FIXME hideous. Split in two methods lighting and shadow-lighting
 (defn lighting
-  ([material light-source position eye normal]
-   (lighting material light-source position eye normal false))
-  ([material light-source position eye normal in-shadow]
-   (let [effective-color (color/mul (materials/get-color material position)
+  ([object light-source position eye normal]
+   (lighting object light-source position eye normal false))
+  ([object light-source position eye normal in-shadow]
+   (let [material (:material object)
+         effective-color (color/mul (materials/get-color object position)
                                     (:intensity light-source))
          ambient-color (compute-ambient effective-color material)]
      (if in-shadow

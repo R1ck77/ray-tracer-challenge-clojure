@@ -14,8 +14,9 @@
    (merge (material) args)))
 
 
-(defn get-color [material point]
-  (if-let [pattern (:pattern material)]
-    (pattern/color-at-object pattern nil point)
-    (:color material)))
+(defn get-color [object point]
+  (let [material (:material object)]
+    (if-let [pattern (:pattern material)]
+      (pattern/color-at-object pattern object point)
+      (:color material))))
 

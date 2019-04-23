@@ -15,7 +15,10 @@
   (merge pattern {:transform new-transform
                   :inverse-transform (matrix/invert new-transform 4)}))
 
+(defn- point-in-pattern-space [pattern object point]
+  (->> point
+       (matrix/transform (:inverse-transform object))
+       (matrix/transform (:inverse-transform pattern))))
+
 (defn color-at-object [pattern object point]
-  ((:stripe-at pattern) pattern (matrix/transform (:inverse-transform pattern)
-                                                  (matrix/transform (:inverse-transform object)
-                                                                    point))))
+  ((:stripe-at pattern) pattern (point-in-pattern-space pattern object point)))
