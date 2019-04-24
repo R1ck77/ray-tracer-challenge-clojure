@@ -3,6 +3,7 @@
             [raytracer.svector :as svector]
             [raytracer.canvas :as canvas]            
             [raytracer.ray :as ray]
+            [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
             [raytracer.materials :as materials]
@@ -17,7 +18,8 @@
 (def partπ (/ Math/PI 4))
 
 (def room-material (materials/material :specular 0.0
-                                       :color [1 0.9 0.9]))
+                                       :pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
+                                                                          matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)))

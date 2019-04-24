@@ -35,6 +35,16 @@
 (defn ring [white black]
   (create-pattern white black ring-function))
 
+(defn- checker-function [pattern [x y z _]]
+  (if (zero? (mod (int (+ (Math/abs x)
+                          (Math/abs y)
+                          (Math/abs z))) 2))
+    (:a pattern)
+    (:b pattern)))
+
+(defn checker [white black]
+  (create-pattern white black checker-function))
+
 (defn change-transform [pattern new-transform]
   (merge pattern {:transform new-transform
                   :inverse-transform (matrix/invert new-transform 4)}))

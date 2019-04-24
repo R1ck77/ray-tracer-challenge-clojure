@@ -50,6 +50,21 @@
       (is (v= black ((:color-at ring) ring (point/point 0 0 1))))
       (is (v= black ((:color-at ring) ring (point/point 0.708 0.708 0.708)))))))
 
+(deftest test-checker-pattern
+  (let [checker (pattern/checker white black)]
+    (testing "Checkers should repeat in x"
+      (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
+      (is (v= white ((:color-at checker) checker (point/point 0.99 0 0))))
+      (is (v= black ((:color-at checker) checker (point/point 1.01 0 0)))))  
+    (testing "Checkers should repeat in y"
+      (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
+      (is (v= white ((:color-at checker) checker (point/point 0 0.99 0))))
+      (is (v= black ((:color-at checker) checker (point/point 0 1.01 0)))))
+    (testing "Checkers should repeat in z"
+      (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
+      (is (v= white ((:color-at checker) checker (point/point 0 0 0.99))))
+      (is (v= black ((:color-at checker) checker (point/point 0 0 1.01)))))))
+
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"
     (let [object (shapes/change-transform (shapes/sphere)
