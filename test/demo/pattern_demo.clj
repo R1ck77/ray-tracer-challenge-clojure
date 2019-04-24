@@ -22,7 +22,8 @@
                                                                           matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
-               (shapes/change-material room-material)))
+               (shapes/change-material room-material)
+               (shapes/change-transform (transform/translate 0 -0.0001 0))))
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (materials/material :diffuse 0.7, :specular 0.3
