@@ -42,6 +42,14 @@
       (is (v= matrix/identity-matrix (:transform gradient)))
       (is (v= matrix/identity-matrix (:inverse-transform gradient))))))
 
+(deftest test-ring-pattern
+  (let [ring (pattern/ring white black)]
+    (testing "A ring should extend in both x and z"
+      (is (v= white ((:color-at ring) ring (point/point 0 0 0))))
+      (is (v= black ((:color-at ring) ring (point/point 1 0 0))))
+      (is (v= black ((:color-at ring) ring (point/point 0 0 1))))
+      (is (v= black ((:color-at ring) ring (point/point 0.708 0.708 0.708)))))))
+
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"
     (let [object (shapes/change-transform (shapes/sphere)
