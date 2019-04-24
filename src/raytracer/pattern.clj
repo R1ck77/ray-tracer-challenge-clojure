@@ -36,9 +36,9 @@
   (create-pattern white black ring-function))
 
 (defn- checker-function [pattern [x y z _]]
-  (if (zero? (mod (int (+ (Math/floor x )
-                          (Math/floor y)
-                          (Math/floor z))) 2))
+  (if (zero? (mod (+ (int x)
+                     (int y)
+                     (int z)) 2))
     (:a pattern)
     (:b pattern)))
 
