@@ -57,9 +57,23 @@
                 px py
                 (world/color-at world (ray-for-pixel camera px py))))
 
-(defn render [camera world]
+(defn render-serial [camera world]
   (let [width (:h-size camera)
         height (:v-size camera)]
     (reduce (partial render-pixel camera world)
             (canvas/create-canvas width height)
             (seq-pixels width height))))
+
+(defn- get-pixel-color [camera world [px py]]
+  (vector px py (world/color-at world (ray-for-pixel camera px py))))
+
+(defn render
+  "very coarse and far from optmized parallel version"
+  [camera world]
+  (let [width (:h-size camera)
+        height (:v-size camera)]
+    (reduce (fn [canvas [x y color]]
+              (canvas/write canvas x y color))
+            (canvas/create-canvas width height)
+            (pmap (partial get-pixel-color camera world)
+                  (seq-pixels width height)))))

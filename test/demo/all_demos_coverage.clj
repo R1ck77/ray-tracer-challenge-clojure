@@ -31,4 +31,5 @@
             (pattern-demo/render-demo 10 5)))
 
 (defn -main [& args]
-  (run-all-demos))
+  (run-all-demos)
+  (shutdown-agents))
