@@ -63,7 +63,12 @@
     (testing "Checkers should repeat in z"
       (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
       (is (v= white ((:color-at checker) checker (point/point 0 0 0.99))))
-      (is (v= black ((:color-at checker) checker (point/point 0 0 1.01)))))))
+      (is (v= black ((:color-at checker) checker (point/point 0 0 1.01)))))
+    (testing "Checkers has x/y/z interactions"
+      (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
+      (is (v= white ((:color-at checker) checker (point/point 0 1.5 1.5))))
+      (is (v= white ((:color-at checker) checker (point/point 1.5 0.5 1.5))))
+      (is (v= black ((:color-at checker) checker (point/point 1.5 1.5 1.5)))))))
 
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"
