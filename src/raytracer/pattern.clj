@@ -9,6 +9,12 @@
    :transform matrix/identity-matrix
    :inverse-transform matrix/identity-matrix})
 
+(defn- solid-function [pattern _]
+  (:a pattern))
+
+(defn solid [color]
+  (create-pattern color color solid-function))
+
 (defn- stripe-function [pattern point]
   (if (zero? (mod (int (Math/floor (first point))) 2))
     (:a pattern)
@@ -45,6 +51,20 @@
 (defn checker [white black]
   (create-pattern white black checker-function))
 
+(defn blend-function [pattern point]
+  (let [a (:a-pattern pattern)
+        b (:b-pattern pattern)]
+    (color/scale (color/add ((:color-at a) a point)
+                            ((:color-at b) b point))
+                 0.5)))
+
+(defn blend [_ pattern-a pattern-b]
+  {:transform matrix/identity-matrix
+   :inverse-transform matrix/identity-matrix
+   :a-pattern pattern-a
+   :b-pattern pattern-b
+   :color-at blend-function})
+
 (defn change-transform [pattern new-transform]
   (merge pattern {:transform new-transform
                   :inverse-transform (matrix/invert new-transform 4)}))
@@ -56,3 +76,4 @@
 
 (defn color-at-object [pattern object point]
   ((:color-at pattern) pattern (point-in-pattern-space pattern object point)))
+

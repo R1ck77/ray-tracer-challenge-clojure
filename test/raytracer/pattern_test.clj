@@ -10,6 +10,14 @@
 (def white [1 1 1])
 (def black [0 0 0])
 
+(deftest test-solid-pattern
+  (testing "A solid pattern is the same everywhere"
+    (let [solid (pattern/solid white)]
+      (is (v= white ((:color-at solid) solid (point/point 0 0 0))))
+      (is (v= white ((:color-at solid) solid (point/point 1.5 1.5 1.5))))
+      (is (v= white ((:color-at solid) solid (point/point -0.5 0 0))))
+      (is (v= white ((:color-at solid) solid (point/point -10 10 100)))))))
+
 (deftest test-stripe-pattern
   (let [stripe (pattern/stripe white black)]
     (testing "Creating a stripe pattern"
@@ -69,6 +77,15 @@
       (is (v= white ((:color-at checker) checker (point/point 0 1.5 1.5))))
       (is (v= white ((:color-at checker) checker (point/point 1.5 0.5 1.5))))
       (is (v= black ((:color-at checker) checker (point/point 1.5 1.5 1.5)))))))
+
+(deftest test-nested-pattern
+  (testing "Average blending"
+    (let [blended (pattern/blend :average
+                                 (pattern/checker white black)
+                                 (pattern/checker black white))]
+      (is (v= [0.5 0.5 0.5] ((:color-at blended) blended (point/point 0 0 0))))
+      (is (v= [0.5 0.5 0.5] ((:color-at blended) blended (point/point 1.5 0 0))))
+      (is (v= [0.5 0.5 0.5] ((:color-at blended) blended (point/point 1.5 1.5 0)))))))
 
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"
