@@ -72,7 +72,7 @@
   [camera world]
   (let [width (:h-size camera)
         height (:v-size camera)]
-    (reduce (fn [canvas [x y color]]
+    (reduce (fn write-on-cavas [canvas [x y color]]
               (canvas/write canvas x y color))
             (canvas/create-canvas width height)
             (pmap (partial get-pixel-color camera world)
