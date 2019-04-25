@@ -55,23 +55,23 @@
   (let [perlin-data {:x-scale 5
                      :y-scale 3}]
     (testing "conditions for point in the higher left corner"
-      (is (= #{[2 4] [0 4] [2 0] [0 0]}
+      (is (= [[2 4] [2 0] [0 4] [0 0]]
              (perlin/get-neighbors perlin-data [4.9 2.9]))))
     (testing "condition for the point in the lower right corner"
-      (is (= #{[0 0] [1 0] [0 1] [1 1]}
+      (is (= [[0 0] [0 1] [1 0] [1 1]]
              (perlin/get-neighbors perlin-data [0.5 0.5]))))))
 
 (deftest test-get-distances
   (testing "given a point in the grid and a set of neighbors, compute the distances"
-    (is (= #{{:coords [0 0]
+    (is (= [{:coords [0 0]
               :distance (svector/svector 0 0 0)}
-             {:coords [1 1]
-              :distance (svector/svector 1 1 0)}
              {:coords [0 1]
               :distance (svector/svector 0 1 0)}
              {:coords [1 0]
-              :distance (svector/svector 1 0 0)}}
-           (perlin/compute-distances #{[0 0] [1 1] [0 1] [1 0]}
+              :distance (svector/svector 1 0 0)}
+             {:coords [1 1]
+              :distance (svector/svector 1 1 0)}]
+           (perlin/compute-distances [[0 0] [0 1] [1 0] [1 1]]
                                      [0 0])))))
 
 
@@ -86,20 +86,20 @@
 (deftest test-get-products
   (let [perlin-data (create-fake-perlin-data)]
     (testing "given a set of distances and the grid, compute the dot products"
-      (is (= #{{:coords [0 0]
-                :dot 0}
+      (is (= [{:coords [0 0]
+               :dot 0}
+               {:coords [1 1]
+                :dot 2}              
                {:coords [1 0]
                 :dot 1}
                {:coords [0 1]
-                :dot 1}
-               {:coords [1 1]
-                :dot 2}}             
-             (perlin/compute-products (:grid perlin-data) #{{:coords [0 0]
+                :dot 1}]             
+             (perlin/compute-products (:grid perlin-data) [{:coords [0 0]
                                                              :distance (svector/svector 0 0 0)}
                                                             {:coords [1 1]
                                                              :distance (svector/svector 1 1 0)}
                                                             {:coords [1 0]
                                                              :distance (svector/svector 1 0 0)}
                                                             {:coords [0 1]
-                                                             :distance (svector/svector 0 1 0)}}))))))
+                                                             :distance (svector/svector 0 1 0)}]))))))
 

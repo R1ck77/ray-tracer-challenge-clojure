@@ -45,7 +45,7 @@
   (vector (scale-coordinate x (:x-scale perlin-data))
           (scale-coordinate y (:y-scale perlin-data))))
 
-(def neighbors-delta #{[0 0] [0 1] [1 0] [1 1]})
+(def neighbors-delta [[0 0] [0 1] [1 0] [1 1]])
 
 (defn- combine
   [x-scale y-scale [base-y base-x] [dy dx]]
@@ -57,17 +57,17 @@
   [perlin-data scaled-point]  
   (let [{:keys [x-scale y-scale]} perlin-data
         base (get-cell perlin-data scaled-point)]
-    (into #{} (map (partial combine x-scale y-scale base) neighbors-delta))))
+    (vec (map (partial combine x-scale y-scale base) neighbors-delta))))
 
 (defn compute-distances
   "Compute the distance of a scaled point from the node vertices
 
   Use svector because… It's there."
   [neighbors [sx sy]]
-  (into #{} (map (fn single-distance [[gx gy :as neighbor]]
-                   {:coords neighbor
-                    :distance (svector/svector (- gx sx) (- gy sy) 0)})
-                 neighbors)))
+  (vec (map (fn single-distance [[gx gy :as neighbor]]
+              {:coords neighbor
+               :distance (svector/svector (- gx sx) (- gy sy) 0)})
+            neighbors)))
 
 (defn- dot-product
   [grid
@@ -79,5 +79,18 @@
 (defn compute-products
   "Give a grid of gradients and a set of distances, compute a set of dot products"
   [grid distances]
-  (into #{} (map (partial dot-product grid)
-                 distances)))
+  (vec (map (partial dot-product grid)
+            distances)))
+
+(defn- lerp [a0 a1 w]
+  (+ (* (- 1 w) a0))
+  (* w a1))
+
+(defn interpolate
+  "Find the final value for the point
+
+  Note that the coordinates of the scaled point and the ones of the grid are inverted"
+  [products scaled-point]
+
+  
+  )
