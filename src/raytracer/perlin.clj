@@ -45,7 +45,17 @@
   (vector (scale-coordinate x (:x-scale perlin-data))
           (scale-coordinate y (:y-scale perlin-data))))
 
-(defn get-neighbors [perlin-data scaled-point]
-  (let [{:keys [x-scale y-scale]} perlin-data]
-   (conj #{} (get-cell perlin-data scaled-point))) ;; this is the base, I need to sum +1+1 to it
-  )
+(def neighbors-delta #{[0 0] [0 1] [1 0] [1 1]})
+
+(defn- combine
+  [x-scale y-scale [base-y base-x] [dy dx]]
+  (println base-x base-y dx dy x-scale y-scale)
+  (vector (mod (+ base-y dy) y-scale)
+          (mod (+ base-x dx) x-scale)))
+
+(defn get-neighbors
+  "Return the list of nodes in row,column format"
+  [perlin-data scaled-point]  
+  (let [{:keys [x-scale y-scale]} perlin-data
+        base (get-cell perlin-data scaled-point)]
+    (into #{} (map (partial combine x-scale y-scale base) neighbors-delta))))
