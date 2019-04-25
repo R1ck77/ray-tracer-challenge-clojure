@@ -16,3 +16,7 @@
 (defn create-grid [rows columns]
   (doto (empty-grid rows columns)
     (fill-grid rows columns)))
+
+(defn get-cell [perlin-data [x y]]
+  (vector (int (* y (:y-scale perlin-data)))
+          (int (* x (:x-scale perlin-data)))))

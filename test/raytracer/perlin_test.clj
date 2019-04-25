@@ -23,3 +23,30 @@
         (doseq [i (range rows)
                 j (range columns)]
           (is (eps= 0 (nth (aget grid i j) 2))))))))
+
+
+(deftest test-get-cell
+  (let [perlin-data {:y-scale 3
+                    :x-scale 5
+                     :grid nil}
+        yinc (/ 3)
+        xinc (/ 5)]
+    (testing "get-cell returns the correct indices for a point inside the grid"
+      (is (= [0 0] (perlin/get-cell perlin-data [0.0001 0.0001])))
+      (is (= [2 4] (perlin/get-cell perlin-data [(+ (* xinc 4)
+                                                    0.0001)
+                                                 (+ (* yinc 2)
+                                                    0.0001)])))
+      (is (= [1 2] (perlin/get-cell perlin-data [(+ (* xinc 2)
+                                                    0.0001)
+                                                 (+ (* yinc 1)
+                                                    0.0001)]))))
+    (testing "get-cell returns the correct indices for a point outside the grid"
+      (is (= [7 8] (perlin/get-cell perlin-data [(+ (* xinc 8)
+                                                    0.0001)
+                                                 (+ (* yinc 7)
+                                                    0.0001)])))
+      (is (= [-10 -2] (perlin/get-cell perlin-data [(+ (* xinc -2)
+                                                    0.0001)
+                                                 (+ (* yinc -10)
+                                                    0.0001)]))))))
