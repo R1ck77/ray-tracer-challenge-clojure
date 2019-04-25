@@ -61,3 +61,16 @@
       (is (= #{[0 0] [1 0] [0 1] [1 1]}
              (perlin/get-neighbors perlin-data [0.5 0.5]))))))
 
+(deftest test-get-distances
+  (testing "given a point in the grid and a set of neighbors, compute the distances"
+    (is (= #{{:coords [0 0]
+              :distance (svector/svector 0 0 0)}
+             {:coords [1 1]
+              :distance (svector/svector 1 1 0)}
+             {:coords [0 1]
+              :distance (svector/svector 0 1 0)}
+             {:coords [1 0]
+              :distance (svector/svector 1 0 0)}}
+           (perlin/compute-distances #{[0 0] [1 1] [0 1] [1 0]}
+                                     [0 0])))))
+

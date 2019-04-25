@@ -59,3 +59,13 @@
   (let [{:keys [x-scale y-scale]} perlin-data
         base (get-cell perlin-data scaled-point)]
     (into #{} (map (partial combine x-scale y-scale base) neighbors-delta))))
+
+(defn compute-distances
+  "Compute the distance of a scaled point from the node vertices
+
+  Use svector because… It's there."
+  [neighbors [sx sy]]
+  (into #{} (map (fn single-distance [[gx gy :as neighbor]]
+                   {:coords neighbor
+                    :distance (svector/svector (- gx sx) (- gy sy) 0)})
+                 neighbors)))
