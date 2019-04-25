@@ -78,7 +78,7 @@
 (defn- create-fake-perlin-data []
   (let [grid (perlin/create-grid 3 5)]
     (doseq [i (range 3), j (range 5)]
-      (aset grid i j (svector/svector j i 0)))
+      (aset grid i j (svector/svector i j 0)))
     {:x-scale 5
      :y-scale 3
      :grid grid}))
@@ -103,3 +103,13 @@
                                                             {:coords [0 1]
                                                              :distance (svector/svector 0 1 0)}]))))))
 
+(deftest test-noise
+  (let [perlin-data {:grid (perlin/create-grid 7 13)
+                     :x-scale 13
+                     :y-scale 7}]
+    (testing "noise returns some value for some special points"
+      (is (perlin/noise perlin-data [0 0]) 0)
+      (is (perlin/noise perlin-data [0.9999 0.9999]) 0))
+    (testing "noise returns some value for points outside the grid"
+      (is (perlin/noise perlin-data [-0.2 -0.4]) 0)
+      (is (perlin/noise perlin-data [1.3 4.5]) 0))))

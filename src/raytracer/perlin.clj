@@ -74,7 +74,7 @@
    {[x y :as coords] :coords
     distance :distance}]
   {:coords coords
-   :dot (svector/dot distance (aget grid y x))})
+   :dot (svector/dot distance (aget grid x y))})
 
 (defn compute-products
   "Give a grid of gradients and a set of distances, compute a set of dot products"
@@ -90,7 +90,18 @@
   "Find the final value for the point
 
   Note that the coordinates of the scaled point and the ones of the grid are inverted"
-  [products scaled-point]
+  [products [y x]]
+  (let [x1 (nth products 0)
+        x2 (nth products 2)
+        x3 (nth products 1)
+        x4 (nth products 3)]
+    (lerp (lerp (:dot x1) (:dot x2) (- (first (:coords x1)) y))
+          (lerp (:dot x3) (:dot x4) (- (first (:coords x3)) y))
+          x)))
 
-  
-  )
+(defn noise [perlin-data point]
+  (let [scaled-point (scale-point perlin-data point)]
+    (interpolate (compute-products (:grid perlin-data)
+                                   (compute-distances (get-neighbors perlin-data scaled-point)
+                                                      scaled-point))
+                 scaled-point)))
