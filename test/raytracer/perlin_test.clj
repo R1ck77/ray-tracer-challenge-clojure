@@ -51,3 +51,13 @@
       (is (v= [(- 20 19.5) (- 9 8.7)]
               (perlin/scale-point perlin-data [-3.9 -2.9]))))))
 
+(deftest test-get-neighbors
+  (let [perlin-data {:x-scale 5
+                     :y-scale 3}]
+    (testing "conditions for point in the higher left corner"
+      (is (= #{[2 4] [0 4] [2 0] [0 0]}
+             (perlin/get-neighbors perlin-data [4.9 2.9]))))
+    (testing "condition for the point in the lower right corner"
+      (is (= #{[0 0] [1 0] [0 1] [1 1]}
+             (perlin/get-neighbors perlin-data [0.5 0.5]))))))
+

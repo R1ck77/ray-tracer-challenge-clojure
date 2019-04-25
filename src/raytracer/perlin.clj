@@ -27,13 +27,9 @@
   (scale-positive-coord (translate-to-positive p scale)
                         scale))
 
-(defn- get-cell-scale [x-scale y-scale x y]
-  (vector (scale-coord y y-scale) 
-          (scale-coord x x-scale)))
-
-(defn get-cell [perlin-data [x y]]
-  (get-cell-scale (:x-scale perlin-data) (:y-scale perlin-data)
-                  x y))
+(defn get-cell [perlin-data [scaled-x scaled-y]]
+  (vector (scale-coord scaled-y (:y-scale perlin-data)) 
+          (scale-coord scaled-x (:x-scale perlin-data))))
 
 (defn make-positive [scaled-p scale]
   (if (>= scaled-p 0)
@@ -48,3 +44,7 @@
   [perlin-data [x y]]
   (vector (scale-coordinate x (:x-scale perlin-data))
           (scale-coordinate y (:y-scale perlin-data))))
+
+(defn get-neighbors [perlin-data scaled-point]
+  (conj #{} (get-cell perlin-data scaled-point))
+  )
