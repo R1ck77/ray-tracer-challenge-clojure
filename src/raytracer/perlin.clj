@@ -49,7 +49,6 @@
 
 (defn- combine
   [x-scale y-scale [base-y base-x] [dy dx]]
-  (println base-x base-y dx dy x-scale y-scale)
   (vector (mod (+ base-y dy) y-scale)
           (mod (+ base-x dx) x-scale)))
 
@@ -69,3 +68,16 @@
                    {:coords neighbor
                     :distance (svector/svector (- gx sx) (- gy sy) 0)})
                  neighbors)))
+
+(defn- dot-product
+  [grid
+   {[x y :as coords] :coords
+    distance :distance}]
+  {:coords coords
+   :dot (svector/dot distance (aget grid y x))})
+
+(defn compute-products
+  "Give a grid of gradients and a set of distances, compute a set of dot products"
+  [grid distances]
+  (into #{} (map (partial dot-product grid)
+                 distances)))

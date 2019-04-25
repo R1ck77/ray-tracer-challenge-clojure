@@ -74,3 +74,32 @@
            (perlin/compute-distances #{[0 0] [1 1] [0 1] [1 0]}
                                      [0 0])))))
 
+
+(defn- create-fake-perlin-data []
+  (let [grid (perlin/create-grid 3 5)]
+    (doseq [i (range 3), j (range 5)]
+      (aset grid i j (svector/svector j i 0)))
+    {:x-scale 5
+     :y-scale 3
+     :grid grid}))
+
+(deftest test-get-products
+  (let [perlin-data (create-fake-perlin-data)]
+    (testing "given a set of distances and the grid, compute the dot products"
+      (is (= #{{:coords [0 0]
+                :dot 0}
+               {:coords [1 0]
+                :dot 1}
+               {:coords [0 1]
+                :dot 1}
+               {:coords [1 1]
+                :dot 2}}             
+             (perlin/compute-products (:grid perlin-data) #{{:coords [0 0]
+                                                             :distance (svector/svector 0 0 0)}
+                                                            {:coords [1 1]
+                                                             :distance (svector/svector 1 1 0)}
+                                                            {:coords [1 0]
+                                                             :distance (svector/svector 1 0 0)}
+                                                            {:coords [0 1]
+                                                             :distance (svector/svector 0 1 0)}}))))))
+
