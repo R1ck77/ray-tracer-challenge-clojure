@@ -46,5 +46,6 @@
           (scale-coordinate y (:y-scale perlin-data))))
 
 (defn get-neighbors [perlin-data scaled-point]
-  (conj #{} (get-cell perlin-data scaled-point))
+  (let [{:keys [x-scale y-scale]} perlin-data]
+   (conj #{} (get-cell perlin-data scaled-point))) ;; this is the base, I need to sum +1+1 to it
   )
