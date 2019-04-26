@@ -61,15 +61,15 @@
          (vector (- x cx)
                  (- y cy))) corners))
 
-(defn- compute-dot-products [gradients distances]
+(defn- compute-dot-products [gradients [dx dy]]
   (vec
-   (map (fn [[gx gy] [dx dy]]
-          (+ (* gx dx) (* gy dy))) gradients distances)))
+   (map (fn [[gx gy]]
+          (+ (* gx dx) (* gy dy))) gradients)))
 
 (defn assoc-dot-products [perlin-data {:keys [corners point] :as temp-data}]
   (assoc temp-data
          :dots (compute-dot-products (recover-gradients perlin-data corners)
-                                     (compute-distances perlin-data point corners))))
+                                     (first corners))))
 
 (defn interpolate [{:keys [corners point dots]}]
   (let [[px py] point
