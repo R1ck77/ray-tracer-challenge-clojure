@@ -5,41 +5,44 @@
             [raytracer.perlin :as perlin]))
 
 (deftest test-create-grid
-  (let [rows 3
-        columns 5]
-    (testing "create-grid creates an array of svectors of the right size"
-      (let [grid (perlin/create-grid rows columns)]
-        (is (= rows (count grid)))
-        (is (= columns (count (aget grid 0))))
-        (is (= columns (count (aget grid 1))))
-        (is (= columns (count (aget grid 2))))))
-    (testing "create-grid creates an array in which each element is a unit length 3D vector"
-      (let [grid (perlin/create-grid rows columns)]
-        (doseq [i (range rows)
-                j (range columns)]
+  (let [width 5
+        height 3]
+    (testing "creates an array of svectors of the right size"
+      (let [grid (perlin/create-grid width height)]
+        (is (= height (count grid)))
+        (is (= width (count (aget grid 0))))
+        (is (= width (count (aget grid 1))))
+        (is (= width (count (aget grid 2))))))
+    (testing "creates an array in which each element is a unit length 3D vector"
+      (let [grid (perlin/create-grid width height)]
+        (doseq [i (range height)
+                j (range width)]
           (is (eps= 1 (svector/mag (aget grid i j)))))))
-    (testing "create-grid creates an array in which each 3D vector has a 0 z component"
-      (let [grid (perlin/create-grid rows columns)]
-        (doseq [i (range rows)
-                j (range columns)]
+    (testing "creates an array in which each 3D vector has a 0 z component"
+      (let [grid (perlin/create-grid width height)]
+        (doseq [i (range height)
+                j (range width)]
           (is (eps= 0 (nth (aget grid i j) 2))))))))
 
+(deftest test-create-perlin-data
+  (testing "creates a perlin structure with the grid and the grid dimensions readily available"
+    (let [perlin-data (perlin/create-perlin-data 30 20)]
+      (is (= 30 (:x-scale perlin-data)))
+      (is (= 20 (:y-scale perlin-data)))
+      (is (= 20 (count (:grid perlin-data))))
+      (is (= 30 (count (aget (:grid perlin-data) 0)))))))
 
-(deftest test-get-cell
-  (let [perlin-data {:y-scale 3
-                     :x-scale 5
-                     :grid nil}]
-    (testing "get-cell returns the correct indices for a point inside the grid"
-      (is (= [0 0] (perlin/get-cell perlin-data [0.1 0.1])))
-      (is (= [2 4] (perlin/get-cell perlin-data [4.1 2.1])))
-      (is (= [1 2] (perlin/get-cell perlin-data [2.1 1.1]))))
-    (testing "get-cell returns the correct indices for a point outside the grid"
-      (is (= [1 3] (perlin/get-cell perlin-data [8.1 7.1]))))))
+(deftest test-get-cell-corner
+  (let [perlin-data (perlin/create-perlin-data 5 3)]
+    (testing "get-cell-corner returns the correct indices for a scaled point inside the grid"
+      (is (= [0 0] (perlin/get-cell-corner perlin-data [0.1 0.1])))
+      (is (= [4 2] (perlin/get-cell-corner perlin-data [4.1 2.1])))
+      (is (= [2 1] (perlin/get-cell-corner perlin-data [2.1 1.1]))))
+    (testing "get-cell-corner returns the correct indices for a scaled point outside the grid"
+      (is (= [3 1] (perlin/get-cell-corner perlin-data [8.1 7.1]))))))
 
 (deftest test-scale-point
-  (let [perlin-data {:x-scale 5
-                     :y-scale 3                     
-                     :grid nil}]
+  (let [perlin-data (perlin/create-perlin-data 5 3)]
     (testing "positive point in range"
       (is (v= [1 1.8]
               (perlin/scale-point perlin-data [0.2 0.6])))
@@ -52,13 +55,12 @@
               (perlin/scale-point perlin-data [-3.9 -2.9]))))))
 
 (deftest test-get-neighbors
-  (let [perlin-data {:x-scale 5
-                     :y-scale 3}]
+  (let [perlin-data (perlin/create-perlin-data 5 3)]
     (testing "conditions for point in the higher left corner"
-      (is (= [[2 4] [2 0] [0 4] [0 0]]
+      (is (= [[4 2] [0 2] [4 0] [0 0]]
              (perlin/get-neighbors perlin-data [4.9 2.9]))))
     (testing "condition for the point in the lower right corner"
-      (is (= [[0 0] [0 1] [1 0] [1 1]]
+      (is (= [[0 0] [1 0] [0 1] [1 1]]
              (perlin/get-neighbors perlin-data [0.5 0.5]))))))
 
 (deftest test-get-distances
@@ -104,9 +106,7 @@
                                                              :distance (svector/svector 0 1 0)}]))))))
 
 (deftest test-noise
-  (let [perlin-data {:grid (perlin/create-grid 7 13)
-                     :x-scale 13
-                     :y-scale 7}]
+  (let [perlin-data (perlin/create-perlin-data 13 7)]
     (testing "noise returns some value for some special points"
       (is (perlin/noise perlin-data [0 0]) 0)
       (is (perlin/noise perlin-data [0.9999 0.9999]) 0))

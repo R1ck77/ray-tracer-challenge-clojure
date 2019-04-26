@@ -2,8 +2,8 @@
 (ns raytracer.perlin
   (:require [raytracer.svector :as svector]))
 
-(defn- empty-grid [rows columns]
-  (into-array (take rows (repeatedly #(make-array java.util.List columns)))))
+(defn- empty-grid [width height]
+  (into-array (take height (repeatedly #(make-array java.util.List width)))))
 
 (defn- random-gradient []
   (svector/normalize (svector/svector (rand) (rand) 0)))
@@ -13,23 +13,24 @@
           j (range columns)]
     (aset grid i j (random-gradient))))
 
-(defn create-grid [rows columns]
-  (doto (empty-grid rows columns)
+(defn create-grid [columns rows]
+  (doto (empty-grid columns rows)
     (fill-grid rows columns)))
 
-(defn- translate-to-positive [p scale]
-  p)
+(defn create-perlin-data [x-scale y-scale]
+  {:x-scale x-scale
+   :y-scale y-scale
+   :grid (create-grid x-scale y-scale)})
 
-(defn- scale-positive-coord [p scale]
-  (mod (int p) scale))
+(defn get-cell [grid x y]
+  (aget grid y x))
 
 (defn- scale-coord [p scale]
-  (scale-positive-coord (translate-to-positive p scale)
-                        scale))
+  (mod (int p) scale))
 
-(defn get-cell [perlin-data [scaled-x scaled-y]]
-  (vector (scale-coord scaled-y (:y-scale perlin-data)) 
-          (scale-coord scaled-x (:x-scale perlin-data))))
+(defn get-cell-corner [perlin-data [scaled-x scaled-y]]
+  (vector (scale-coord scaled-x (:x-scale perlin-data)) 
+          (scale-coord scaled-y (:y-scale perlin-data))))
 
 (defn make-positive [scaled-p scale]
   (if (>= scaled-p 0)
@@ -45,18 +46,18 @@
   (vector (scale-coordinate x (:x-scale perlin-data))
           (scale-coordinate y (:y-scale perlin-data))))
 
-(def neighbors-delta [[0 0] [0 1] [1 0] [1 1]])
+(def neighbors-delta [[0 0] [1 0] [0 1] [1 1]])
 
 (defn- combine
-  [x-scale y-scale [base-y base-x] [dy dx]]
-  (vector (mod (+ base-y dy) y-scale)
-          (mod (+ base-x dx) x-scale)))
+  [x-scale y-scale [base-x base-y] [dx dy]]
+  (vector (mod (+ base-x dx) x-scale)
+          (mod (+ base-y dy) y-scale)))
 
 (defn get-neighbors
   "Return the list of nodes in row,column format"
   [perlin-data scaled-point]  
   (let [{:keys [x-scale y-scale]} perlin-data
-        base (get-cell perlin-data scaled-point)]
+        base (get-cell-corner perlin-data scaled-point)]
     (vec (map (partial combine x-scale y-scale base) neighbors-delta))))
 
 (defn compute-distances
