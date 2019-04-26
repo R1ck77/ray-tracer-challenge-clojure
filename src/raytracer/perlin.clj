@@ -7,8 +7,11 @@
 (defn- empty-grid [width height]
   (into-array (take height (repeatedly #(make-array java.util.List width)))))
 
+(defn- random-simm []
+  (- (rand 2) 1))
+
 (defn- random-gradient []
-  (svector/normalize (svector/svector (rand) (rand) 0)))
+  (svector/normalize (svector/svector (random-simm) (random-simm) 0)))
 
 (defn- fill-grid [grid rows columns]
   (doseq [i (range rows)
@@ -55,8 +58,8 @@
 
 (defn- compute-distances [perlin-data [x y] corners]
   (map (fn [[cx cy]]
-         (vector (- cx x)
-                 (- cy y))) corners))
+         (vector (- x cx)
+                 (- y cy))) corners))
 
 (defn- compute-dot-products [gradients distances]
   (vec
@@ -68,17 +71,13 @@
          :dots (compute-dot-products (recover-gradients perlin-data corners)
                                      (compute-distances perlin-data point corners))))
 
-(defn interpolate
-  [{:keys [corners point dots]}]
+(defn interpolate [{:keys [corners point dots]}]
   (let [[px py] point
-        distances (vec
-                   (map (fn [[cx cy]]
-                              (+ (Math/abs (float (- cx px)))
-                                 (Math/abs (float (- cy py)))))
-                            corners))
-        sum-distances (apply + distances)]
-    (/ (apply + (map * dots distances))
-       sum-distances)))
+        a (lerp (nth dots 0) (nth dots 1) (- (first point) (first (first corners))))
+        b (lerp (nth dots 2) (nth dots 3) (- (first point) (first (first corners))))
+        c (lerp a b (- (second point) (second (first corners))))]
+    c
+    ))
 
 (defn noise [perlin-data point]
   (interpolate
