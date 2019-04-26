@@ -91,8 +91,8 @@
   "Find the final value for the point"
   [products [x y]]
   (let [x1 (nth products 0)
-        x2 (nth products 2)
-        x3 (nth products 1)
+        x2 (nth products 1)
+        x3 (nth products 2)
         x4 (nth products 3)]
     (lerp (lerp (:dot x1) (:dot x2) (- (first (:coords x1)) y))
           (lerp (:dot x3) (:dot x4) (- (first (:coords x3)) y))

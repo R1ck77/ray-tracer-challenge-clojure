@@ -2,8 +2,8 @@
   (:require [raytracer.perlin :as perlin]
             [raytracer.canvas :as canvas]))
 
-(def grid-width 32)
-(def grid-height 20)
+(def grid-width 2)
+(def grid-height 2)
 
 (defn write-color-to-canvas [width height colors]
   (reduce (fn color-to-canvas [canvas [color [x y]]]
