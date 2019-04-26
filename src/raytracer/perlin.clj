@@ -96,7 +96,7 @@
         x4 (nth products 3)]
     (lerp (lerp (:dot x1) (:dot x2) (- (first (:coords x1)) y))
           (lerp (:dot x3) (:dot x4) (- (first (:coords x3)) y))
-          x)))
+          (- (second (:coords x1)) x))))
 
 (defn noise [perlin-data point]
   (let [scaled-point (scale-point perlin-data point)]

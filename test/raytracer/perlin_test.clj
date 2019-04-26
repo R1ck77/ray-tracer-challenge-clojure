@@ -41,6 +41,25 @@
     (testing "get-cell-corner returns the correct indices for a scaled point outside the grid"
       (is (= [3 1] (perlin/get-cell-corner perlin-data [8.1 7.1]))))))
 
+(deftest test-get-scaled-point-bounds
+  (let [perlin-data (perlin/create-perlin-data 5 3)]
+    (testing "return the correct indices for a scaled point inside the grid"
+      (is (= {:corners [[0 0]]
+              :point [0.1 0.1]}
+             (perlin/get-scaled-point-bounds perlin-data [0.1 0.1])))
+      (is (= {:corners [[4 2]]
+              :point [4.1 2.1]}
+             (perlin/get-scaled-point-bounds perlin-data [4.1 2.1])))
+      (is (= {:corners [[2 1]]
+              :point [2.1 1.1]}
+             (perlin/get-scaled-point-bounds perlin-data [2.1 1.1]))))
+    (testing "return the correct indices for a scaled point outside the grid"
+      (is (= {:corners [[8 7]]
+              :point [8.1 7.1]} (perlin/get-scaled-point-bounds perlin-data [8.1 7.1])))
+      (is (= {:corners [[-2 -3]]
+              :point [-1.3 -2.4]} (perlin/get-scaled-point-bounds perlin-data [-1.3 -2.4]))))))
+
+
 (deftest test-scale-point
   (let [perlin-data (perlin/create-perlin-data 5 3)]
     (testing "positive point in range"
