@@ -54,7 +54,7 @@
           (mod (+ base-y dy) y-scale)))
 
 (defn get-neighbors
-  "Return the list of nodes in row,column format"
+  "Return the list of nodes"
   [perlin-data scaled-point]  
   (let [{:keys [x-scale y-scale]} perlin-data
         base (get-cell-corner perlin-data scaled-point)]
@@ -88,9 +88,7 @@
   (* w a1))
 
 (defn interpolate
-  "Find the final value for the point
-
-  Note that the coordinates of the scaled point and the ones of the grid are inverted"
+  "Find the final value for the point"
   [products [y x]]
   (let [x1 (nth products 0)
         x2 (nth products 2)
