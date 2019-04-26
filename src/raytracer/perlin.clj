@@ -49,3 +49,38 @@
   (aget (:grid perlin-data)
         (mod y (:y-scale perlin-data))
         (mod x (:x-scale perlin-data))))
+
+(defn- recover-gradients [perlin-data corners]
+  (map #(get-pbc perlin-data %) corners))
+
+(defn- compute-distances [perlin-data [x y] corners]
+  (map (fn [[cx cy]]
+         (vector (- cx x)
+                 (- cy y))) corners))
+
+(defn- compute-dot-products [gradients distances]
+  (vec
+   (map (fn [[gx gy] [dx dy]]
+          (+ (* gx dx) (* gy dy))) gradients distances)))
+
+(defn assoc-dot-products [perlin-data {:keys [corners point] :as temp-data}]
+  (assoc temp-data
+         :dots (compute-dot-products (recover-gradients perlin-data corners)
+                                     (compute-distances perlin-data point corners))))
+
+(defn interpolate
+  [{:keys [corners point dots]}]
+  (let [[px py] point
+        distances (vec
+                   (map (fn [[cx cy]]
+                              (+ (Math/abs (float (- cx px)))
+                                 (Math/abs (float (- cy py)))))
+                            corners))
+        sum-distances (apply + distances)]
+    (/ (apply + (map * dots distances))
+       sum-distances)))
+
+(defn noise [perlin-data point]
+  (interpolate
+   (assoc-dot-products perlin-data
+                       (get-scaled-point-bounds (scale-point perlin-data point)))))
