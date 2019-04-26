@@ -104,3 +104,21 @@
                                    (compute-distances (get-neighbors perlin-data scaled-point)
                                                       scaled-point))
                  scaled-point)))
+
+(def neighbors [[0 0] [1 0] [0 1] [1 1]])
+
+(defn- compute-corners [x y]
+  (vec
+   (map (fn from-delta [[dx dy]]
+          (vector (+ (int (Math/floor x)) dx)
+                  (+ (int (Math/floor y)) dy)))
+        neighbors)))
+
+(defn get-scaled-point-bounds [scaled-point]
+  {:corners (apply compute-corners scaled-point)
+   :point scaled-point})
+
+(defn get-pbc [perlin-data [x y :as point]]
+  (aget (:grid perlin-data)
+        (mod y (:y-scale perlin-data))
+        (mod x (:x-scale perlin-data))))

@@ -42,22 +42,44 @@
       (is (= [3 1] (perlin/get-cell-corner perlin-data [8.1 7.1]))))))
 
 (deftest test-get-scaled-point-bounds
+  (testing "return the correct indices for a scaled point inside the grid"
+    (is (= {:corners [[0 0] [1 0] [0 1] [1 1]]
+            :point [0.1 0.1]}
+           (perlin/get-scaled-point-bounds [0.1 0.1])))
+    (is (= {:corners [[4 2] [5 2] [4 3] [5 3]]
+            :point [4.1 2.1]}
+           (perlin/get-scaled-point-bounds [4.1 2.1])))
+    (is (= {:corners [[2 1] [3 1] [2 2] [3 2]]
+            :point [2.1 1.1]}
+           (perlin/get-scaled-point-bounds [2.1 1.1]))))
+  (testing "return the correct indices for a scaled point outside the grid"
+    (is (= {:corners [[8 7] [9 7] [8 8] [9 8]]
+            :point [8.1 7.1]} (perlin/get-scaled-point-bounds [8.1 7.1])))
+    (is (= {:corners [[-2 -3] [-1 -3] [-2 -2] [-1 -2]]
+            :point [-1.3 -2.4]} (perlin/get-scaled-point-bounds [-1.3 -2.4])))))
+
+(defn- set-fake-grid-values! [grid width height]
+  (doseq [j (range height)
+          i (range width)]
+    (aset grid j i [(str i ";" j)])))
+
+(deftest test-get-pbc
   (let [perlin-data (perlin/create-perlin-data 5 3)]
-    (testing "return the correct indices for a scaled point inside the grid"
-      (is (= {:corners [[0 0]]
-              :point [0.1 0.1]}
-             (perlin/get-scaled-point-bounds perlin-data [0.1 0.1])))
-      (is (= {:corners [[4 2]]
-              :point [4.1 2.1]}
-             (perlin/get-scaled-point-bounds perlin-data [4.1 2.1])))
-      (is (= {:corners [[2 1]]
-              :point [2.1 1.1]}
-             (perlin/get-scaled-point-bounds perlin-data [2.1 1.1]))))
-    (testing "return the correct indices for a scaled point outside the grid"
-      (is (= {:corners [[8 7]]
-              :point [8.1 7.1]} (perlin/get-scaled-point-bounds perlin-data [8.1 7.1])))
-      (is (= {:corners [[-2 -3]]
-              :point [-1.3 -2.4]} (perlin/get-scaled-point-bounds perlin-data [-1.3 -2.4]))))))
+    (set-fake-grid-values! (:grid perlin-data) 5 3)
+    (testing "return the correct value for cells in the grid"
+      (is (= ["3;2"] (perlin/get-pbc perlin-data [3 2])))
+      (is (= ["0;0"] (perlin/get-pbc perlin-data [0 0])))
+      (is (= ["4;2"] (perlin/get-pbc perlin-data [4 2]))))
+    (testing "return the correct value for cells outside the grid"
+      (is (= ["3;1"] (perlin/get-pbc perlin-data [8 7])))
+      (is (= ["1;1"] (perlin/get-pbc perlin-data [16 10])))
+      (is (= ["0;1"] (perlin/get-pbc perlin-data [0 10])))
+      (is (= ["2;0"] (perlin/get-pbc perlin-data [17 0]))))
+    (testing "return the correct value for cells negative indices outside the grid"
+      (is (= ["4;2"] (perlin/get-pbc perlin-data [-1 -1])))
+      (is (= ["3;1"] (perlin/get-pbc perlin-data [-2 -2])))
+      (is (= ["1;2"] (perlin/get-pbc perlin-data [-4 -4])))
+      (is (= ["4;0"] (perlin/get-pbc perlin-data [-6 -6]))))))
 
 
 (deftest test-scale-point
