@@ -75,7 +75,7 @@
    {[x y :as coords] :coords
     distance :distance}]
   {:coords coords
-   :dot (svector/dot distance (aget grid x y))})
+   :dot (svector/dot distance (get-cell grid x y))})
 
 (defn compute-products
   "Give a grid of gradients and a set of distances, compute a set of dot products"
@@ -89,7 +89,7 @@
 
 (defn interpolate
   "Find the final value for the point"
-  [products [y x]]
+  [products [x y]]
   (let [x1 (nth products 0)
         x2 (nth products 2)
         x3 (nth products 1)
