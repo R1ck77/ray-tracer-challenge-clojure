@@ -1,6 +1,7 @@
 (ns demo.perlin-demo
   (:require [raytracer.wikiperlin :as perlin]
-            [raytracer.canvas :as canvas]))
+            [raytracer.canvas :as canvas])
+  (:import [perlin ImprovedNoise]))
 
 (def grid-width 100)
 (def grid-height 100)
@@ -14,13 +15,13 @@
 (defn convert-noise-to-color [noise]
   (map
    (fn noise-to-color [[x y noise]]
-                      (let [value (- 1 noise)]
+                      (let [value (/ (+ 1 noise) 2)]
                         (vector [value value value] (vector x y))))
    noise))
 
 (defn create-noise [perlin-data width height]
   (pmap (fn pixel-to-noise [[x y]]
-         (vector x y (perlin/perlin perlin-data (/ x 10) (/ y 10))))
+         (vector x y (ImprovedNoise/noise (/ x 50) (/ y 50) 0.3)))
        (for [i (range height)
              j (range width)]
          (vector j i))))
