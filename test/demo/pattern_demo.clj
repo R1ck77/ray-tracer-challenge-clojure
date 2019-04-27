@@ -18,7 +18,7 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def perlin-data (perlin/create-perlin-data 8 8))
+(def perlin-data (perlin/create-perlin-data 16 16))
 
 (def room-material (materials/material :specular 0.0
                                        :pattern (pattern/perturb-pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
