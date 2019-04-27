@@ -1,7 +1,6 @@
 (ns demo.perlin-demo
   (:require [raytracer.perlin :as perlin]
-            [raytracer.canvas :as canvas])
-  (:import [perlin ImprovedNoise]))
+            [raytracer.canvas :as canvas]))
 
 (def grid-width 20)
 (def grid-height 20)
