@@ -87,6 +87,21 @@
       (is (v= [0.5 0.5 0.5] ((:color-at blended) blended (point/point 1.5 0 0))))
       (is (v= [0.5 0.5 0.5] ((:color-at blended) blended (point/point 1.5 1.5 0)))))))
 
+(deftest test-perturb-pattern
+  (testing "Perturbing a pattern changes the coordinates received by the pattern"
+    (let [perturbed-pattern (pattern/perturb-pattern (pattern/checker white black)
+                                                     (fn [[x y z]]
+                                                       (vector 1.1 0 0)))]
+      (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 0 0 0))))
+      (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 0 0))))
+      (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 1.1 0)))))
+    (let [perturbed-pattern (pattern/perturb-pattern (pattern/checker white black)
+                                                     (fn [[x y z]]
+                                                       (vector 1.1 1.1 0)))]
+      (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 0 0 0))))
+      (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 0 0))))
+      (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 1.1 0)))))))
+
 (deftest test-color-at-object
   (testing "Stripes with an object transformation"
     (let [object (shapes/change-transform (shapes/sphere)

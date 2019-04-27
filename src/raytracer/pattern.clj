@@ -65,6 +65,11 @@
    :b-pattern pattern-b
    :color-at blend-function})
 
+(defn perturb-pattern [pattern perturbation-f]
+  (update pattern :color-at (fn [blend-function]
+                              (fn [pattern point]
+                                (blend-function pattern (perturbation-f point))))))
+
 (defn change-transform [pattern new-transform]
   (merge pattern {:transform new-transform
                   :inverse-transform (matrix/invert new-transform 4)}))
@@ -76,4 +81,3 @@
 
 (defn color-at-object [pattern object point]
   ((:color-at pattern) pattern (point-in-pattern-space pattern object point)))
-
