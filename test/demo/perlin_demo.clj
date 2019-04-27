@@ -21,7 +21,7 @@
 
 (defn create-noise [perlin-data width height]
   (pmap (fn pixel-to-noise [[x y]]
-         (vector x y (perlin/noise perlin-data [(/ x width) (/ y height)])))
+         (vector x y (perlin/noise perlin-data [(- (/ x width) 0.5) (- (/ y height) 0.5)])))
        (for [i (range height)
              j (range width)]
          (vector j i))))
