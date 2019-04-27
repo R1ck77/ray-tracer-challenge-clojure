@@ -99,13 +99,6 @@
                                           {:corners [[4 2] [5 2] [4 3] [5 3]]
                                            :point [4 2]}))))))
 
-(deftest test-interpolate
-  (testing "computes an interpolation for the point"
-    (is (eps= (/ (+ (* 1 3) (* 1 -2) (* 2 -7)) 4)
-              (perlin/interpolate {:corners [[4 2] [5 2] [4 3] [5 3]]
-                                   :dots [0 3 -2 -7]
-                                   :point [4 2]})))))
-
 (deftest test-noise
   (testing "can produce a value of sorts"
     (is (not (nil? (perlin/noise (perlin/create-perlin-data 6 4)
