@@ -85,7 +85,10 @@
     c
     ))
 
+(def half√2 (/ (Math/sqrt 2) 2))
+
 (defn noise [perlin-data point]
-  (interpolate
-   (assoc-dot-products perlin-data
-                       (get-scaled-point-bounds (scale-point perlin-data point)))))
+  (/ (interpolate
+    (assoc-dot-products perlin-data
+                        (get-scaled-point-bounds (scale-point perlin-data point))))
+     half√2))
