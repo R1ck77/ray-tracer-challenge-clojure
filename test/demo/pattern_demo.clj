@@ -10,6 +10,7 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
             [raytracer.pattern :as pattern]
+            [raytracer.perlin :as perlin]
             [raytracer.world :as world]))
 
 ;;; Note: the result of this demo changes with the evolution of the underlying functions
@@ -17,9 +18,15 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
+(def perlin-data (perlin/create-perlin-data 8 8))
+
 (def room-material (materials/material :specular 0.0
-                                       :pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
-                                                                          matrix/identity-matrix)))
+                                       :pattern (pattern/perturb-pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
+                                                                                                   matrix/identity-matrix)
+                                                                         (fn [[x y z]]
+                                                                           (vector (+ x (perlin/noise perlin-data [x y]))
+                                                                                   (+ y (perlin/noise perlin-data [x y]))
+                                                                                   z)))))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
