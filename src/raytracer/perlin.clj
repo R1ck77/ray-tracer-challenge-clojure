@@ -33,9 +33,13 @@
   (vector (* x (:x-scale perlin-data))
           (* y (:y-scale perlin-data))))
 
+(defn fade [t]
+  (* (* t t t)
+     (+ (* t (- (* 6 t) 15))
+        10)))
+
 (defn- lerp [a0 a1 w]
-  (+ (* (- 1 w) a0))
-  (* w a1))
+  (+ a0 (* (fade w) (- a1 a0))))
 
 (defn- compute-corners [x y]
   (vec
@@ -53,29 +57,31 @@
         (mod y (:y-scale perlin-data))
         (mod x (:x-scale perlin-data))))
 
-(defn- recover-gradients [perlin-data corners]
+(defn- recover-gradients
+  [perlin-data corners]
   (map #(get-pbc perlin-data %) corners))
 
-(defn- compute-distances [perlin-data [x y] corners]
-  (map (fn [[cx cy]]
-         (vector (- x cx)
-                 (- y cy))) corners))
-
-(defn- compute-dot-products [gradients [dx dy]]
+(defn- compute-dot-products [gradients distances]
   (vec
-   (map (fn [[gx gy]]
-          (+ (* gx dx) (* gy dy))) gradients)))
+   (map (fn [[gx gy] [dx dy]]
+          (+ (* gx dx) (* gy dy))) gradients distances)))
+
+(defn- compute-distances [corners [x y]]
+  (map (fn corner-point-distance [[cx cy]]
+         (vector (- cx x) (- cy y)))
+       corners))
 
 (defn assoc-dot-products [perlin-data {:keys [corners point] :as temp-data}]
-  (assoc temp-data
-         :dots (compute-dot-products (recover-gradients perlin-data corners)
-                                     (first corners))))
+  (let  [[x y] point]
+    (assoc temp-data
+           :dots (compute-dot-products (recover-gradients perlin-data corners)
+                                       (compute-distances corners point)))))
 
 (defn interpolate [{:keys [corners point dots]}]
   (let [[px py] point
-        a (lerp (nth dots 0) (nth dots 1) (- (first point) (first (first corners))))
-        b (lerp (nth dots 2) (nth dots 3) (- (first point) (first (first corners))))
-        c (lerp a b (- (second point) (second (first corners))))]
+        b (lerp (nth dots 2) (nth dots 3) (- (first point) (int (first point))))
+        a (lerp (nth dots 0) (nth dots 1) (- (first point) (int (first point))))
+        c (lerp a b (- (second point) (int (second point) )))]
     c
     ))
 
