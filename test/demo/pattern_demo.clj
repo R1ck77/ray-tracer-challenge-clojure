@@ -18,15 +18,16 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def perlin-data (perlin/create-perlin-data 16 16))
+(def perlin-data (perlin/create-perlin-data  4 4))
 
 (def room-material (materials/material :specular 0.0
                                        :pattern (pattern/perturb-pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
                                                                                                    matrix/identity-matrix)
                                                                          (fn [[x y z]]
                                                                            (vector (+ x (perlin/noise perlin-data [x y]))
-                                                                                   (+ y (perlin/noise perlin-data [x y]))
-                                                                                   z)))))
+                                                                                   y
+                                                                                   (+ z (perlin/noise perlin-data [x y]))
+                                                                                   )))))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
@@ -67,7 +68,7 @@
                                               (svector/svector 0 1 0))))
 
 (defn render-demo
-  ([] (render-demo 400 200))
+  ([] (render-demo 800 600))
   ([width height]
    (spit "pattern-demo.ppm"
          (canvas/canvas-to-ppm (camera/render (create-camera width height)
