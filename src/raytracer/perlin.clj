@@ -79,9 +79,9 @@
 
 (defn interpolate [{:keys [corners point dots]}]
   (let [[px py] point
-        b (lerp (nth dots 2) (nth dots 3) (- (first point) (int (first point))))
-        a (lerp (nth dots 0) (nth dots 1) (- (first point) (int (first point))))
-        c (lerp a b (- (second point) (int (second point) )))]
+        b (lerp (nth dots 2) (nth dots 3) (- (first point) (Math/floor (first point))))
+        a (lerp (nth dots 0) (nth dots 1) (- (first point) (Math/floor (first point))))
+        c (lerp a b (- (second point) (Math/floor (second point) )))]
     c
     ))
 
