@@ -42,15 +42,13 @@
     (fill-grid dimensions)))
 
 (defn create-perlin-data [dimensions]
-  {:x-scale (first dimensions)
-   :y-scale (second dimensions)
+  {:dimensions dimensions
    :grid (create-grid dimensions)})
 
 (defn scale-point
   "Scale the point so that it fits inside the proper grid after periodic boundary translation"
-  [perlin-data [x y]]
-  (vector (* x (:x-scale perlin-data))
-          (* y (:y-scale perlin-data))))
+  [perlin-data [x y :as point]]
+  (vector (map * (:dimensions perlin-data) point)))
 
 (defn fade [t]
   (* (* t t t)
@@ -72,9 +70,9 @@
    :point scaled-point})
 
 (defn get-pbc [perlin-data [x y :as point]]
-  (aget (:grid perlin-data)
-        (mod y (:y-scale perlin-data))
-        (mod x (:x-scale perlin-data))))
+  (apply (partial aget (:grid perlin-data))
+         ;;; TODO/FIXME name this thing!
+         (reverse (map #(mod % %2) point (:dimensions perlin-data)))))
 
 (defn- recover-gradients
   [perlin-data corners]
