@@ -1,31 +1,50 @@
 ;;; 2D Perlin noise
-(ns raytracer.perlin
-  (:require [raytracer.svector :as svector]))
+(ns raytracer.perlin)
 
 (def neighbors [[0 0] [1 0] [0 1] [1 1]])
 
-(defn- empty-grid [width height]
-  (into-array (take height (repeatedly #(make-array java.util.List width)))))
+(defn- empty-grid [dimensions]
+  (apply (partial make-array java.util.List) (reverse dimensions)))
 
 (defn- random-simm []
   (- (rand 2) 1))
 
-(defn- random-gradient []
-  (svector/normalize (svector/svector (random-simm) (random-simm) 0)))
+(defn- random-gradient [dimensions]
+  (let [v  (take dimensions (repeatedly random-simm))
+        size (Math/sqrt (apply + (map #(* % %) v)))]
+    (vec (if (> size 1e-6)
+           (map #(/ % size) v)
+           (random-gradient dimensions)))))
 
-(defn- fill-grid [grid rows columns]
-  (doseq [i (range rows)
-          j (range columns)]
-    (aset grid i j (random-gradient))))
+(defn- recursive-fill-array
+  [f supplier dimensions]
+  (if (not (empty? dimensions))
+    (let [n (first dimensions)]
+      (doseq [i (range n)]
+        (recursive-fill-array (partial f i) supplier (rest dimensions))))
+    (f (supplier))))
 
-(defn create-grid [columns rows]
-  (doto (empty-grid columns rows)
-    (fill-grid rows columns)))
+(defn fill-array
+  "Fill the array with the specific value.
 
-(defn create-perlin-data [x-scale y-scale]
-  {:x-scale x-scale
-   :y-scale y-scale
-   :grid (create-grid x-scale y-scale)})
+  Dimensions is in the user expected order, supplier generates value to set."
+  [array supplier dimensions]
+  (recursive-fill-array (partial aset array)
+                        supplier
+                        (reverse dimensions)))
+
+
+(defn- fill-grid [grid dimensions]
+  (fill-array grid #(random-gradient (count dimensions)) dimensions))
+
+(defn create-grid [dimensions]
+  (doto (empty-grid dimensions)
+    (fill-grid dimensions)))
+
+(defn create-perlin-data [dimensions]
+  {:x-scale (first dimensions)
+   :y-scale (second dimensions)
+   :grid (create-grid dimensions)})
 
 (defn scale-point
   "Scale the point so that it fits inside the proper grid after periodic boundary translation"

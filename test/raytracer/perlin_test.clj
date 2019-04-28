@@ -5,35 +5,33 @@
             [raytracer.perlin :as perlin]))
 
 (deftest test-create-grid
-  (let [width 5
-        height 3]
+  (let [dimensions [5 3]]
     (testing "creates an array of svectors of the right size"
-      (let [grid (perlin/create-grid width height)]
-        (is (= height (count grid)))
-        (is (= width (count (aget grid 0))))
-        (is (= width (count (aget grid 1))))
-        (is (= width (count (aget grid 2))))))
+      (let [grid (perlin/create-grid dimensions)]
+        (is (= 3 (count grid)))
+        (is (= 5 (count (aget grid 0))))
+        (is (= 5 (count (aget grid 1))))
+        (is (= 5 (count (aget grid 2)))))
+      (let [grid (perlin/create-grid [5 3 2])]
+        (is (= 2 (count grid)))
+        (is (= 3 (count (aget grid 0))))
+        (is (= 5 (count (aget grid 0 0))))))
     (testing "creates an array in which each element is a unit length 3D vector"
-      (let [grid (perlin/create-grid width height)]
-        (doseq [i (range height)
-                j (range width)]
-          (is (eps= 1 (svector/mag (aget grid i j)))))))
-    (testing "creates an array in which each 3D vector has a 0 z component"
-      (let [grid (perlin/create-grid width height)]
-        (doseq [i (range height)
-                j (range width)]
-          (is (eps= 0 (nth (aget grid i j) 2))))))))
+      (let [grid (perlin/create-grid dimensions)]
+        (doseq [i (range 3)
+                j (range 5)]
+          (is (eps= 1 (Math/sqrt (apply + (map #(* % %) (aget grid i j)))))))))))
 
 (deftest test-create-perlin-data
   (testing "creates a perlin structure with the grid and the grid dimensions readily available"
-    (let [perlin-data (perlin/create-perlin-data 30 20)]
+    (let [perlin-data (perlin/create-perlin-data [30 20])]
       (is (= 30 (:x-scale perlin-data)))
       (is (= 20 (:y-scale perlin-data)))
       (is (= 20 (count (:grid perlin-data))))
       (is (= 30 (count (aget (:grid perlin-data) 0)))))))
 
 (deftest test-scale-point
-  (let [perlin-data (perlin/create-perlin-data 5 3)]
+  (let [perlin-data (perlin/create-perlin-data [5 3])]
     (testing "positive point in range"
       (is (v= [1 1.8]
               (perlin/scale-point perlin-data [0.2 0.6])))
@@ -51,7 +49,7 @@
     (aset grid j i [(str i ";" j)])))
 
 (deftest test-get-pbc
-  (let [perlin-data (perlin/create-perlin-data 5 3)]
+  (let [perlin-data (perlin/create-perlin-data [5 3])]
     (set-fake-grid-values! (:grid perlin-data) 5 3)
     (testing "return the correct value for cells in the grid"
       (is (= ["3;2"] (perlin/get-pbc perlin-data [3 2])))
@@ -87,7 +85,7 @@
 
 (deftest test-assoc-dot-products
   (testing "computes the dot product for the specific point"
-    (let [perlin-data (perlin/create-perlin-data 6 4)]
+    (let [perlin-data (perlin/create-perlin-data [6 4])]
       (aset (:grid perlin-data) 2 4 [1 2])
       (aset (:grid perlin-data) 2 5 [3 4])
       (aset (:grid perlin-data) 3 4 [-1 -2])
@@ -108,5 +106,5 @@
 
 (deftest test-noise
   (testing "can produce a value of sorts"
-    (is (not (nil? (perlin/noise (perlin/create-perlin-data 6 4)
+    (is (not (nil? (perlin/noise (perlin/create-perlin-data [6 4])
                                  [0.1 0.7]))))))

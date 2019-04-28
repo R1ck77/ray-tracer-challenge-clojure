@@ -28,7 +28,7 @@
 (defn render-demo
   ([] (render-demo 400 400))
   ([width height]
-   (let [perlin-data (perlin/create-perlin-data grid-width grid-height)]
+   (let [perlin-data (perlin/create-perlin-data [grid-width grid-height])]
      (spit "noise.ppm" (canvas/canvas-to-ppm
                         (write-color-to-canvas width height
                                                (convert-noise-to-color           
