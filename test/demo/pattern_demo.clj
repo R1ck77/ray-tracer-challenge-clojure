@@ -24,10 +24,10 @@
                                        :pattern (pattern/perturb-pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
                                                                                                    matrix/identity-matrix)
                                                                          (fn [[x y z]]
-                                                                           (vector (+ x (perlin/noise perlin-data [x y]))
-                                                                                   y
-                                                                                   (+ z (perlin/noise perlin-data [x y]))
-                                                                                   )))))
+                                                                           (let [noise (perlin/noise perlin-data [x y])]
+                                                                            (vector (+ x noise)
+                                                                                    y
+                                                                                    (+ z noise)))))))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
