@@ -31,7 +31,6 @@
                         supplier
                         (reverse dimensions)))
 
-
 (defn- fill-grid [grid dimensions]
   (fill-array grid #(random-gradient (count dimensions)) dimensions))
 
@@ -48,14 +47,6 @@
   "Scale the point so that it fits inside the proper grid after periodic boundary translation"
   [perlin-data point]
   (vec (map * (:dimensions perlin-data) point)))
-
-(defn fade [t]
-  (* (* t t t)
-     (+ (* t (- (* 6 t) 15))
-        10)))
-
-(defn- lerp [a0 a1 w]
-  (+ a0 (* (fade w) (- a1 a0))))
 
 (defn- compute-corners [neighbors point]
   (vec
@@ -92,13 +83,21 @@
            :dots (compute-dot-products (recover-gradients perlin-data corners)
                                        (compute-distances corners point)))))
 
+(defn fade [t]
+  (* (* t t t)
+     (+ (* t (- (* 6 t) 15))
+        10)))
+
+(defn- lerp [a0 a1 w]
+  (+ a0
+     (* (fade w)
+        (- a1 a0))))
+
 (defn interpolate [{:keys [corners point dots]}]
   (let [[px py] point
-        b (lerp (nth dots 2) (nth dots 3) (- (first point) (Math/floor (first point))))
-        a (lerp (nth dots 0) (nth dots 1) (- (first point) (Math/floor (first point))))
-        c (lerp a b (- (second point) (Math/floor (second point) )))]
-    c
-    ))
+        upper-interpolation (lerp (nth dots 2) (nth dots 3) (- (first point) (Math/floor (first point))))
+        lower-interpolation (lerp (nth dots 0) (nth dots 1) (- (first point) (Math/floor (first point))))]
+    (lerp lower-interpolation upper-interpolation (- (second point) (Math/floor (second point) )))))
 
 (def half√2 (/ (Math/sqrt 2) 2))
 
