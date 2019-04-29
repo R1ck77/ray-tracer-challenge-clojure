@@ -104,11 +104,18 @@
      (* (fade w)
         (- a1 a0))))
 
-(defn interpolate [{:keys [corners point dots]}]
-  (let [[px py] point
-        upper-interpolation (lerp (nth dots 2) (nth dots 3) (- (first point) (Math/floor (first point))))
-        lower-interpolation (lerp (nth dots 0) (nth dots 1) (- (first point) (Math/floor (first point))))]
-    (lerp lower-interpolation upper-interpolation (- (second point) (Math/floor (second point) )))))
+(defn interpolate-coordinate [values coord]
+  (map (fn interpolate-pair [[v1 v2]]
+         (lerp v1 v2 coord))
+       (partition 2 values)))
+
+;; [0 0] [1 0] [0 1] [1 1]
+;; [0 0] [1 0] ; [0 1] [1 1]
+;; [00 vs 10] [01 vs 11]
+(defn interpolate [{:keys [point dots]}]
+  (let [relative-coords (map #(- % (Math/floor %)) point)]
+    (let [first-tournament (interpolate-coordinate dots (first relative-coords))]
+     (lerp (first first-tournament) (second first-tournament) (second relative-coords)))))
 
 (def half√2 (/ (Math/sqrt 2) 2))
 
