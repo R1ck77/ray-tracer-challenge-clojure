@@ -18,16 +18,11 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def perlin-data (perlin/create-perlin-data  4 4))
+(def perlin-data (perlin/create-perlin-data [3 3 3]))
 
 (def room-material (materials/material :specular 0.0
-                                       :pattern (pattern/perturb-pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
-                                                                                                   matrix/identity-matrix)
-                                                                         (fn [[x y z]]
-                                                                           (let [noise (perlin/noise perlin-data [x y])]
-                                                                            (vector (+ x noise)
-                                                                                    y
-                                                                                    (+ z noise)))))))
+                                       :pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
+                                                                          matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
@@ -51,7 +46,12 @@
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (materials/material :diffuse 0.7
                                                                   :specular 0.3
-                                                                  :pattern (pattern/change-transform (pattern/ring [1 1 1] [0.0 0 0.0])
+                                                                  :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring [1 1 1] [0.0 0 0.0]) 
+                                                                                                                              (fn [[x y z]]
+                                                                                                                                (let [noise (perlin/noise perlin-data [x y z])]
+                                                                                                                                  (vector (+ x noise)
+                                                                                                                                          y
+                                                                                                                                          (+ z noise)))))
                                                                                                      (transform/scale 0.5 0.125 0.125
                                                                                                                       (transform/rotate-z 0.23423)))))
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)

@@ -109,13 +109,17 @@
          (lerp v1 v2 coord))
        (partition 2 values)))
 
+(defn recursive-interpolate [values relative-coords]
+  (if (empty? relative-coords)
+    (first values)
+    (recur (interpolate-coordinate values (first relative-coords)) (rest relative-coords))))
+
 ;; [0 0] [1 0] [0 1] [1 1]
 ;; [0 0] [1 0] ; [0 1] [1 1]
 ;; [00 vs 10] [01 vs 11]
 (defn interpolate [{:keys [point dots]}]
   (let [relative-coords (map #(- % (Math/floor %)) point)]
-    (let [first-tournament (interpolate-coordinate dots (first relative-coords))]
-     (lerp (first first-tournament) (second first-tournament) (second relative-coords)))))
+    (recursive-interpolate dots relative-coords)))
 
 (def half√2 (/ (Math/sqrt 2) 2))
 
