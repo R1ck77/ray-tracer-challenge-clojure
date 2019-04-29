@@ -25,8 +25,8 @@
 (deftest test-create-perlin-data
   (testing "creates a perlin structure with the grid and the grid dimensions readily available"
     (let [perlin-data (perlin/create-perlin-data [30 20])]
-      (is (= 30 (:x-scale perlin-data)))
-      (is (= 20 (:y-scale perlin-data)))
+      (is (= 30 (first (:dimensions perlin-data))))
+      (is (= 20 (second (:dimensions perlin-data))))
       (is (= 20 (count (:grid perlin-data))))
       (is (= 30 (count (aget (:grid perlin-data) 0)))))))
 
@@ -67,21 +67,26 @@
       (is (= ["4;0"] (perlin/get-pbc perlin-data [-6 -6]))))))
 
 (deftest test-get-scaled-point-bounds
-  (testing "return the correct indices for a scaled point inside the grid"
-    (is (= {:corners [[0 0] [1 0] [0 1] [1 1]]
-            :point [0.1 0.1]}
-           (perlin/get-scaled-point-bounds [0.1 0.1])))
-    (is (= {:corners [[4 2] [5 2] [4 3] [5 3]]
-            :point [4.1 2.1]}
-           (perlin/get-scaled-point-bounds [4.1 2.1])))
-    (is (= {:corners [[2 1] [3 1] [2 2] [3 2]]
-            :point [2.1 1.1]}
-           (perlin/get-scaled-point-bounds [2.1 1.1]))))
-  (testing "return the correct indices for a scaled point outside the grid"
-    (is (= {:corners [[8 7] [9 7] [8 8] [9 8]]
-            :point [8.1 7.1]} (perlin/get-scaled-point-bounds [8.1 7.1])))
-    (is (= {:corners [[-2 -3] [-1 -3] [-2 -2] [-1 -2]]
-            :point [-1.3 -2.4]} (perlin/get-scaled-point-bounds [-1.3 -2.4])))))
+  (let [neighbors [[0 0] [1 0] [0 1] [1 1]]]
+    (testing "return the correct indices for a scaled point inside the grid"
+      (is (= {:corners [[0 0] [1 0] [0 1] [1 1]]
+              :point [0.1 0.1]}
+             (perlin/get-scaled-point-bounds neighbors [0.1 0.1])))
+      (is (= {:corners [[4 2] [5 2] [4 3] [5 3]]
+              :point [4.1 2.1]}
+             (perlin/get-scaled-point-bounds neighbors [4.1 2.1])))
+      (is (= {:corners [[2 1] [3 1] [2 2] [3 2]]
+              :point [2.1 1.1]}
+             (perlin/get-scaled-point-bounds neighbors [2.1 1.1]))))
+    (testing "return the correct indices for a scaled point outside the grid"
+      (is (= {:corners [[8 7] [9 7] [8 8] [9 8]]
+              :point [8.1 7.1]} (perlin/get-scaled-point-bounds neighbors [8.1 7.1])))
+      (is (= {:corners [[-2 -3] [-1 -3] [-2 -2] [-1 -2]]
+              :point [-1.3 -2.4]} (perlin/get-scaled-point-bounds neighbors [-1.3 -2.4])))))
+  (testing "3-dimensional case"
+    (let [neighbors [[0 0 0] [1 0 0] [0 1 0] [1 1 0] [0 0 1] [1 0 1] [0 1 1] [1 1 1]]]
+     (is (= {:corners [[8 7 12] [9 7 12] [8 8 12] [9 8 12] [8 7 13] [9 7 13] [8 8 13] [9 8 13]]
+             :point [8.1 7.1]} (perlin/get-scaled-point-bounds neighbors [8.1 7.1 12.7]))))))
 
 (deftest test-assoc-dot-products
   (testing "computes the dot product for the specific point"

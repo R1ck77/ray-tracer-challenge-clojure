@@ -1,8 +1,6 @@
 ;;; 2D Perlin noise
 (ns raytracer.perlin)
 
-(def neighbors [[0 0] [1 0] [0 1] [1 1]])
-
 (defn- empty-grid [dimensions]
   (apply (partial make-array java.util.List) (reverse dimensions)))
 
@@ -43,12 +41,13 @@
 
 (defn create-perlin-data [dimensions]
   {:dimensions dimensions
+   :neighbors [[0 0] [1 0] [0 1] [1 1]]
    :grid (create-grid dimensions)})
 
 (defn scale-point
   "Scale the point so that it fits inside the proper grid after periodic boundary translation"
-  [perlin-data [x y :as point]]
-  (vector (map * (:dimensions perlin-data) point)))
+  [perlin-data point]
+  (vec (map * (:dimensions perlin-data) point)))
 
 (defn fade [t]
   (* (* t t t)
@@ -58,15 +57,15 @@
 (defn- lerp [a0 a1 w]
   (+ a0 (* (fade w) (- a1 a0))))
 
-(defn- compute-corners [x y]
+(defn- compute-corners [neighbors x y]
   (vec
    (map (fn from-delta [[dx dy]]
           (vector (+ (int (Math/floor x)) dx)
                   (+ (int (Math/floor y)) dy)))
         neighbors)))
 
-(defn get-scaled-point-bounds [scaled-point]
-  {:corners (apply compute-corners scaled-point)
+(defn get-scaled-point-bounds [neighbors scaled-point]
+  {:corners (apply compute-corners neighbors scaled-point)
    :point scaled-point})
 
 (defn get-pbc [perlin-data [x y :as point]]
@@ -107,5 +106,6 @@
 (defn noise [perlin-data point]
   (/ (interpolate
     (assoc-dot-products perlin-data
-                        (get-scaled-point-bounds (scale-point perlin-data point))))
+                        (get-scaled-point-bounds (:neighbors perlin-data)
+                                                 (scale-point perlin-data point))))
      half√2))
