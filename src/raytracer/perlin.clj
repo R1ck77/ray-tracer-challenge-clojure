@@ -57,15 +57,14 @@
 (defn- lerp [a0 a1 w]
   (+ a0 (* (fade w) (- a1 a0))))
 
-(defn- compute-corners [neighbors x y]
+(defn- compute-corners [neighbors point]
   (vec
-   (map (fn from-delta [[dx dy]]
-          (vector (+ (int (Math/floor x)) dx)
-                  (+ (int (Math/floor y)) dy)))
+   (map (fn from-delta [delta]
+          (vec (map #(+ (int (Math/floor %)) %2) point delta)))
         neighbors)))
 
 (defn get-scaled-point-bounds [neighbors scaled-point]
-  {:corners (apply compute-corners neighbors scaled-point)
+  {:corners (compute-corners neighbors scaled-point)
    :point scaled-point})
 
 (defn get-pbc [perlin-data [x y :as point]]
