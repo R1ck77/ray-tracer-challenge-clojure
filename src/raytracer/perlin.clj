@@ -38,6 +38,9 @@
   (doto (empty-grid dimensions)
     (fill-grid dimensions)))
 
+(defn compute-neighbors-displacements [n]
+  [[0] [1]])
+
 (defn create-perlin-data [dimensions]
   {:dimensions dimensions
    :neighbors [[0 0] [1 0] [0 1] [1 1]]

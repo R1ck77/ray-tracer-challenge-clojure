@@ -66,6 +66,17 @@
       (is (= ["1;2"] (perlin/get-pbc perlin-data [-4 -4])))
       (is (= ["4;0"] (perlin/get-pbc perlin-data [-6 -6]))))))
 
+(deftest test-compute-neighbors-displacements
+  (testing "1D case"
+    (is (= [[0] [1]]
+           (perlin/compute-neighbors-displacements 1))))
+  (testing "2D case"
+    (is (= [[0 0] [1 0] [0 1] [1 1]]
+           (perlin/compute-neighbors-displacements 2))))
+  (testing "3D case"
+    (is (= [[0 0 0] [1 0 0] [0 1 0] [1 1 0] [0 0 1] [1 0 1] [0 1 1] [1 1 1]]
+           (perlin/compute-neighbors-displacements 3)))))
+
 (deftest test-get-scaled-point-bounds
   (let [neighbors [[0 0] [1 0] [0 1] [1 1]]]
     (testing "return the correct indices for a scaled point inside the grid"
