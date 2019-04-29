@@ -38,12 +38,20 @@
   (doto (empty-grid dimensions)
     (fill-grid dimensions)))
 
+(defn- recursive-compute-neighbors [accumulator instance n]
+  (if (= n 0)
+    (conj accumulator (vec instance))
+    (vec (concat accumulator
+                 (recursive-compute-neighbors accumulator (conj instance 0) (dec n))
+                 (recursive-compute-neighbors accumulator (conj instance 1) (dec n))))))
+
 (defn compute-neighbors-displacements [n]
-  [[0] [1]])
+  {:pre [(> n 0)]}
+  (recursive-compute-neighbors [] '() n))
 
 (defn create-perlin-data [dimensions]
   {:dimensions dimensions
-   :neighbors [[0 0] [1 0] [0 1] [1 1]]
+   :neighbors (compute-neighbors-displacements (count dimensions))
    :grid (create-grid dimensions)})
 
 (defn scale-point

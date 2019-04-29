@@ -97,7 +97,8 @@
   (testing "3-dimensional case"
     (let [neighbors [[0 0 0] [1 0 0] [0 1 0] [1 1 0] [0 0 1] [1 0 1] [0 1 1] [1 1 1]]]
      (is (= {:corners [[8 7 12] [9 7 12] [8 8 12] [9 8 12] [8 7 13] [9 7 13] [8 8 13] [9 8 13]]
-             :point [8.1 7.1]} (perlin/get-scaled-point-bounds neighbors [8.1 7.1 12.7]))))))
+             :point [8.1 7.1 12.7]}
+            (perlin/get-scaled-point-bounds neighbors [8.1 7.1 12.7]))))))
 
 (deftest test-assoc-dot-products
   (testing "computes the dot product for the specific point"
