@@ -38,6 +38,10 @@
   (doto (empty-grid dimensions)
     (fill-grid dimensions)))
 
+(defn compute-normalization [n-dimensions]
+  "The noise is divided by this factor"
+  (/ (Math/sqrt 2) 2))
+
 (defn- recursive-compute-neighbors [accumulator instance n]
   (if (= n 0)
     (conj accumulator (vec instance))
@@ -50,8 +54,10 @@
   (recursive-compute-neighbors [] '() n))
 
 (defn create-perlin-data [dimensions]
+  (println "dimensions:" dimensions "normalization: " (compute-normalization (count dimensions)))
   {:dimensions dimensions
    :neighbors (compute-neighbors-displacements (count dimensions))
+   :normalization (compute-normalization (count dimensions))
    :grid (create-grid dimensions)})
 
 (defn scale-point
@@ -114,18 +120,13 @@
     (first values)
     (recur (interpolate-coordinate values (first relative-coords)) (rest relative-coords))))
 
-;; [0 0] [1 0] [0 1] [1 1]
-;; [0 0] [1 0] ; [0 1] [1 1]
-;; [00 vs 10] [01 vs 11]
 (defn interpolate [{:keys [point dots]}]
   (let [relative-coords (map #(- % (Math/floor %)) point)]
     (recursive-interpolate dots relative-coords)))
 
-(def half√2 (/ (Math/sqrt 2) 2))
-
 (defn noise [perlin-data point]
   (/ (interpolate
-    (assoc-dot-products perlin-data
-                        (get-scaled-point-bounds (:neighbors perlin-data)
-                                                 (scale-point perlin-data point))))
-     half√2))
+      (assoc-dot-products perlin-data
+                          (get-scaled-point-bounds (:neighbors perlin-data)
+                                                   (scale-point perlin-data point))))
+     (:normalization perlin-data)))
