@@ -20,7 +20,7 @@
 
 (defn create-noise [perlin-data width height]
   (pmap (fn pixel-to-noise [[x y]]
-         (vector x y (perlin/noise perlin-data [(- (/ x width) 0.5) (- (/ y height) 0.5) 3.1415])))
+         (vector x y (perlin/noise perlin-data [(- (/ x width) 0.5) (- (/ y height))])))
        (for [i (range height)
              j (range width)]
          (vector j i))))
@@ -28,7 +28,7 @@
 (defn render-demo
   ([] (render-demo 400 400))
   ([width height]
-   (let [perlin-data (perlin/create-perlin-data [grid-width grid-height 3])]
+   (let [perlin-data (perlin/create-perlin-data [grid-width grid-height])]
      (spit "noise.ppm" (canvas/canvas-to-ppm
                         (write-color-to-canvas width height
                                                (convert-noise-to-color           

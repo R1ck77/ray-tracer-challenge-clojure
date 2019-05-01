@@ -125,3 +125,75 @@
   (testing "can produce a value of sorts"
     (is (not (nil? (perlin/noise (perlin/create-perlin-data [6 4])
                                  [0.1 0.7]))))))
+
+(defn- set-4D-grid-values!
+  [{grid :grid} values]
+  (dorun
+   (map (fn [[[i j k w] v]]
+          (aset grid w k j i v))
+        values)))
+
+(defn- set-3D-grid-values!
+  [{grid :grid} values]
+  (dorun
+   (map (fn [[[i j k] v]]
+          (aset grid k j i v))
+        values)))
+
+(defn- set-2D-grid-values!
+  [{grid :grid} values]
+  (dorun
+   (map (fn [[[i j] v]]
+          (aset grid j i v))
+        values)))
+
+(defn- set-1D-grid-values!
+  [{grid :grid} values]
+  (dorun
+   (map-indexed #(aset grid % (vector %2)) values)))
+
+(deftest test-normalization
+  (testing "noise extremes for the 1D noise"
+    (let [perlin-data (doto (perlin/create-perlin-data [2])
+                        (set-1D-grid-values! [-1 1]))]
+      (is (eps= 1 (perlin/noise perlin-data [0.25])))))
+  (testing "noise extremes for the 2D noise"
+    (let [half√2 (/ (Math/sqrt 2) 2)
+          perlin-data (doto (perlin/create-perlin-data [2 2])
+                        (set-2D-grid-values! {[0 0] [(- half√2) (- half√2)]
+                                              [1 0] [(+ half√2) (- half√2)]
+                                              [0 1] [(- half√2) (+ half√2)]
+                                              [1 1] [(+ half√2) (+ half√2)]}))]
+      (is (eps= 1 (perlin/noise perlin-data [0.25 0.25])))))
+  (testing "noise extremes for the 3D noise"
+    (let [inv√3 (/ (Math/sqrt 3))
+          perlin-data (doto (perlin/create-perlin-data [2 2 2])
+                        (set-3D-grid-values! {[0 0 0] [(- inv√3) (- inv√3) (- inv√3)]
+                                              [1 0 0] [(+ inv√3) (- inv√3) (- inv√3)]
+                                              [0 1 0] [(- inv√3) (+ inv√3) (- inv√3)]
+                                              [1 1 0] [(+ inv√3) (+ inv√3) (- inv√3)]
+                                              [0 0 1] [(- inv√3) (- inv√3) (+ inv√3)]
+                                              [1 0 1] [(+ inv√3) (- inv√3) (+ inv√3)]
+                                              [0 1 1] [(- inv√3) (+ inv√3) (+ inv√3)]
+                                              [1 1 1] [(+ inv√3) (+ inv√3) (+ inv√3)]}))]
+      (is (eps= 1 (perlin/noise perlin-data [0.25 0.25 0.25])))))
+    (testing "noise extremes for the 4D noise"
+    (let [half (/ 2)
+          perlin-data (doto (perlin/create-perlin-data [2 2 2 2])
+                        (set-4D-grid-values! {[0 0 0 0] [(- half) (- half) (- half) (- half)]
+                                              [1 0 0 0] [(+ half) (- half) (- half) (- half)]
+                                              [0 1 0 0] [(- half) (+ half) (- half) (- half)]
+                                              [1 1 0 0] [(+ half) (+ half) (- half) (- half)]
+                                              [0 0 1 0] [(- half) (- half) (+ half) (- half)]
+                                              [1 0 1 0] [(+ half) (- half) (+ half) (- half)]
+                                              [0 1 1 0] [(- half) (+ half) (+ half) (- half)]
+                                              [1 1 1 0] [(+ half) (+ half) (+ half) (- half)]
+                                              [0 0 0 1] [(- half) (- half) (- half) (+ half)]
+                                              [1 0 0 1] [(+ half) (- half) (- half) (+ half)]
+                                              [0 1 0 1] [(- half) (+ half) (- half) (+ half)]
+                                              [1 1 0 1] [(+ half) (+ half) (- half) (+ half)]
+                                              [0 0 1 1] [(- half) (- half) (+ half) (+ half)]
+                                              [1 0 1 1] [(+ half) (- half) (+ half) (+ half)]
+                                              [0 1 1 1] [(- half) (+ half) (+ half) (+ half)]
+                                              [1 1 1 1] [(+ half) (+ half) (+ half) (+ half)]                                              }))]
+      (is (eps= 1 (perlin/noise perlin-data [0.25 0.25 0.25 0.25]))))))

@@ -40,7 +40,7 @@
 
 (defn compute-normalization [n-dimensions]
   "The noise is divided by this factor"
-  (/ (Math/sqrt 2) 2))
+  (/ (Math/sqrt n-dimensions) 2))
 
 (defn- recursive-compute-neighbors [accumulator instance n]
   (if (= n 0)
@@ -54,7 +54,6 @@
   (recursive-compute-neighbors [] '() n))
 
 (defn create-perlin-data [dimensions]
-  (println "dimensions:" dimensions "normalization: " (compute-normalization (count dimensions)))
   {:dimensions dimensions
    :neighbors (compute-neighbors-displacements (count dimensions))
    :normalization (compute-normalization (count dimensions))
