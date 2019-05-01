@@ -2,8 +2,9 @@
   (:require [raytracer.perlin :as perlin]
             [raytracer.canvas :as canvas]))
 
-(def grid-width 20)
-(def grid-height 20)
+(def grid-width 10)
+(def grid-height 10)
+(def grid-depth 6)
 
 (defn write-color-to-canvas [width height colors]
   (reduce (fn color-to-canvas [canvas [color [x y]]]
@@ -18,9 +19,9 @@
                         (vector [value value value] (vector x y))))
    noise))
 
-(defn create-noise [perlin-data width height]
-  (pmap (fn pixel-to-noise [[x y]]
-         (vector x y (perlin/noise perlin-data [(- (/ x width) 0.5) (- (/ y height))])))
+(defn create-noise [perlin-data width height time]
+  (map (fn pixel-to-noise [[x y]]
+         (vector x y (perlin/noise perlin-data [(- (/ x width) 0.5) (- (/ y height)) time])))
        (for [i (range height)
              j (range width)]
          (vector j i))))
@@ -33,3 +34,18 @@
                         (write-color-to-canvas width height
                                                (convert-noise-to-color           
                                                 (create-noise perlin-data width height))))))))
+
+(defn render-animation
+  ([width height frames]
+   (let [perlin-data (perlin/create-perlin-data [grid-width grid-height grid-depth])
+         render-frame (fn [frame]
+                        (spit (format "noise_%d.ppm" frame)
+                              (canvas/canvas-to-ppm
+                               (write-color-to-canvas width height
+                                                      (convert-noise-to-color           
+                                                       (create-noise perlin-data width height (/ frame frames)))))))]
+     (dorun
+      (pmap #(do
+               (println "Rendering frame" % "…")
+               (render-frame %))
+            (range frames))))))
