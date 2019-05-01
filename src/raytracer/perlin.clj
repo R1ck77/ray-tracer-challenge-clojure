@@ -12,7 +12,7 @@
         size (Math/sqrt (apply + (map #(* % %) v)))]
     (vec (if (> size 1e-6)
            (map #(/ % size) v)
-           (random-gradient dimensions)))))
+           (vec (take dimensions (repeat 0)))))))
 
 (defn- recursive-fill-array
   [f supplier dimensions]
@@ -86,12 +86,12 @@
 
 (defn- compute-dot-products [gradients distances]
   (vec
-   (map (fn [[gx gy] [dx dy]]
-          (+ (* gx dx) (* gy dy))) gradients distances)))
+   (map (fn [gradient distance]
+          (apply + (map * gradient distance))) gradients distances)))
 
-(defn- compute-distances [corners [x y]]
-  (map (fn corner-point-distance [[cx cy]]
-         (vector (- cx x) (- cy y)))
+(defn- compute-distances [corners point]
+  (map (fn corner-point-distance [corner]
+         (vec (map #(- % %2) corner point)))
        corners))
 
 (defn assoc-dot-products [perlin-data {:keys [corners point] :as temp-data}]
