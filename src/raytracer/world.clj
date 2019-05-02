@@ -76,7 +76,8 @@
      :point  point
      :over-point (tuple/add point (svector/mul normal-v EPSILON))
      :eye-v eye-v
-     :normal-v normal-v}))
+     :normal-v normal-v
+     :reflection (svector/reflect (:direction ray) normal-v)}))
 
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only

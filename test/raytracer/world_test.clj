@@ -12,6 +12,9 @@
             [raytracer.transform :as transform]
             [raytracer.light-sources :as light-sources]))
 
+(def √2 (Math/sqrt 2))
+(def half√2 (/ √2 2))
+
 (deftest test-create
   (testing "Creating a world"
     (let [world (world/create)]
@@ -67,7 +70,13 @@
       (is (v= (point/point 0 0 1) (:point result)))
       (is (v= (svector/svector 0 0 -1) (:eye-v result)))
       (is (v= (svector/svector 0 0 -1) (:normal-v result)))))
-
+  (testing "Precomputing the reflection vector"
+    (let [shape (shapes/plane)
+          ray (ray/ray (point/point 0 1 -1)
+                     (svector/svector 0 (- half√2) half√2))
+          intersection (intersection/intersection √2 shape)]
+      (is (v= (svector/svector 0 half√2 half√2)
+              (:reflection (world/prepare-computations ray intersection))))))
   (testing "The hit should offset the point"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
