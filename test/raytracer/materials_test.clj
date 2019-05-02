@@ -10,7 +10,8 @@
       (is (= 0.1 (:ambient default-material)))
       (is (= 0.9 (:diffuse default-material)))
       (is (= 0.9 (:specular default-material)))
-      (is (= 200.0 (:shiness default-material))))
+      (is (= 200.0 (:shiness default-material)))
+      (is (= 0.0 (:reflectivity default-material))))
     (testing "material with custom color"
       (let [material (materials/material :color [1 2 3])]
         (is (= [1 2 3] (:color material)))
