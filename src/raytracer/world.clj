@@ -12,6 +12,8 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
+(def ^:dynamic *maximum-reflections* 100)
+
 (def EPSILON 1e-6)
 
 (defn create [] ;;; TODO/FIXME change name to "world"
@@ -94,7 +96,8 @@
 (def reflected-color)
 
 ;; TODO/FIXME the rendering throws without a light source set!
-(defn shade-hit [world intermediate-result]
+(defn shade-hit
+  [world intermediate-result remaining]
   (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
     (color/add (phong/lighting (:object intermediate-result)
                                (first (:light-sources world)) ;;; first light source, for now
@@ -102,22 +105,27 @@
                                (:eye-v intermediate-result)
                                (:normal-v intermediate-result)
                                shadowed)
-               (reflected-color world intermediate-result))))
+               (reflected-color world intermediate-result remaining))))
 
-(defn color-at [world ray]
-  (let [intersection (intersection/hit (intersect world ray))]
-    (if intersection
-      (shade-hit world (prepare-computations ray intersection))
-      [0 0 0])))
+(defn color-at
+  ([world ray]
+   (color-at world ray *maximum-reflections*))
+  ([world ray remaining]
+   (let [intersection (intersection/hit (intersect world ray))]
+     (if intersection
+       (shade-hit world (prepare-computations ray intersection) remaining)
+       [0 0 0]))))
 
 
-(defn reflected-color [world intermediate-result]
-  (let [reflectivity (get-reflectivity intermediate-result)]
-    (if (< reflectivity EPSILON)
-      [0 0 0]
-      (let [reflection (ray/ray (:over-point intermediate-result)
-                                (:reflection intermediate-result))]
-        (color/scale (color-at world reflection) reflectivity)))))
+(defn reflected-color [world intermediate-result remaining]
+  (if (> remaining 0)
+   (let [reflectivity (get-reflectivity intermediate-result)]
+     (if (< reflectivity EPSILON)
+       [0 0 0]
+       (let [reflection (ray/ray (:over-point intermediate-result)
+                                 (:reflection intermediate-result))]
+         (color/scale (color-at world reflection (dec remaining)) reflectivity))))
+   [0 0 0]))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))

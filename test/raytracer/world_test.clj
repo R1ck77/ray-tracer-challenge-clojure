@@ -105,7 +105,7 @@
                                                    (intersection/intersection 4 (first (:objects world))))]
       (is (v= [0.38066 0.47583 0.2855]
               (world/shade-hit world
-                               intermediate)))))
+                               intermediate 1)))))
   (testing "Shading an intersection from the inside"
     (let [world (world/set-light-sources (world/default-world)
                                          (light-sources/create-point-light (point/point 0 0.25 0)
@@ -115,9 +115,9 @@
                                                    (intersection/intersection 0.5 (second (:objects world))))]
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
-                               intermediate)))))
+                               intermediate 1)))))
   (testing "shade_hit() is given an intersection in shadow"
-    (let [ sphere1 (shapes/sphere)
+    (let [sphere1 (shapes/sphere)
           sphere2 (shapes/change-transform (shapes/sphere)
                                            (transform/translate 0 0 10))
           world (-> (world/create)
@@ -127,7 +127,7 @@
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 sphere2)
           comp (world/prepare-computations ray intersection)
-          color (world/shade-hit world comp)]
+          color (world/shade-hit world comp 1)]
       (is (v= [0.1 0.1 0.1]
               color))))
     (testing "Lighting with reflection enabled"
@@ -141,7 +141,7 @@
                          (svector/svector 0 (- half√2) half√2))
             intersection (intersection/intersection √2 shape)]
         (is (v= [0.87677 0.92436 0.82918]
-                (world/shade-hit world (world/prepare-computations ray intersection)))))))
+                (world/shade-hit world (world/prepare-computations ray intersection) 1))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
@@ -236,7 +236,8 @@
       (is (v= [0 0 0]
               (world/reflected-color world
                                      (world/prepare-computations ray
-                                                                 intersection))))))
+                                                                 intersection)
+                                     1)))))
 
   (testing "The reflected color for a reflective material"
     (let [template-shape (shapes/plane)
@@ -249,7 +250,7 @@
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
       (is (v= [0.19032 0.2379 0.14274]
-              (world/reflected-color world (world/prepare-computations ray intersection))))))
+              (world/reflected-color world (world/prepare-computations ray intersection) 1)))))
     (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
                     (shapes/change-material (materials/material :reflectivity 0.5))
