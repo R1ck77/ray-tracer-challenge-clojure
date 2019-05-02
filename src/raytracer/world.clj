@@ -80,6 +80,18 @@
      :normal-v normal-v
      :reflection (svector/reflect (:direction ray) normal-v)}))
 
+(defn- get-reflectivity [intermediate-result]
+  (println intermediate-result)
+  (:reflectivity (:material (:object intermediate-result))))
+
+(defn reflected-color [world intermediate-result]
+  (let [reflectivity (get-reflectivity intermediate-result)]
+    (if (< reflectivity EPSILON)
+      [0 0 0]
+      (let [reflection (ray/ray (:over-point intermediate-result)
+                                (:reflection intermediate-result))]
+        (color/scale (color-at world reflection) reflectivity)))))
+
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
@@ -90,12 +102,13 @@
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
   (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
-    (phong/lighting (:object intermediate-result)
-                    (first (:light-sources world)) ;;; first light source, for now
-                    (:point intermediate-result)
-                    (:eye-v intermediate-result)
-                    (:normal-v intermediate-result)
-                    shadowed)))
+    (color/add (phong/lighting (:object intermediate-result)
+                               (first (:light-sources world)) ;;; first light source, for now
+                               (:point intermediate-result)
+                               (:eye-v intermediate-result)
+                               (:normal-v intermediate-result)
+                               shadowed)
+               (reflected-color world intermediate-result))))
 
 (defn color-at [world ray]
   (let [intersection (intersection/hit (intersect world ray))]
@@ -114,15 +127,3 @@
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))
-
-(defn- get-reflectivity [intermediate-result]
-  (println intermediate-result)
-  (:reflectivity (:material (:object intermediate-result))))
-
-(defn reflected-color [world intermediate-result]
-  (let [reflectivity (get-reflectivity intermediate-result)]
-    (if (< reflectivity EPSILON)
-      [0 0 0]
-      (let [reflection (ray/ray (:over-point intermediate-result)
-                                (:reflection intermediate-result))]
-        (color/scale (color-at world reflection) reflectivity)))))

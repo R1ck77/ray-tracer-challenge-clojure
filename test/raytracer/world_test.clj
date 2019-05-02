@@ -129,7 +129,19 @@
           comp (world/prepare-computations ray intersection)
           color (world/shade-hit world comp)]
       (is (v= [0.1 0.1 0.1]
-              color)))))
+              color))))
+    (testing "Lighting with reflection enabled"
+      (let [template-shape (shapes/plane)
+            shape (shapes/change-material (shapes/change-transform template-shape
+                                                                   (transform/translate 0 -1 0))
+                                          (materials/update-material (:material template-shape)
+                                                                     :reflectivity 0.5))
+            world (world/add-object (world/default-world) shape)
+            ray (ray/ray (point/point 0 0 -3)
+                         (svector/svector 0 (- half√2) half√2))
+            intersection (intersection/intersection √2 shape)]
+        (is (v= [0.87677 0.92436 0.82918]
+                (world/shade-hit world (world/prepare-computations ray intersection)))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
