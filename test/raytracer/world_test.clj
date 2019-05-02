@@ -21,6 +21,13 @@
       (is (empty? (:objects world)))
       (is (empty? (:light-sources world))))))
 
+(deftest test-add-object
+  (testing "Adding a new object"
+    (let [world (world/default-world)
+          new-object (shapes/plane)]
+      (is (contains? (apply hash-set (:objects (world/add-object world new-object)))
+                     new-object)))))
+
 (deftest test-default-world
   (testing "The default world"
     (let [world (world/default-world)
@@ -185,3 +192,37 @@
       (is (not (world/is-shadowed? world (point/point -20 20 -20)))))
     (testing "There is no shadow when an object is behind the point"
       (is (not (world/is-shadowed? world (point/point -2 2 -2)))))))
+
+(defn- update-ambient [shape]
+  (shapes/change-material shape
+                          (materials/update-material (:material shape)
+                                                     :ambient 1)))
+
+(defn- change-second-object-material [world]
+  (let [objects (:objects world)]
+    (world/set-objects world
+                       (assoc objects 1 (update-ambient (second objects))))))
+
+(deftest test-reflected-color
+  (testing "The reflected color for a nonreflective material"
+    (let [world (change-second-object-material (world/default-world))
+          ray (ray/ray (point/point 0 0 0)
+                       (svector/svector 0 0 1))
+          intersection (intersection/intersection 1 (second (:objects world)))]
+      (is (v= [0 0 0]
+              (world/reflected-color world
+                                     (world/prepare-computations ray
+                                                                 intersection))))))
+
+  (testing "The reflected color for a reflective material"
+    (let [template-shape (shapes/plane)
+          shape (shapes/change-material (shapes/change-transform template-shape
+                                                                 (transform/translate 0 -1 0))
+                                        (materials/update-material (:material template-shape)
+                                                                   :reflectivity 0.5))
+          world (world/add-object (world/default-world) shape)
+          ray (ray/ray (point/point 0 0 -3)
+                       (svector/svector 0 (- half√2) half√2))
+          intersection (intersection/intersection √2 shape)]
+      (is (v= [0.19032 0.2379 0.14274]
+              (world/reflected-color world (world/prepare-computations ray intersection)))))))

@@ -2,6 +2,7 @@
   (:require [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.color :as color]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.shapes :as shapes]
@@ -17,7 +18,7 @@
   {:objects []
    :light-sources #{}})
 
-(defn- add-object [world object]
+(defn add-object [world object]
   (update world :objects #(conj % object)))
 
 (defn- add-light-source [world light-source]
@@ -113,3 +114,15 @@
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))
+
+(defn- get-reflectivity [intermediate-result]
+  (println intermediate-result)
+  (:reflectivity (:material (:object intermediate-result))))
+
+(defn reflected-color [world intermediate-result]
+  (let [reflectivity (get-reflectivity intermediate-result)]
+    (if (< reflectivity EPSILON)
+      [0 0 0]
+      (let [reflection (ray/ray (:over-point intermediate-result)
+                                (:reflection intermediate-result))]
+        (color/scale (color-at world reflection) reflectivity)))))

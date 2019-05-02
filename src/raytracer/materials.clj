@@ -14,10 +14,12 @@
   ([& {:as args}]
    (merge (material) args)))
 
-
 (defn get-color [object point]
   (let [material (:material object)]
     (if-let [pattern (:pattern material)]
       (pattern/color-at-object pattern object point)
       (:color material))))
+
+(defn update-material [material property value]
+  (assoc material property value))
 

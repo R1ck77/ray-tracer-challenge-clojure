@@ -47,3 +47,8 @@
         (is (= 0.9 (:diffuse material)))
         (is (= 0.9 (:specular material)))
         (is (= 70 (:shiness material)))))))
+
+(deftest test-update-material
+  (testing "a material can be updated"
+    (is (= 14 (:ambient (materials/update-material (materials/material)
+                                                   :ambient 14))))))
