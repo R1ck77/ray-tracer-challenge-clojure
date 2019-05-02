@@ -163,8 +163,19 @@
                                    (map reset-ambient-color (:objects (world/default-world))))
           ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
       (is (v= (:color (:material (second (:objects world))))
-              (world/color-at world ray))))))
-
+              (world/color-at world ray)))))
+  (testing "color_at() with mutually reflective surfaces"
+    (let [light (light-sources/create-point-light (point/point 0 0 0)
+                                                  [1 1 1])
+          reflective-plane (shapes/change-material (shapes/plane)
+                                                   (materials/material :reflectivity 1))
+          lower-plane (shapes/change-transform reflective-plane (transform/translate 0 -1 0))
+          upper-plane (shapes/change-transform reflective-plane (transform/translate 0 1 0))
+          world (-> (world/default-world)
+                    (world/set-light-sources light)
+                    (world/set-objects [lower-plane upper-plane]))]
+      (is (world/color-at world (ray/ray (point/point 0 0 0)
+                                         (svector/svector 0 1 0)))))))
 (deftest test-view-transform
   (testing "The transformation matrix for the default orientation"
     (let [from (point/point 0 0 0)

@@ -14,7 +14,7 @@
 
 (def EPSILON 1e-6)
 
-(defn create []
+(defn create [] ;;; TODO/FIXME change name to "world"
   {:objects []
    :light-sources #{}})
 
@@ -81,23 +81,17 @@
      :reflection (svector/reflect (:direction ray) normal-v)}))
 
 (defn- get-reflectivity [intermediate-result]
-  (println intermediate-result)
   (:reflectivity (:material (:object intermediate-result))))
-
-(defn reflected-color [world intermediate-result]
-  (let [reflectivity (get-reflectivity intermediate-result)]
-    (if (< reflectivity EPSILON)
-      [0 0 0]
-      (let [reflection (ray/ray (:over-point intermediate-result)
-                                (:reflection intermediate-result))]
-        (color/scale (color-at world reflection) reflectivity)))))
 
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
         intersection (intersection/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
     (and intersection
-         (< (:t intersection) (svector/mag pos->light)))))
+         (< (:t intersection)
+            (svector/mag pos->light)))))
+
+(def reflected-color)
 
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit [world intermediate-result]
@@ -115,6 +109,15 @@
     (if intersection
       (shade-hit world (prepare-computations ray intersection))
       [0 0 0])))
+
+
+(defn reflected-color [world intermediate-result]
+  (let [reflectivity (get-reflectivity intermediate-result)]
+    (if (< reflectivity EPSILON)
+      [0 0 0]
+      (let [reflection (ray/ray (:over-point intermediate-result)
+                                (:reflection intermediate-result))]
+        (color/scale (color-at world reflection) reflectivity)))))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
