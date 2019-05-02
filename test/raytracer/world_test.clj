@@ -176,6 +176,7 @@
                     (world/set-objects [lower-plane upper-plane]))]
       (is (world/color-at world (ray/ray (point/point 0 0 0)
                                          (svector/svector 0 1 0)))))))
+
 (deftest test-view-transform
   (testing "The transformation matrix for the default orientation"
     (let [from (point/point 0 0 0)
@@ -248,4 +249,14 @@
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
       (is (v= [0.19032 0.2379 0.14274]
-              (world/reflected-color world (world/prepare-computations ray intersection)))))))
+              (world/reflected-color world (world/prepare-computations ray intersection))))))
+    (testing "The reflected color at the maximum recursive depth"
+    (let [plane (-> (shapes/plane)
+                    (shapes/change-material (materials/material :reflectivity 0.5))
+                    (shapes/change-transform (transform/translate 0 -1 0)))
+          world (world/set-objects (world/default-world) plane)
+          ray (ray/ray (point/point 0 0 -3)
+                       (svector/svector 0 (- half√2) half√2))
+          intersection (intersection/intersection √2 plane)]
+      (is (v= [0 0 0]
+              (world/reflected-color world (world/prepare-computations ray intersection) 0))))))
