@@ -9,6 +9,8 @@
     :specular 0.9
     :shiness 200.0
     :reflectivity 0.0
+    :transparency 0.0
+    :refractive-index 1.0
     :pattern nil}) ;; TODO/FIXME very crude. generalize in a color getter function and remove color!
                    ;; you can probably fit a texture, uv mapping or something here, and make color a special case!
   ([& {:as args}]
@@ -20,6 +22,6 @@
       (pattern/color-at-object pattern object point)
       (:color material))))
 
-(defn update-material [material property value]
-  (assoc material property value))
+(defn update-material [material & {:as args}]
+  (merge material args))
 
