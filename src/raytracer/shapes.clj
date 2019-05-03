@@ -13,6 +13,9 @@
 (defn change-material [shape new-material]
   (assoc shape :material new-material))
 
+(defn update-material [shape material-update-f]
+  (change-material shape (material-update-f (:material shape))))
+
 (defn sphere []
   (sphere-ns/sphere))
 
