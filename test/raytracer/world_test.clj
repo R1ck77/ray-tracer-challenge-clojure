@@ -95,7 +95,45 @@
       (is (< (nth (:over-point intermediate) 2)
              (/ (- world/EPSILON) 2)))
       (is (> (nth (:point intermediate) 2)
-             (nth (:over-point intermediate) 2))))))
+             (nth (:over-point intermediate) 2)))))
+
+
+  (testing "Finding n1 and n2 at various intersections"
+    (let [sphere-a (-> (shapes/glass-sphere)
+                       (shapes/change-transform (transform/scale 2 2 2))
+                       (shapes/update-material #(materials/update-material % :refractive-index 1.5)))
+          sphere-b (-> (shapes/glass-sphere)
+                       (shapes/change-transform (transform/translate 0 0 -0.25))
+                       (shapes/update-material #(materials/update-material % :refractive-index 2.0)))
+          sphere-c (-> (shapes/glass-sphere)
+                       (shapes/change-transform (transform/translate 0 0 0.25))
+                       (shapes/update-material #(materials/update-material % :refractive-index 2.5)))
+          ray (ray/ray (point/point 0 0 -4)
+                       (svector/svector 0 0 1))
+          intersections (vec (map #(apply intersection/intersection %) [[2 sphere-a]
+                                                                        [2.75 sphere-b]
+                                                                        [3.25 sphere-c]
+                                                                        [4.75 sphere-b]
+                                                                        [5.25 sphere-c]
+                                                                        [6 sphere-a]]))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 0))]
+        (is (eps= 1 (:n1 intermediate-result)))
+        (is (eps= 1.5 (:n2 intermediate-result))))
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 1))]
+        (is (eps= 1.5 (:n1 intermediate-result)))
+        (is (eps= 2.0 (:n2 intermediate-result))))
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 2))]
+        (is (eps= 2 (:n1 intermediate-result)))
+        (is (eps= 2.5 (:n2 intermediate-result))))
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 3))]
+        (is (eps= 2.5 (:n1 intermediate-result)))
+        (is (eps= 2.5 (:n2 intermediate-result))))
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 4))]
+        (is (eps= 2.5 (:n1 intermediate-result)))
+        (is (eps= 1.5 (:n2 intermediate-result))))
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 5))]
+        (is (eps= 1.5 (:n1 intermediate-result)))
+        (is (eps= 1.0 (:n2 intermediate-result)))))))
 
 (deftest test-shade-hit
   (testing "Shading an intersection"

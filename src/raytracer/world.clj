@@ -80,7 +80,9 @@
      :over-point (tuple/add point (svector/mul normal-v EPSILON))
      :eye-v eye-v
      :normal-v normal-v
-     :reflection (svector/reflect (:direction ray) normal-v)}))
+     :reflection (svector/reflect (:direction ray) normal-v)
+     :n1 1
+     :n2 1}))
 
 (defn- get-reflectivity [intermediate-result]
   (:reflectivity (:material (:object intermediate-result))))
