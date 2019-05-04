@@ -18,7 +18,8 @@
 
 (defn create [] ;;; TODO/FIXME change name to "world"
   {:objects []
-   :light-sources #{}})
+   :light-sources #{}
+   :material materials/void-material})
 
 (defn add-object [world object]
   (update world :objects #(conj % object)))
@@ -60,11 +61,22 @@
 (defn intersect [world ray]
   (sort-by :t (unsorted-intersections world ray)))
 
+;;; TODO/FIXME not sure about this reduced stuff. Smells like cheating
+(defn- compute-refraction-indices [checked-intersection xintersection world-refractive-index]
+  ;;; TODO/FIXME bogus return value
+  (let [n2 (-> checked-intersection :object :material :refractive-index)]
+    (vector (reduce (fn [n1 intersection]
+               (if (= checked-intersection intersection)
+                 (reduced n1)
+                 (-> intersection :object :material :refractive-index)))
+                    world-refractive-index xintersection)
+            n2)))
+
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
 
-
-(defn prepare-computations [ray intersection]
+(defn prepare-computations
+  [ray intersection all-intersections world-refractive-index]
   (let [point (tuple/add (:origin ray)
                          (svector/mul (:direction ray)
                                       (:t intersection)))
@@ -72,7 +84,9 @@
         object (:object intersection)
         normal-v ((:normal object) object point)
         inside (is-inside? eye-v normal-v)
-        normal-v (if inside (svector/neg normal-v) normal-v)]
+        normal-v (if inside (svector/neg normal-v) normal-v)
+        [n1 n2] (compute-refraction-indices intersection all-intersections world-refractive-index)]
+    (println n1 n2)
     {:inside inside
      :object object
      :t (:t intersection)
@@ -81,8 +95,8 @@
      :eye-v eye-v
      :normal-v normal-v
      :reflection (svector/reflect (:direction ray) normal-v)
-     :n1 1
-     :n2 1}))
+     :n1 n1
+     :n2 n2}))
 
 (defn- get-reflectivity [intermediate-result]
   (:reflectivity (:material (:object intermediate-result))))
@@ -113,30 +127,35 @@
   ([world ray]
    (color-at world ray *maximum-reflections*))
   ([world ray remaining]
-   (let [intersection (intersection/hit (intersect world ray))]
+   (let [intersections (intersect world ray)
+         intersection (intersection/hit intersections)]
      (if intersection
-       (shade-hit world (prepare-computations ray intersection) remaining)
-       [0 0 0]))))
+       (shade-hit world (prepare-computations ray
+                                              intersection
+                                              intersections
+                                              (-> world :material :refractive-index))
+                  remaining)
+       (-> world :material :color)))))
 
 
 (defn reflected-color [world intermediate-result remaining]
   (if (> remaining 0)
    (let [reflectivity (get-reflectivity intermediate-result)]
      (if (< reflectivity EPSILON)
-       [0 0 0]
+       (-> world :material :color)
        (let [reflection (ray/ray (:over-point intermediate-result)
                                  (:reflection intermediate-result))]
          (color/scale (color-at world reflection (dec remaining)) reflectivity))))
-   [0 0 0]))
+   (-> world :material :color)))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
         [left-x left-y left-z _ :as left] (svector/cross forward (svector/normalize up))
         [true-up-x true-up-y true-up-z _ :as true-up] (svector/cross left forward)]
-    (matrix/mul4 (vector    left-x    left-y    left-z 0
-                            true-up-x true-up-y true-up-z 0
-                            (- fwd-x) (- fwd-y) (- fwd-z) 0
-                            0         0         0 1)
+    (matrix/mul4 (vector left-x      left-y      left-z      0
+                         true-up-x   true-up-y   true-up-z   0
+                         (- fwd-x)   (- fwd-y)   (- fwd-z)   0
+                         0           0           0           1)
                  (transform/translate (- from-x)
                                       (- from-y)
                                       (- from-z)))))

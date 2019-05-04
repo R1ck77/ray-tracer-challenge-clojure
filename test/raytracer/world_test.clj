@@ -56,7 +56,7 @@
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 (shapes/sphere))
-          result (world/prepare-computations ray intersection)]
+          result (world/prepare-computations ray intersection [] 1)]
       (is (= (shapes/sphere) (:object result)))
       (is (= 4 (:t result)))
       (is (v= (point/point 0 0 -1) (:point result)))
@@ -67,12 +67,12 @@
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 (shapes/sphere))]
-      (is (not (:inside (world/prepare-computations ray intersection))))))
+      (is (not (:inside (world/prepare-computations ray intersection [] 1))))))
   (testing "The hit, when an intersection occurs on the inside"
     (let [ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 1 (shapes/sphere))
-          result (world/prepare-computations ray intersection)]
+          result (world/prepare-computations ray intersection [] 1)]
       (is (:inside result))
       (is (v= (point/point 0 0 1) (:point result)))
       (is (v= (svector/svector 0 0 -1) (:eye-v result)))
@@ -83,14 +83,14 @@
                      (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
       (is (v= (svector/svector 0 half√2 half√2)
-              (:reflection (world/prepare-computations ray intersection))))))
+              (:reflection (world/prepare-computations ray intersection [] 1))))))
   (testing "The hit should offset the point"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
           sphere (shapes/change-transform (shapes/sphere)
                                           (transform/translate 0 0 1))
           intersection (intersection/intersection 5 sphere)
-          intermediate (world/prepare-computations ray intersection)
+          intermediate (world/prepare-computations ray intersection [] 1)
           ]
       (is (< (nth (:over-point intermediate) 2)
              (/ (- world/EPSILON) 2)))
@@ -116,22 +116,22 @@
                                                                         [4.75 sphere-b]
                                                                         [5.25 sphere-c]
                                                                         [6 sphere-a]]))]
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 0))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 0) intersections 1)]
         (is (eps= 1 (:n1 intermediate-result)))
         (is (eps= 1.5 (:n2 intermediate-result))))
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 1))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 1) intersections 1)]
         (is (eps= 1.5 (:n1 intermediate-result)))
         (is (eps= 2.0 (:n2 intermediate-result))))
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 2))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 2) intersections 1)]
         (is (eps= 2 (:n1 intermediate-result)))
         (is (eps= 2.5 (:n2 intermediate-result))))
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 3))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 3) intersections 1)]
         (is (eps= 2.5 (:n1 intermediate-result)))
         (is (eps= 2.5 (:n2 intermediate-result))))
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 4))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 4) intersections 1)]
         (is (eps= 2.5 (:n1 intermediate-result)))
         (is (eps= 1.5 (:n2 intermediate-result))))
-      (let  [intermediate-result (world/prepare-computations ray (nth intersections 5))]
+      (let  [intermediate-result (world/prepare-computations ray (nth intersections 5) intersections 1)]
         (is (eps= 1.5 (:n1 intermediate-result)))
         (is (eps= 1.0 (:n2 intermediate-result)))))))
 
@@ -140,7 +140,9 @@
     (let [world (world/default-world)
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 -5)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 4 (first (:objects world))))]
+                                                   (intersection/intersection 4 (first (:objects world)))
+                                                   []
+                                                   1)]
       (is (v= [0.38066 0.47583 0.2855]
               (world/shade-hit world
                                intermediate 1)))))
@@ -150,7 +152,9 @@
                                                                            [1 1 1]))
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 0.5 (second (:objects world))))]
+                                                   (intersection/intersection 0.5 (second (:objects world)))
+                                                   []
+                                                   1)]
       (is (v= [0.90498 0.90498 0.90498]
               (world/shade-hit world
                                intermediate 1)))))
@@ -164,7 +168,7 @@
           ray (ray/ray (point/point 0 0 5)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 sphere2)
-          comp (world/prepare-computations ray intersection)
+          comp (world/prepare-computations ray intersection [] 1)
           color (world/shade-hit world comp 1)]
       (is (v= [0.1 0.1 0.1]
               color))))
@@ -179,7 +183,7 @@
                          (svector/svector 0 (- half√2) half√2))
             intersection (intersection/intersection √2 shape)]
         (is (v= [0.87677 0.92436 0.82918]
-                (world/shade-hit world (world/prepare-computations ray intersection) 1))))))
+                (world/shade-hit world (world/prepare-computations ray intersection [] 1) 1))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
@@ -274,7 +278,9 @@
       (is (v= [0 0 0]
               (world/reflected-color world
                                      (world/prepare-computations ray
-                                                                 intersection)
+                                                                 intersection
+                                                                 []
+                                                                 1)
                                      1)))))
 
   (testing "The reflected color for a reflective material"
@@ -288,7 +294,7 @@
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
       (is (v= [0.19032 0.2379 0.14274]
-              (world/reflected-color world (world/prepare-computations ray intersection) 1)))))
+              (world/reflected-color world (world/prepare-computations ray intersection [] 1) 1)))))
     (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
                     (shapes/change-material (materials/material :reflectivity 0.5))
@@ -298,4 +304,4 @@
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 plane)]
       (is (v= [0 0 0]
-              (world/reflected-color world (world/prepare-computations ray intersection) 0))))))
+              (world/reflected-color world (world/prepare-computations ray intersection [] 1) 0))))))
