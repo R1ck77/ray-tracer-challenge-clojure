@@ -62,15 +62,30 @@
   (sort-by :t (unsorted-intersections world ray)))
 
 ;;; TODO/FIXME not sure about this reduced stuff. Smells like cheating
-(defn- compute-refraction-indices [checked-intersection xintersection world-refractive-index]
+(defn- compute-refraction-indices [checked-intersection intersections world-refractive-index]
   ;;; TODO/FIXME bogus return value
-  (let [n2 (-> checked-intersection :object :material :refractive-index)]
-    (vector (reduce (fn [n1 intersection]
-               (if (= checked-intersection intersection)
-                 (reduced n1)
-                 (-> intersection :object :material :refractive-index)))
-                    world-refractive-index xintersection)
-            n2)))
+  (let [checked-intersection-object (-> checked-intersection :object :material) ;;; Horribly complex
+        transitions (first (reduce (fn [[transitions inside] [checked-intersection object]]
+                                     (let [[new-transitions new-inside :as status] (if (contains? inside object)
+                                                                                     [(conj transitions [:out object])
+                                                                                      (disj inside object)]
+                                                                                     [(conj transitions [:in object])
+                                                                                      (conj inside object)])]
+                                       (if checked-intersection
+                                         (reduced (if (empty? new-inside)
+                                                    [(conj transitions [:in :void])
+                                                     (conj inside :void)]
+                                                    status))                                         
+                                         status)))
+                                   ['([:in :void]) #{:void}]
+                                   (map (fn [intersection]
+                                          (vector (= intersection checked-intersection) (:object intersection)))
+                                        intersections)))]
+    (map (fn to-refractive-index [[_ object-or-void]]
+           (if (= :void object-or-void)
+             world-refractive-index
+             (-> object-or-void :material :refractive-index)))
+         (reverse transitions))))
 
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
@@ -86,7 +101,6 @@
         inside (is-inside? eye-v normal-v)
         normal-v (if inside (svector/neg normal-v) normal-v)
         [n1 n2] (compute-refraction-indices intersection all-intersections world-refractive-index)]
-    (println n1 n2)
     {:inside inside
      :object object
      :t (:t intersection)
