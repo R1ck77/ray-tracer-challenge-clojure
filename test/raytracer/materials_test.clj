@@ -50,6 +50,14 @@
         (is (= 0.9 (:specular material)))
         (is (= 70 (:shiness material)))))))
 
+(deftest test-void-material
+  (testing "the void material is black"
+    (is (v= [0 0 0] (:color materials/void-material))))
+  (testing "the void material has full transparency"
+    (is (eps= 1.0 (:transparency materials/void-material))))
+  (testing "the void material has 1 as refractive index"
+    (is (eps= 1.0 (:refractive-index materials/void-material)))))
+
 (deftest test-update-material
   (testing "a material can be updated"
     (is (= 14 (:ambient (materials/update-material (materials/material)

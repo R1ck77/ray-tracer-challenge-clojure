@@ -16,6 +16,10 @@
   ([& {:as args}]
    (merge (material) args)))
 
+(def void-material (material :color [0 0 0]
+                             :transparency 1.0
+                             :refractive-index 1.0))
+
 (defn get-color [object point]
   (let [material (:material object)]
     (if-let [pattern (:pattern material)]
