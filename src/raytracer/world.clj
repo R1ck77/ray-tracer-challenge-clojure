@@ -16,6 +16,8 @@
 
 (def EPSILON 1e-6)
 
+(def zero-color [0 0 0])
+
 (defn create [] ;;; TODO/FIXME change name to "world"
   {:objects []
    :light-sources #{}
@@ -173,13 +175,13 @@
 
 (defn reflected-color [world intermediate-result remaining]
   (if (> remaining 0)
-   (let [reflectivity (get-reflectivity intermediate-result)]
-     (if (< reflectivity EPSILON)
-       (-> world :material :color)
-       (let [reflection (ray/ray (:over-point intermediate-result)
-                                 (:reflection intermediate-result))]
-         (color/scale (color-at world reflection (dec remaining)) reflectivity))))
-   (-> world :material :color)))
+    (let [reflectivity (get-reflectivity intermediate-result)]
+      (if (< reflectivity EPSILON)
+        zero-color
+        (let [reflection (ray/ray (:over-point intermediate-result)
+                                  (:reflection intermediate-result))]
+          (color/scale (color-at world reflection (dec remaining)) reflectivity))))
+    (-> world :material :color)))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
