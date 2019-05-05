@@ -61,9 +61,11 @@
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
 
-(def world (world/set-light-sources (world/set-objects (world/create) [floor left-sphere middle-sphere right-sphere])
-                                    (light-sources/create-point-light (point/point -10 10 -10)
-                                                                      [1 1 1])))
+(def world (-> (world/create)
+               (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
+                                                                          [1 1 1]))
+               (world/set-objects [floor left-sphere middle-sphere right-sphere])
+               (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
@@ -72,8 +74,8 @@
                                               (svector/svector 0 1 0))))
 
 (defn render-demo
-  ([] (render-demo 800 600))
+  ([] (render-demo 400 300))
   ([width height]
-   (spit "pattern-demo.ppm"
+   (spit "reflection-demo.ppm"
          (canvas/canvas-to-ppm (camera/render (create-camera width height)
                                               world)))))
