@@ -106,6 +106,10 @@
     [(convert-to-refractive-index obj1 world-refractive-index)
      (convert-to-refractive-index obj2 world-refractive-index)]))
 
+(defn schlick [intermediate-results]
+  1.0
+  )
+
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
 
