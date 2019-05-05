@@ -124,6 +124,7 @@
      :t (:t intersection)
      :point  point
      :over-point (tuple/add point (svector/mul normal-v EPSILON))
+     :under-point (tuple/add point (svector/mul normal-v (- EPSILON)))
      :eye-v eye-v
      :normal-v normal-v
      :reflection (svector/reflect (:direction ray) normal-v)
