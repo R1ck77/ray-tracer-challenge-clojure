@@ -44,6 +44,8 @@
 (def middle-sphere (-> (shapes/sphere)
                        (shapes/change-material (materials/material :diffuse 0.7
                                                                    :specular 0.3
+                                                                   :transparency 0.9
+                                                                   :refractive-index 2.0
                                                                    :reflectivity 0.1
                                                                    :transparency 0.8
                                                                    :refractive-index 2.0
