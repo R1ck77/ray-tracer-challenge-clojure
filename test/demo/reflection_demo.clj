@@ -15,6 +15,9 @@
 
 ;;; Note: the result of this demo changes with the evolution of the underlying functions
 
+(def ^:dynamic *output-file* "reflection-demo.ppm")
+(def ^:dynamic *image-resolution* [800 600])
+
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
@@ -36,12 +39,14 @@
                                                                                                     (transform/scale 0.2 0.2 0.2
                                                                                                                      (transform/rotate-y (/ Math/PI 5))))))
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
-                                                (transform/translate -1.5 0.33 -0.75)))))
+                                                   (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
                        (shapes/change-material (materials/material :diffuse 0.7
                                                                    :specular 0.3
                                                                    :reflectivity 0.1
+                                                                   :transparency 0.8
+                                                                   :refractive-index 2.0
                                                                    :pattern (pattern/change-transform (pattern/gradient [1 0 0] [0 0 1])
                                                                                                       (transform/rotate-x (/ Math/PI 2)))))
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
@@ -59,7 +64,7 @@
                                                                                                      (transform/scale 0.5 0.125 0.125
                                                                                                                       (transform/rotate-z 0.23423)))))
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
-                                                 (transform/translate 1.5 0.5 -0.5)))))
+                                                    (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (-> (world/create)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
@@ -74,8 +79,8 @@
                                               (svector/svector 0 1 0))))
 
 (defn render-demo
-  ([] (render-demo 400 300))
+  ([] (apply render-demo *image-resolution*))
   ([width height]
-   (spit "reflection-demo.ppm"
+   (spit *output-file*
          (canvas/canvas-to-ppm (camera/render (create-camera width height)
                                               world)))))
