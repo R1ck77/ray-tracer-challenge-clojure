@@ -52,17 +52,17 @@
               (map :t (world/intersect world ray)))))))
 
 (deftest test-prepare-computation
-  (testing "Precomputing the state of an intersection"
-    (let [ray (ray/ray (point/point 0 0 -5)
-                       (svector/svector 0 0 1))
-          intersection (intersection/intersection 4 (shapes/sphere))
-          result (world/prepare-computations ray intersection [] 1)]
-      (is (= (shapes/sphere) (:object result)))
-      (is (= 4 (:t result)))
-      (is (v= (point/point 0 0 -1) (:point result)))
-      (is (v= (svector/svector 0 0 -1) (:eye-v result)))
-      (is (v= (svector/svector 0 0 -1) (:normal-v result)))
-      (is (not (:inside result)))))
+(testing "Precomputing the state of an intersection"
+  (let [ray (ray/ray (point/point 0 0 -5)
+                     (svector/svector 0 0 1))
+        intersection (intersection/intersection 4 (shapes/sphere))
+        result (world/prepare-computations ray intersection [] 1)]
+    (is (= (shapes/sphere) (:object result)))
+    (is (= 4 (:t result)))
+    (is (v= (point/point 0 0 -1) (:point result)))
+    (is (v= (svector/svector 0 0 -1) (:eye-v result)))
+    (is (v= (svector/svector 0 0 -1) (:normal-v result)))
+    (is (not (:inside result)))))
   (testing "The hit, when an intersection occurs on the outside"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
@@ -80,7 +80,7 @@
   (testing "Precomputing the reflection vector"
     (let [shape (shapes/plane)
           ray (ray/ray (point/point 0 1 -1)
-                     (svector/svector 0 (- half√2) half√2))
+                       (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
       (is (v= (svector/svector 0 half√2 half√2)
               (:reflection (world/prepare-computations ray intersection [] 1))))))
@@ -97,7 +97,7 @@
       (is (> (nth (:point intermediate) 2)
              (nth (:over-point intermediate) 2)))))
 
-
+  
   (testing "Finding n1 and n2 at various intersections"
     (let [sphere-a (-> (shapes/glass-sphere)
                        (shapes/change-transform (transform/scale 2 2 2))

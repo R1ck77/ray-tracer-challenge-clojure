@@ -61,35 +61,53 @@
 (defn intersect [world ray]
   (sort-by :t (unsorted-intersections world ray)))
 
-;;; TODO/FIXME not sure about this reduced stuff. Smells like cheating
-(defn- compute-refraction-indices [checked-intersection intersections world-refractive-index]
-  ;;; TODO/FIXME bogus return value
-  (let [checked-intersection-object (-> checked-intersection :object :material) ;;; Horribly complex
-        transitions (first (reduce (fn [[transitions inside] [checked-intersection object]]
-                                     (let [[new-transitions new-inside :as status] (if (contains? inside object)
-                                                                                     [(conj transitions [:out object])
-                                                                                      (disj inside object)]
-                                                                                     [(conj transitions [:in object])
-                                                                                      (conj inside object)])]
-                                       (if checked-intersection
-                                         (reduced (if (empty? new-inside)
-                                                    [(conj transitions [:in :void])
-                                                     (conj inside :void)]
-                                                    status))                                         
-                                         status)))
-                                   ['([:in :void]) #{:void}]
-                                   (map (fn [intersection]
-                                          (vector (= intersection checked-intersection) (:object intersection)))
-                                        intersections)))]
-    (map (fn to-refractive-index [[_ object-or-void]]
-           (if (= :void object-or-void)
-             world-refractive-index
-             (-> object-or-void :material :refractive-index)))
-         (reverse transitions))))
+;;; TODO/FIXME This bunch of refraction functions should probably deserve a namespace on their own
+(defn- convert-to-refractive-index [object-or-void world-refractive-index]
+  (if (= object-or-void :void)
+    world-refractive-index
+    (-> object-or-void :material :refractive-index)))
+
+(defn- take-until-including [filter-f list]
+  (persistent!
+   (reduce (fn [collection x]
+             (if (filter-f x)
+               (conj! collection x)
+               (reduced (conj! collection x))))
+           (transient [])
+           list)))
+
+(defn- accumulate-transitions [intersections]
+  (persistent! (reduce (fn [transitions intersection]
+                         (conj! transitions (:object intersection)))
+                       (transient [:void])
+                       intersections)))
+
+(defn- compute-transitions [intersections checked-intersection]
+  (accumulate-transitions
+   (take-until-including #(not= % checked-intersection)
+                         intersections)))
+
+(defn- get-first-odd-recurrence [xo frequencies]
+  (first (drop-while #(even? (get frequencies %)) xo)))
+
+(defn- compute-transition [transitions]
+  (let [frequencies (frequencies transitions)
+        reversed-list (reverse transitions)
+        last-element (first reversed-list)]
+    [(get-first-odd-recurrence (rest reversed-list)
+                               (update frequencies (first reversed-list) #(dec %)))
+     (get-first-odd-recurrence reversed-list frequencies)]))
+
+(defn- compute-refractive-indices [checked-intersection intersections world-refractive-index]
+  (let [objects-transitions (compute-transitions intersections checked-intersection)
+        [obj1 obj2] (compute-transition objects-transitions)]
+    [(convert-to-refractive-index obj1 world-refractive-index)
+     (convert-to-refractive-index obj2 world-refractive-index)]))
 
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
 
+;;; TODO/FIXME I don't care what the books says: too many arguments for my tastes, even without the world refractive-index
 (defn prepare-computations
   [ray intersection all-intersections world-refractive-index]
   (let [point (tuple/add (:origin ray)
@@ -100,7 +118,7 @@
         normal-v ((:normal object) object point)
         inside (is-inside? eye-v normal-v)
         normal-v (if inside (svector/neg normal-v) normal-v)
-        [n1 n2] (compute-refraction-indices intersection all-intersections world-refractive-index)]
+        [n1 n2] (compute-refractive-indices intersection all-intersections world-refractive-index)]
     {:inside inside
      :object object
      :t (:t intersection)
