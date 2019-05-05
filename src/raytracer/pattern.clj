@@ -32,6 +32,12 @@
 (defn gradient [white black]
   (create-pattern white black gradient-function))
 
+(defn- test-pattern-function [pattern [x y z _]]
+  [x y z])
+
+(defn test []
+  (create-pattern nil nil test-pattern-function))
+
 (defn- ring-function [pattern [x _ z _]]
   (let [distance (Math/sqrt (+ (* x x) (* z z)))]
                         (if (zero? (mod (int (Math/floor distance)) 2))

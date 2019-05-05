@@ -125,3 +125,10 @@
       (is (v= white (pattern/color-at-object pattern
                                              object
                                              (point/point 2.5 0 0)))))))
+
+(deftest test-test-pattern
+  (testing "The pattern returns the point coordinate"
+    (let [pattern (pattern/test)]
+      (is (v= [0.2 0.3 0.4] (pattern/color-at-object pattern
+                                                     (shapes/sphere)
+                                                     (point/point 0.2 0.3 0.4)))))))
