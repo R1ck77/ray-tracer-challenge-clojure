@@ -10,6 +10,7 @@
             [raytracer.shapes :as shapes]
             [raytracer.materials :as materials]
             [raytracer.transform :as transform]
+            [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]))
 
 (def √2 (Math/sqrt 2))
@@ -293,7 +294,6 @@
                                                                  []
                                                                  1)
                                      1)))))
-
   (testing "The reflected color for a reflective material"
     (let [template-shape (shapes/plane)
           shape (shapes/change-material (shapes/change-transform template-shape
@@ -316,3 +316,61 @@
           intersection (intersection/intersection √2 plane)]
       (is (v= [0 0 0]
               (world/reflected-color world (world/prepare-computations ray intersection [] 1) 0))))))
+
+(deftest test-refracted-color
+  (testing "The refracted color for an opaque material"
+    (let [world (change-second-object-material (world/default-world))
+          shape (first (:objects world))
+          ray (ray/ray (point/point 0 0 -5)                       
+                       (svector/svector 0 0 1))
+          intersections [(intersection/intersection 4 shape)
+                         (intersection/intersection 6 shape)]]
+      (is (v= [0 0 0]
+              (world/refracted-color world
+                                     (world/prepare-computations ray (first intersections) intersections 1)
+                                     1)))))
+  (testing "The refracted color at maximum recursive depth"
+    (let [shape (shapes/change-material (first (:objects (world/default-world)))
+                                        (materials/material :transparency 1.0
+                                                            :refractive-index 1.5))
+          world (world/set-objects (world/default-world) (vector shape))
+          ray (ray/ray (point/point 0 0 -5)                       
+                       (svector/svector 0 0 1))
+          intersections [(intersection/intersection 4 shape)
+                         (intersection/intersection 6 shape)]]
+      (is (v= [0 0 0]
+              (world/refracted-color world
+                                     (world/prepare-computations ray (first intersections) intersections 1)
+                                     0)))))
+  (testing "The refracted color under total internal refraction"
+    (let [shape (shapes/change-material (first (:objects (world/default-world)))
+                                        (materials/material :refractive-index 1.5
+                                                            :transparency 1.0))
+          world (world/set-objects (world/default-world) [shape])
+          ray (ray/ray (point/point 0 0 half√2)
+                       (svector/svector 0 1 0))
+          intersections (vector (intersection/intersection (- half√2) shape)
+                                (intersection/intersection half√2 shape))
+          intermediate-result (world/prepare-computations ray (second intersections) intersections 1)
+          ]
+      (is (v= [0 0 0] (world/refracted-color world intermediate-result 10)))))
+  (testing "The refracted color with a refracted ray"
+    (let [shape-a (shapes/change-material (first (:objects (world/default-world)))
+                                          (materials/material :ambient 1.0
+                                                              :pattern (pattern/test)))
+          shape-b (shapes/change-material (second (:objects (world/default-world)))
+                                          (materials/material :transparency 1.0
+                                                              :refractive-index 1.5))
+          world (world/set-objects (world/default-world) [shape-a shape-b])
+          ray (ray/ray (point/point 0 0 0.1)
+                       (svector/svector 0 1 0))
+          intersections (vector (intersection/intersection -0.9899 shape-a)
+                                (intersection/intersection -0.4899 shape-b)
+                                (intersection/intersection 0.4899 shape-b)
+                                (intersection/intersection 0.9899 shape-a))
+          intermediate-results (world/prepare-computations ray
+                                                           (nth intersections 2)
+                                                           intersections
+                                                           1)]
+      (is (v= [0 0.99888 0.04725]
+              (world/refracted-color world intermediate-results 5))))))

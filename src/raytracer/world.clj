@@ -133,9 +133,6 @@
      :n1 n1
      :n2 n2}))
 
-(defn- get-reflectivity [intermediate-result]
-  (:reflectivity (:material (:object intermediate-result))))
-
 (defn is-shadowed? [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
@@ -145,6 +142,7 @@
             (svector/mag pos->light)))))
 
 (def reflected-color)
+(def refracted-color)
 
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit
@@ -172,6 +170,8 @@
                   remaining)
        (-> world :material :color)))))
 
+(defn- get-reflectivity [intermediate-result]
+  (:reflectivity (:material (:object intermediate-result))))
 
 (defn reflected-color [world intermediate-result remaining]
   (if (> remaining 0)
@@ -182,6 +182,37 @@
                                   (:reflection intermediate-result))]
           (color/scale (color-at world reflection (dec remaining)) reflectivity))))
     (-> world :material :color)))
+
+(defn- compute-refracted-ray [intermediate-result n-ratio sin-t-squared cos-i]
+  (let [cos-t (Math/sqrt (- 1 sin-t-squared))]
+    (ray/ray (:under-point intermediate-result)
+             (svector/sub (svector/mul (:normal-v intermediate-result)
+                                       (- (* n-ratio cos-i) cos-t))
+                          (svector/mul (:eye-v intermediate-result) n-ratio)))))
+
+(defn- refraction-color [world intermediate-result remaining]
+    (let [n-ratio (/ (:n1 intermediate-result)
+                   (:n2 intermediate-result))
+        cos-i (svector/dot (:eye-v intermediate-result)
+                           (:normal-v intermediate-result))
+        sin-t-squared (* n-ratio n-ratio (- 1 (* cos-i cos-i)))]
+    (if (> sin-t-squared 1)
+      [0 0 0]
+      (color/scale (color-at world
+                             (compute-refracted-ray intermediate-result n-ratio sin-t-squared cos-i)
+                             (dec remaining))
+                   (-> intermediate-result :object :material :transparency)))))
+
+(defn- get-transparency [intermediate-result]
+  (-> intermediate-result :object :material :transparency))
+
+(defn refracted-color [world intermediate-result remaining]
+  (if (> remaining 0)
+    (let [transparency (get-transparency intermediate-result)]
+      (if (< transparency EPSILON)
+        zero-color
+        (refraction-color world intermediate-result remaining)))
+    zero-color))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
   (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
