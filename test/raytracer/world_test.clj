@@ -195,7 +195,27 @@
                          (svector/svector 0 (- half√2) half√2))
             intersection (intersection/intersection √2 shape)]
         (is (v= [0.87677 0.92436 0.82918]
-                (world/shade-hit world (world/prepare-computations ray intersection [] 1) 1))))))
+                (world/shade-hit world (world/prepare-computations ray intersection [] 1) 1)))))
+
+
+  (testing "shade_hit() with a transparent material"
+    (let [floor (-> (shapes/plane)
+                    (shapes/change-transform (transform/translate 0 -1 0))
+                    (shapes/change-material (materials/material :transparency 0.5
+                                                                :refractive-index 1.5)))
+          ball (-> (shapes/sphere)
+                   (shapes/change-transform (transform/translate 0 -3.5 -0.5))
+                   (shapes/change-material (materials/material :color [1 0 0]
+                                                               :ambient 0.5)))
+          world (-> (world/default-world)
+                    (world/add-object floor)
+                    (world/add-object ball))
+          ray (ray/ray (point/point 0 0 -3)
+                       (svector/svector 0 (- half√2) half√2))
+          intersections [(intersection/intersection √2 floor)]
+          intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
+      (is (v= [0.93642 0.68642 0.68642]
+              (world/shade-hit world intermediate-results 5))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]

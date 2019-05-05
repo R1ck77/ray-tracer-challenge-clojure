@@ -148,13 +148,14 @@
 (defn shade-hit
   [world intermediate-result remaining]
   (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
-    (color/add (phong/lighting (:object intermediate-result)
+    (-> (phong/lighting (:object intermediate-result)
                                (first (:light-sources world)) ;;; first light source, for now
                                (:point intermediate-result)
                                (:eye-v intermediate-result)
                                (:normal-v intermediate-result)
                                shadowed)
-               (reflected-color world intermediate-result remaining))))
+        (color/add (reflected-color world intermediate-result remaining))
+        (color/add (refracted-color world intermediate-result remaining)))))
 
 (defn color-at
   ([world ray]
