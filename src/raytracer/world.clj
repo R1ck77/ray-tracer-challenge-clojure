@@ -161,18 +161,32 @@
 (def reflected-color)
 (def refracted-color)
 
+(defn combine-colors
+  [intermediate-result surface reflected refracted]
+  (let [ material (-> intermediate-result :object :material)]
+   (if (and (> (:transparency material) 0)
+            (> (:reflectivity material) 0))
+     (let [reflectance (schlick intermediate-result)]
+       (-> surface
+           (color/add (color/scale reflected reflectance))
+           (color/add (color/scale refracted (- 1 reflectance)))))      
+     (-> surface
+         (color/add reflected)
+         (color/add refracted)))))
+
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit
   [world intermediate-result remaining]
-  (let [shadowed (is-shadowed? world (:over-point intermediate-result))]
-    (-> (phong/lighting (:object intermediate-result)
-                               (first (:light-sources world)) ;;; first light source, for now
-                               (:point intermediate-result)
-                               (:eye-v intermediate-result)
-                               (:normal-v intermediate-result)
-                               shadowed)
-        (color/add (reflected-color world intermediate-result remaining))
-        (color/add (refracted-color world intermediate-result remaining)))))
+  (let [shadowed (is-shadowed? world (:over-point intermediate-result))
+        surface (phong/lighting (:object intermediate-result)
+                                         (first (:light-sources world)) ;;; first light source, for now
+                                         (:point intermediate-result)
+                                         (:eye-v intermediate-result)
+                                         (:normal-v intermediate-result)
+                                         shadowed)
+        reflected (reflected-color world intermediate-result remaining)
+        refracted (refracted-color world intermediate-result remaining)]
+    (combine-colors intermediate-result surface reflected refracted)))
 
 (defn color-at
   ([world ray]
