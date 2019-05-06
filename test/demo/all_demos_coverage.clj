@@ -6,7 +6,9 @@
             [demo.phong-sphere :as phong-sphere]
             [demo.phong-scene :as phong-scene]
             [demo.plane-demo :as plane-demo]
-            [demo.pattern-demo :as pattern-demo]))
+            [demo.pattern-demo :as pattern-demo]
+            [raytracer.world :as world]
+            [demo.reflection-demo :as reflections-demo]))
 
 
 (defmacro run-demo [name demo-code]
@@ -28,7 +30,10 @@
   (run-demo "tiny plane demo"
             (plane-demo/render-demo 10 5))
   (run-demo "tiny pattern demo"
-            (pattern-demo/render-demo 10 5)))
+            (pattern-demo/render-demo 10 5))
+  (run-demo "tiny reflections demo"
+            (with-redefs [world/*maximum-reflections* 2]
+              (reflections-demo/render-demo 10 5))))
 
 (defn -main [& args]
   (run-all-demos)
