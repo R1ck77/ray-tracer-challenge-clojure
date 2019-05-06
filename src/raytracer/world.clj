@@ -12,7 +12,7 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
-(def ^:dynamic *maximum-reflections* 100)
+(def ^:dynamic *maximum-reflections* 8)
 
 (def EPSILON 1e-6)
 
