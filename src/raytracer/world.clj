@@ -106,9 +106,22 @@
     [(convert-to-refractive-index obj1 world-refractive-index)
      (convert-to-refractive-index obj2 world-refractive-index)]))
 
-(defn schlick [intermediate-results]
-  1.0
-  )
+(defn- schlick-partial-reflection [n1 n2 cos]
+  (let [r0 (Math/pow (/ (- n1 n2) (+ n1 n2)) 2)]
+    (+ r0 (* (- 1 r0) (Math/pow (- 1 cos) 5)))))
+
+(defn- schlick-total-internal-reflection [n1 n2 cos]
+  (let [n (/ n1 n2)
+        sin2-t (* n n (- 1 (* cos cos)))]
+    (if (> sin2-t 1)
+      1
+      (schlick-partial-reflection n1 n2 (Math/sqrt (- 1 sin2-t))))))
+
+(defn schlick [{:keys [n1 n2 eye-v normal-v]}]
+  (let [cos (svector/dot eye-v normal-v)]
+    (if (> n1 n2)
+      (schlick-total-internal-reflection n1 n2 cos)
+      (schlick-partial-reflection n1 n2 cos))))
 
 (defn- is-inside? [eye-v normal-v]
   (< (svector/dot eye-v normal-v) 0))
