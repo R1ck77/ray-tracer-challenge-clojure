@@ -29,7 +29,7 @@
                                                            :reflectivity 0.8
                                                            :transparency 0.9 
                                                            :pattern nil))
-               (shapes/change-transform (transform/translate 0 10 0))))
+               (shapes/change-transform (transform/translate 0 10.00001 0))))
 
 (def pool-bottom (-> (shapes/plane)
                      (shapes/change-material (materials/material :specular 0.4
@@ -52,7 +52,7 @@
 (def world (-> (world/create)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           [1 1 1]))
-               (world/set-objects [water pool-bottom ])
+               (world/set-objects [water pool-bottom matte-sphere])
                (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
 
 (defn create-camera [width height]
