@@ -29,14 +29,14 @@
                                                            :reflectivity 0.8
                                                            :transparency 0.9 
                                                            :pattern nil))
-               (shapes/change-transform (transform/translate 0 10 0))))
+               (shapes/change-transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
                      (shapes/change-material (materials/material :specular 0.4
                                                                  :reflectivity 0.2
                                                                  :transparency 0.0
                                                                  :pattern (pattern/checker [0 8 8] [0.01 0.01 0.01])))
-                     (shapes/change-transform (transform/translate 0 0.00001 0))))
+                     (shapes/change-transform (transform/translate 0 1e-3 0))))
 
 
 (def matte-sphere (-> (shapes/sphere)
