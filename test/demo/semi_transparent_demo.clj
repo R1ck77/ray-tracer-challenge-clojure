@@ -52,7 +52,7 @@
 (def world (-> (world/create)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           [1 1 1]))
-               (world/set-objects [water pool-bottom matte-sphere])
+               (world/set-objects [water pool-bottom ])
                (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
 
 (defn create-camera [width height]
