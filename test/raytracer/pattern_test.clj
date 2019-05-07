@@ -60,6 +60,13 @@
 
 (deftest test-checker-pattern
   (let [checker (pattern/checker white black)]
+    (testing "Checker is not symmetric around 0"
+      (is (not (v= ((:color-at checker) checker (point/point 0.5 0 0))
+                   ((:color-at checker) checker (point/point -0.5 0 0)))))
+      (is (not (v= ((:color-at checker) checker (point/point 0 0.5 0))
+                   ((:color-at checker) checker (point/point 0 -0.5 0)))))
+      (is (not (v= ((:color-at checker) checker (point/point 0 0 0.5))
+                   ((:color-at checker) checker (point/point 0 0 -0.5))))))
     (testing "Checkers should repeat in x"
       (is (v= white ((:color-at checker) checker (point/point 0 0 0))))
       (is (v= white ((:color-at checker) checker (point/point 0.99 0 0))))
