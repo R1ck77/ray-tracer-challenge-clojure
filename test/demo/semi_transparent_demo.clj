@@ -21,12 +21,13 @@
 (def partπ (/ Math/PI 4))
 
 
+;;; Set the y to 5 and stranger things start happening
 (def water (-> (shapes/plane)
                (shapes/change-material (materials/material :color [0 0 0.01]
                                                            :specular 1
                                                            :shiness 300
                                                            :reflectivity 0.8
-                                                           :transparency 0.99 
+                                                           :transparency 0.9 
                                                            :pattern nil))
                (shapes/change-transform (transform/translate 0 10 0))))
 
@@ -56,7 +57,7 @@
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                        (world/view-transform (point/point 0 15 -10)
+                        (world/view-transform (point/point 0 11 -10)
                                               (point/point 0 0 0)
                                               (svector/svector 0 1 0))))
 
