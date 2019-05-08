@@ -47,15 +47,10 @@
 (defn ring [white black]
   (create-pattern white black ring-function))
 
-(defn- correct-sign [x]
-  (if (< x 0)
-    (inc (- x))
-    x))
-
 (defn- checker-function [pattern [x y z _]]
-  (if (zero? (mod (+ (int (correct-sign x))
-                     (int (correct-sign y))
-                     (int (correct-sign z))) 2))
+  (if (zero? (mod (+ (int (Math/floor (+ 2e9 x)))
+                     (int (Math/floor (+ 2e9 y)))
+                     (int (Math/floor (+ 2e9 z)))) 2))
     (:a pattern)
     (:b pattern)))
 

@@ -7,6 +7,8 @@
             [raytracer.ray :as ray]
             [raytracer.world :as world]))
 
+(def ^:dynamic *single-pixel-rendering* nil) ;;; set to e.g. [30 20] to render a single pixel. Useful for debugging
+
 (defn- compute-pixels [partial-camera]
   (let [half-view (Math/tan (/ (:fov partial-camera) 2.0))
         aspect (/ (:h-size partial-camera)
@@ -76,4 +78,6 @@
               (canvas/write canvas x y color))
             (canvas/create-canvas width height)
             (pmap (partial get-pixel-color camera world)
-                  (seq-pixels width height)))))
+                  (if *single-pixel-rendering*
+                    (vector *single-pixel-rendering*)
+                    (seq-pixels width height))))))
