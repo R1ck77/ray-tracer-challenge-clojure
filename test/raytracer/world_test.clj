@@ -212,7 +212,7 @@
                        (svector/svector 0 (- half√2) half√2))
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
-      (is (v= [0.93642 0.68642 0.68642]
+      (is (v= [1.314506174115707 0.6864253889815014 0.6864253889815014]
               (world/shade-hit world intermediate-results 5)))))
   (testing "shade_hit() with a reflective, transparent material"
     (let [ray (ray/ray (point/point 0 0 -3)
@@ -231,7 +231,7 @@
                     (world/add-object ball))
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
-      (is (v= [0.93391 0.69643 0.69243]
+      (is (v= [1.29609 0.69643423 0.692430697]
               (world/shade-hit world intermediate-results 5))))))
 
 (defn reset-ambient-color [object]

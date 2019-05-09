@@ -150,11 +150,18 @@
      :n1 n1
      :n2 n2}))
 
-(defn is-shadowed? [world point]
+;;; TODO/FIXME this function is oversimplifying the model, even after the update to account transparency
+;;; There is no way to filter a light through a colored glass (or multiple ones!)
+;;; While simulating transparency for arbitrary objects with some realism would be complicated, you can at least:
+;;; a) get the list of intersections with their transparencies
+;;; b) remove the concept of shadow and just filter the light through all objects the light passes through
+(defn is-shadowed?
+  [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
         intersection (intersection/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
     (and intersection
+         (< (:transparency (:material (:object intersection))) 0.5)
          (< (:t intersection)
             (svector/mag pos->light)))))
 
