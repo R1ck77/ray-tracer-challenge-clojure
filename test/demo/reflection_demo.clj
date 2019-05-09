@@ -35,21 +35,44 @@
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (materials/material :diffuse 0.7, :specular 0.3
                                                                  :reflectivity 0.3
-                                                                 :pattern (pattern/change-transform (pattern/stripe [1 0 0] [1 1 1])
+                                                                 :pattern (pattern/change-transform (pattern/stripe [0 1 0] [1 1 1])
                                                                                                     (transform/scale 0.2 0.2 0.2
                                                                                                                      (transform/rotate-y (/ Math/PI 5))))))
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                                    (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
-                       (shapes/change-material (materials/material :diffuse 0.7
+                       (shapes/change-material (materials/material :color [0 0.05 0.1]
+                                                                   :diffuse 0.1
                                                                    :specular 0.3
-                                                                   :refractive-index 2.0
                                                                    :reflectivity 0.1
                                                                    :transparency 0.95
                                                                    :refractive-index 2.0))
                        
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
+
+(def air-sphere (-> (shapes/sphere)
+                    (shapes/change-material (materials/material :color [0 0 0]
+                                                                :diffuse 0.0
+                                                                :specular 0.0
+                                                                :reflectivity 1.0
+                                                                :transparency 1.0
+                                                                :refractive-index 1.0))
+                       
+                    (shapes/change-transform (transform/translate -0.5 1 0.5
+                                                                  (transform/scale 0.5 0.5 0.5)))))
+
+(def back-sphere (-> (shapes/sphere)
+                     (shapes/change-material (materials/material :color (vec (map #(/ % 255) [200 110 200]))
+                                                                 :diffuse 0.4
+                                                                 :specular 0.5
+                                                                 :refractive-index 2.0
+                                                                 :reflectivity 0.3
+                                                                 :transparency 0.0
+                                                                 :refractive-index 0.0))
+                       
+                     (shapes/change-transform (transform/translate 1.75 2 5.5
+                                                                   (transform/scale 2 2 2)))))
 
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (materials/material :diffuse 0.7
@@ -69,8 +92,8 @@
 (def world (-> (world/create)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           [1 1 1]))
-               (world/set-objects [floor left-sphere middle-sphere right-sphere])
-               (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
+               (world/set-objects [floor left-sphere middle-sphere air-sphere back-sphere right-sphere])
+               (update :material #(materials/update-material % :color [0.0 0.0 0.0]))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
