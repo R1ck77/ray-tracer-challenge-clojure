@@ -169,7 +169,7 @@
         pos->light (tuple/sub (:position light-source) point)
         transparencies (filtered-transparencies (intersect world (ray/ray point (svector/normalize pos->light)))
                                                 (svector/mag pos->light))]
-    (apply min (conj transparencies 1))))
+    (apply * (conj transparencies 1))))
 
 (defn- basic-is-shadowed?
   [world point]
