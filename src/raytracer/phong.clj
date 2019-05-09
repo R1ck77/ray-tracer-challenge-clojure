@@ -5,6 +5,8 @@
             [raytracer.materials :as materials]
             [raytracer.ray :as ray]))
 
+(def EPSILON 1e-5)
+
 (defn- compute-if-positive [value function]
   (if (< value 0)
     color/black
@@ -39,19 +41,19 @@
 ;;; TODO/FIXME hideous. Split in two methods lighting and shadow-lighting
 (defn lighting
   ([object light-source position eye normal]
-   (lighting object light-source position eye normal false))
-  ([object light-source position eye normal in-shadow]
+   (lighting object light-source position eye normal 1))
+  ([object light-source position eye normal shadow-attenuation]
    (let [material (:material object)
          effective-color (color/mul (materials/get-color object position)
                                     (:intensity light-source))
          ambient-color (compute-ambient effective-color material)]
-     (if in-shadow
-       ambient-color
      (let [light-vector (svector/normalize (tuple/sub (:position light-source) position))
            light-dot-normal (svector/dot light-vector normal)]
-       (tuple/add ambient-color
-                  (compute-diffuse light-dot-normal effective-color material)
-                  (compute-specular light-dot-normal
-                                    (svector/mul light-vector -1)
-                                    light-source
-                                    normal eye material)))))))
+       (if (< (Math/abs shadow-attenuation) EPSILON)
+         ambient-color
+         (tuple/add ambient-color
+                    (color/scale (compute-diffuse light-dot-normal effective-color material) shadow-attenuation)
+                    (color/scale (compute-specular light-dot-normal
+                                                   (svector/mul light-vector -1)
+                                                   light-source
+                                                   normal eye material) shadow-attenuation)))))))

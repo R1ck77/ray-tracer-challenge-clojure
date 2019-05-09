@@ -13,6 +13,7 @@
             [raytracer.phong :as phong]))
 
 (def ^:dynamic *maximum-reflections* 8)
+(def ^:dynamic *basic-shade-detection* false)
 
 (def EPSILON 1e-6)
 
@@ -155,7 +156,7 @@
 ;;; While simulating transparency for arbitrary objects with some realism would be complicated, you can at least:
 ;;; a) get the list of intersections with their transparencies
 ;;; b) remove the concept of shadow and just filter the light through all objects the light passes through
-(defn compute-shadow-attenuation
+(defn- compute-shadow-attenuation
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
@@ -164,9 +165,20 @@
                                                (intersect world (ray/ray point (svector/normalize pos->light)))))]
     (or (:transparency (:material (:object intersection))) 1.0)))
 
-(defn is-shadowed?
+(defn- basic-is-shadowed?
   [world point]
-  (< (compute-shadow-attenuation world point) 0.5))
+  (let [light-source (first (:light-sources world)) ;;; first light source only
+        pos->light (tuple/sub (:position light-source) point)
+        intersection (intersection/hit (filter #(< (:t %)
+                                                   (svector/mag pos->light))
+                                               (intersect world (ray/ray point (svector/normalize pos->light)))))]
+    intersection))
+
+(defn select-shadow-attenuation
+  [world point]
+  (if *basic-shade-detection*
+    (if (basic-is-shadowed? world point) 0.0 1.0)
+    (compute-shadow-attenuation world point)))
 
 (def reflected-color)
 (def refracted-color)
@@ -187,13 +199,13 @@
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit
   [world intermediate-result remaining]
-  (let [shadowed (is-shadowed? world (:over-point intermediate-result))
+  (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))
         surface (phong/lighting (:object intermediate-result)
                                          (first (:light-sources world)) ;;; first light source, for now
                                          (:point intermediate-result)
                                          (:eye-v intermediate-result)
                                          (:normal-v intermediate-result)
-                                         shadowed)
+                                         shadow-attenuation)
         reflected (reflected-color world intermediate-result remaining)
         refracted (refracted-color world intermediate-result remaining)]
     (combine-colors intermediate-result surface reflected refracted)))

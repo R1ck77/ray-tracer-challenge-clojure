@@ -297,16 +297,29 @@
                0.00000 0.00000 0.00000 1.00000]
               (world/view-transform from to up))))))
 
-(deftest test-is-shadowed?
-  (let [world (world/default-world)]
-    (testing "There is no shadow when nothing is collinear with point and light"      
-      (is (not (world/is-shadowed? world (point/point 0 10 0)))))
-    (testing "The shadow when an object is between the point and the light"
-      (is (world/is-shadowed? world (point/point 10 -10 10))))
-    (testing "There is no shadow when an object is behind the light"
-      (is (not (world/is-shadowed? world (point/point -20 20 -20)))))
-    (testing "There is no shadow when an object is behind the point"
-      (is (not (world/is-shadowed? world (point/point -2 2 -2)))))))
+(deftest test-select-shadow-attenuation-basic
+  (with-redefs [world/*basic-shade-detection* true]
+    (let [world (world/default-world)]
+      (testing "BASIC There is no shadow when nothing is collinear with point and light"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point 0 10 0)))))
+      (testing "BASIC The shadow when an object is between the point and the light"
+        (is (eps= 0 (world/select-shadow-attenuation world (point/point 10 -10 10)))))
+      (testing "BASIC There is no shadow when an object is behind the light"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -20 20 -20)))))
+      (testing "BASIC There is no shadow when an object is behind the point"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))))
+
+(deftest test-select-shadow-attenuation
+  (with-redefs [world/*basic-shade-detection* false]
+    (let [world (world/default-world)]
+      (testing "CUSTOM There is no shadow when nothing is collinear with point and light"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point 0 10 0)))))
+      (testing "CUSTOM The shadow when an object is between the point and the light"
+        (is (eps= 0 (world/select-shadow-attenuation world (point/point 10 -10 10)))))
+      (testing "CUSTOM There is no shadow when an object is behind the light"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -20 20 -20)))))
+      (testing "CUSTOM There is no shadow when an object is behind the point"
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))))
 
 (defn- update-ambient [shape]
   (shapes/change-material shape
