@@ -151,6 +151,13 @@
      :n1 n1
      :n2 n2}))
 
+(defn- filtered-transparencies [intersections light-distance]
+  (map #(-> % :object :material :transparency)
+       (filter (fn [{t :t}]
+                 (and (< t light-distance)
+                      (>= t 0)))
+               intersections)))
+
 ;;; TODO/FIXME this function is oversimplifying the model, even after the update to account transparency
 ;;; There is no way to filter a light through a colored glass (or multiple ones!)
 ;;; While simulating transparency for arbitrary objects with some realism would be complicated, you can at least:
@@ -160,10 +167,9 @@
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
-        intersection (intersection/hit (filter #(< (:t %)
-                                                   (svector/mag pos->light))
-                                               (intersect world (ray/ray point (svector/normalize pos->light)))))]
-    (or (:transparency (:material (:object intersection))) 1.0)))
+        transparencies (filtered-transparencies (intersect world (ray/ray point (svector/normalize pos->light)))
+                                                (svector/mag pos->light))]
+    (apply min (conj transparencies 1))))
 
 (defn- basic-is-shadowed?
   [world point]

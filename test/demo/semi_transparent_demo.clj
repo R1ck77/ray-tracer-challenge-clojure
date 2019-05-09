@@ -32,8 +32,9 @@
                (shapes/change-transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
-                     (shapes/change-material (materials/material :specular 0.4
-                                                                 :reflectivity 0.2
+                     (shapes/change-material (materials/material :specular 0.1
+                                                                 :ambient 0.05
+                                                                 :reflectivity 0.0
                                                                  :transparency 0.0
                                                                  :pattern (pattern/checker [0 8 8] [0.01 0.01 0.01])))
                      (shapes/change-transform (transform/translate 0 1e-3 0))))
