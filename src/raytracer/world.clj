@@ -155,15 +155,18 @@
 ;;; While simulating transparency for arbitrary objects with some realism would be complicated, you can at least:
 ;;; a) get the list of intersections with their transparencies
 ;;; b) remove the concept of shadow and just filter the light through all objects the light passes through
-(defn is-shadowed?
+(defn compute-shadow-attenuation
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
         intersection (intersection/hit (filter #(< (:t %)
                                                    (svector/mag pos->light))
                                                (intersect world (ray/ray point (svector/normalize pos->light)))))]
-    (and intersection
-         (< (:transparency (:material (:object intersection))) 0.5))))
+    (or (:transparency (:material (:object intersection))) 1.0)))
+
+(defn is-shadowed?
+  [world point]
+  (< (compute-shadow-attenuation world point) 0.5))
 
 (def reflected-color)
 (def refracted-color)
