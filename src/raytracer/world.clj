@@ -159,11 +159,11 @@
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
-        intersection (intersection/hit (intersect world (ray/ray point (svector/normalize pos->light))))]
+        intersection (intersection/hit (filter #(< (:t %)
+                                                   (svector/mag pos->light))
+                                               (intersect world (ray/ray point (svector/normalize pos->light)))))]
     (and intersection
-         (< (:transparency (:material (:object intersection))) 0.5)
-         (< (:t intersection)
-            (svector/mag pos->light)))))
+         (< (:transparency (:material (:object intersection))) 0.5))))
 
 (def reflected-color)
 (def refracted-color)
