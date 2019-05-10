@@ -64,10 +64,10 @@
     (let [length (.mag this)]
       (.div this length)))
   (cross [this that]
-    (tuple (- (* (:y this) (:z that)) (* (:z this) (:y that)))
-           (- (* (:z this) (:x that)) (* (:x this) (:z that)))
-           (- (* (:x this) (:y that)) (* (:y this) (:x that)))
-           0))
+    (->Tuple (- (* (:y this) (:z that)) (* (:z this) (:y that)))
+             (- (* (:z this) (:x that)) (* (:x this) (:z that)))
+             (- (* (:x this) (:y that)) (* (:y this) (:x that)))
+             0))
   (reflect [this normal]
     (.sub this (.mul normal (* 2 (.dot normal this))))))
 

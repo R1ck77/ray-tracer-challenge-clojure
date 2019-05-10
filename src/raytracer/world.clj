@@ -57,7 +57,7 @@
   (flatten
    (persistent!
     (reduce (fn [acc object]
-              (conj! acc (ray/intersect ray object)))
+              (conj! acc (.intersect ray object)))
             (transient [])
             (:objects world)))))
 
@@ -119,35 +119,35 @@
       (schlick-partial-reflection n1 n2 (Math/sqrt (- 1 sin2-t))))))
 
 (defn schlick [{:keys [n1 n2 eye-v normal-v]}]
-  (let [cos (svector/dot eye-v normal-v)]
+  (let [cos (.dot eye-v normal-v)]
     (if (> n1 n2)
       (schlick-total-internal-reflection n1 n2 cos)
       (schlick-partial-reflection n1 n2 cos))))
 
 (defn- is-inside? [eye-v normal-v]
-  (< (svector/dot eye-v normal-v) 0))
+  (< (.dot eye-v normal-v) 0))
 
 ;;; TODO/FIXME I don't care what the books says: too many arguments for my tastes, even without the world refractive-index
 (defn prepare-computations
   [ray intersection all-intersections world-refractive-index]
   (let [point (tuple/add (:origin ray)
-                         (svector/mul (:direction ray)
-                                      (:t intersection)))
-        eye-v (svector/neg (:direction ray))
+                         (.mul (:direction ray)
+                               (:t intersection)))
+        eye-v (.neg (:direction ray))
         object (:object intersection)
         normal-v ((:normal object) object point)
         inside (is-inside? eye-v normal-v)
-        normal-v (if inside (svector/neg normal-v) normal-v)
+        normal-v (if inside (.neg normal-v) normal-v)
         [n1 n2] (compute-refractive-indices intersection all-intersections world-refractive-index)]
     {:inside inside
      :object object
      :t (:t intersection)
      :point  point
-     :over-point (tuple/add point (svector/mul normal-v EPSILON))
-     :under-point (tuple/add point (svector/mul normal-v (- EPSILON)))
+     :over-point (tuple/add point (.mul normal-v EPSILON))
+     :under-point (tuple/add point (.mul normal-v (- EPSILON)))
      :eye-v eye-v
      :normal-v normal-v
-     :reflection (svector/reflect (:direction ray) normal-v)
+     :reflection (.reflect (:direction ray) normal-v)
      :n1 n1
      :n2 n2}))
 
@@ -167,8 +167,8 @@
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
-        transparencies (filtered-transparencies (intersect world (ray/ray point (svector/normalize pos->light)))
-                                                (svector/mag pos->light))]
+        transparencies (filtered-transparencies (intersect world (ray/ray point (.normalize pos->light)))
+                                                (.mag pos->light))]
     (apply * (conj transparencies 1))))
 
 (defn- basic-is-shadowed?
@@ -176,8 +176,8 @@
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
         intersection (intersection/hit (filter #(< (:t %)
-                                                   (svector/mag pos->light))
-                                               (intersect world (ray/ray point (svector/normalize pos->light)))))]
+                                                   (.mag pos->light))
+                                               (intersect world (ray/ray point (.normalize pos->light)))))]
     intersection))
 
 (defn select-shadow-attenuation
@@ -246,15 +246,15 @@
 (defn- compute-refracted-ray [intermediate-result n-ratio sin-t-squared cos-i]
   (let [cos-t (Math/sqrt (- 1 sin-t-squared))]
     (ray/ray (:under-point intermediate-result)
-             (svector/sub (svector/mul (:normal-v intermediate-result)
-                                       (- (* n-ratio cos-i) cos-t))
-                          (svector/mul (:eye-v intermediate-result) n-ratio)))))
+             (.sub (.mul (:normal-v intermediate-result)
+                         (- (* n-ratio cos-i) cos-t))
+                   (.mul (:eye-v intermediate-result) n-ratio)))))
 
 (defn- refraction-color [world intermediate-result remaining]
-    (let [n-ratio (/ (:n1 intermediate-result)
+  (let [n-ratio (/ (:n1 intermediate-result)
                    (:n2 intermediate-result))
-        cos-i (svector/dot (:eye-v intermediate-result)
-                           (:normal-v intermediate-result))
+        cos-i (.dot (:eye-v intermediate-result)
+                    (:normal-v intermediate-result))
         sin-t-squared (* n-ratio n-ratio (- 1 (* cos-i cos-i)))]
     (if (> sin-t-squared 1)
       [0 0 0]
@@ -275,9 +275,9 @@
     zero-color))
 
 (defn view-transform [[from-x from-y from-z _ :as from] to up]
-  (let [[fwd-x fwd-y fwd-z _ :as forward] (svector/normalize (svector/sub to from))
-        [left-x left-y left-z _ :as left] (svector/cross forward (svector/normalize up))
-        [true-up-x true-up-y true-up-z _ :as true-up] (svector/cross left forward)]
+  (let [[fwd-x fwd-y fwd-z _ :as forward] (.normalize (.sub to from))
+        [left-x left-y left-z _ :as left] (.cross forward (.normalize up))
+        [true-up-x true-up-y true-up-z _ :as true-up] (.cross left forward)]
     (matrix/mul4 (vector left-x      left-y      left-z      0
                          true-up-x   true-up-y   true-up-z   0
                          (- fwd-x)   (- fwd-y)   (- fwd-z)   0

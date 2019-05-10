@@ -48,7 +48,7 @@
         origin (matrix/transform (:inverse-transform camera)
                                  point/origin)]
     (ray/ray origin
-             (svector/normalize (tuple/sub pixel origin)))))
+             (.normalize (tuple/sub pixel origin)))))
 
 (defn- seq-pixels [width height]
   (for [py (range height)

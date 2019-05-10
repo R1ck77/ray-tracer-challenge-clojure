@@ -17,11 +17,11 @@
 
 (defn normalize [ray]
   (assoc ray
-         :direction (svector/normalize (:direction ray))))
+         :direction (.normalize (:direction ray))))
 
 (defn position [ray t]
   (tuple/add (:origin ray)
-             (svector/mul (:direction ray) t)))
+             (.mul (:direction ray) t)))
 
 (defn transform [input-ray matrix]
   (ray (matrix/transform matrix (:origin input-ray))

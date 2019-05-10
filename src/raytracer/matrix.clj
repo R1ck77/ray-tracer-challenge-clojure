@@ -128,5 +128,4 @@
 
 (defn invert [m n]
   (vec
-   (map float (tuple/div (transpose (cofactor-matrix m n ))
-                         (det m n)))))
+   (map float (map #(/ % (det m n)) (transpose (cofactor-matrix m n ))))))

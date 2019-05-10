@@ -1,6 +1,7 @@
 (ns demo.projectile
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer [eps= v=]]
+            [raytracer.tuple :as tuple]
             [raytracer.svector :refer :all]
             [raytracer.point :refer :all]
             [raytracer.canvas :refer :all]))
@@ -11,7 +12,7 @@
   (svector x y z))
 
 (defn create-forces [& forces]
- (reduce add (svector 0 0 0) (map as-vector forces)))
+ (tuple/add-all (map as-vector forces)))
 
 (deftest test-create-forces
   (testing "no argument"
@@ -39,8 +40,8 @@
   ([object forces]
    (tick object forces dt))
   ([{p :position, v :velocity} forces dt]
-   {:position (add p (mul v dt))
-    :velocity (add v (mul forces dt))}))
+   {:position (.add p (.mul v dt))
+    :velocity (.add v (.mul forces dt))}))
 
 (defn- eq-obj [a b]
   (and (v= (:position a) (:position b))

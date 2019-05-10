@@ -24,7 +24,7 @@
 (defn- compute-specular [light-dot-normal neg-light-vector light-source normal eye material]
   (if (< light-dot-normal 0)
     color/black
-    (compute-if-positive (svector/dot (svector/reflect neg-light-vector normal) eye)
+    (compute-if-positive (.dot (.reflect neg-light-vector normal) eye)
                          #(compute-specular-value % light-source material))))
 
 (defn- compute-diffuse-value [light-dot-normal effective-color material]
@@ -47,13 +47,13 @@
          effective-color (color/mul (materials/get-color object position)
                                     (:intensity light-source))
          ambient-color (compute-ambient effective-color material)]
-     (let [light-vector (svector/normalize (tuple/sub (:position light-source) position))
-           light-dot-normal (svector/dot light-vector normal)]
+     (let [light-vector (.normalize (.sub (:position light-source) position))
+           light-dot-normal (.dot light-vector normal)]
        (if (< (Math/abs (float shadow-attenuation)) EPSILON)
          ambient-color
-         (tuple/add ambient-color
+         (.add ambient-color
                     (color/scale (compute-diffuse light-dot-normal effective-color material) shadow-attenuation)
                     (color/scale (compute-specular light-dot-normal
-                                                   (svector/mul light-vector -1)
+                                                   (.mul light-vector -1)
                                                    light-source
                                                    normal eye material) shadow-attenuation)))))))
