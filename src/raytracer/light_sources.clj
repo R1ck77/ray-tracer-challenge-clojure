@@ -1,5 +1,6 @@
 (ns raytracer.light-sources)
 
+(defrecord LightSource [position intensity])
+
 (defn create-point-light [position intensity]
-  {:position position
-   :intensity intensity})
+  (->LightSource position intensity))
