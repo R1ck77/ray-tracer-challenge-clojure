@@ -305,6 +305,23 @@
                0.00000 0.00000 0.00000 1.00000]
               (world/view-transform from to up))))))
 
+(defn- create-shadow-test-world [light-position]
+  (let [floor0 (-> (shapes/plane)
+                   (shapes/update-material (materials/material :transparency 0.1)))
+        floor1 (-> (shapes/plane)
+                   (shapes/update-material (materials/material :transparency 0.2))
+                   (shapes/change-transform (transform/translate 0 10 0)))
+        floor2 (-> (shapes/plane)
+                   (shapes/update-material (materials/material :transparency 0.3))
+                   (shapes/change-transform (transform/translate 0 20 0)))
+        floor3 (-> (shapes/plane)
+                   (shapes/update-material (materials/material :transparency 0.4))
+                   (shapes/change-transform (transform/translate 0 30 0)))]
+   (-> (world/create)
+       (world/set-objects [floor0 floor1 floor2 floor3])
+       (world/set-light-sources (light-sources/create-point-light (apply point/point light-position)
+                                                                  [1 1 1])))))
+
 (deftest test-select-shadow-attenuation-basic
   (with-redefs [world/*basic-shade-detection* true]
     (let [world (world/default-world)]
@@ -315,7 +332,16 @@
       (testing "BASIC There is no shadow when an object is behind the light"
         (is (eps= 1 (world/select-shadow-attenuation world (point/point -20 20 -20)))))
       (testing "BASIC There is no shadow when an object is behind the point"
-        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))))
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))
+    (testing "BASIC any object between the light source and the point casts a shadow"
+      (is (eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
+                                                     (point/point 0 0.0001 0))))
+      (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
+                                                       (point/point 0 0 0))))
+      (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
+                                                     (point/point 0 0 0))))
+      (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
+                                                     (point/point 0 0 0)))))))
 (deftest test-select-shadow-attenuation
   (with-redefs [world/*basic-shade-detection* false]
     (let [world (world/default-world)]
@@ -326,7 +352,16 @@
       (testing "CUSTOM There is no shadow when an object is behind the light"
         (is (eps= 1 (world/select-shadow-attenuation world (point/point -20 20 -20)))))
       (testing "CUSTOM There is no shadow when an object is behind the point"
-        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))))
+        (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))
+    (testing "CUSTOM objects between the light and the point are attenuated by the transparency"
+      (is (eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
+                                                     (point/point 0 0.0001 0))))
+      (is (eps= 0.1 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
+                                                     (point/point 0 0 0))))
+      (is (eps= 0.02 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
+                                                     (point/point 0 0 0))))
+      (is (eps= 0.006 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
+                                                     (point/point 0 0 0)))))))
 
 (defn- update-ambient [shape]
   (shapes/change-material shape
