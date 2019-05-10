@@ -10,6 +10,8 @@
              :uberjar {:aot :all
                        :global-vars {*warn-on-reflection* true}}             
              :visual-vm {
+                         :aot :all
+                         :main demo.profile
                          :jvm-opts ["-Dcom.sun.management.jmxremote"
                                     "-Dcom.sun.management.jmxremote.ssl=false"
                                     "-Dcom.sun.management.jmxremote.authenticate=false"
