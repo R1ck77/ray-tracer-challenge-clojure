@@ -43,3 +43,9 @@
     (is (not (v= [0 0 0 0] [0 eps 0 0])))
     (is (not (v= [0 0 0 0] [0 0 eps 0])))
     (is (not (v= [0 0 0 0] [0 0 0 eps])))))
+
+(defn t= [t1 t2]
+  (and (eps= (:x t1) (:x t2))
+       (eps= (:y t1) (:y t2))
+       (eps= (:z t1) (:z t2))
+       (eps= (:w t1) (:w t2))))
