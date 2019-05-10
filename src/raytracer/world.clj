@@ -155,7 +155,7 @@
   (map #(-> % :object :material :transparency)
        (filter (fn [{t :t}]
                  (and (< t light-distance)
-                      (>= t 0)))
+                      (> t 0)))
                intersections)))
 
 ;;; TODO/FIXME this function is oversimplifying the model, even after the update to account transparency

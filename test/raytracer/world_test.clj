@@ -307,15 +307,15 @@
 
 (defn- create-shadow-test-world [light-position]
   (let [floor0 (-> (shapes/plane)
-                   (shapes/update-material (materials/material :transparency 0.1)))
+                   (shapes/update-material (fn [_] (materials/material :transparency 0.0))))
         floor1 (-> (shapes/plane)
-                   (shapes/update-material (materials/material :transparency 0.2))
+                   (shapes/update-material (fn [_] (materials/material :transparency 0.2)))
                    (shapes/change-transform (transform/translate 0 10 0)))
         floor2 (-> (shapes/plane)
-                   (shapes/update-material (materials/material :transparency 0.3))
+                   (shapes/update-material (fn [_] (materials/material :transparency 0.3)))
                    (shapes/change-transform (transform/translate 0 20 0)))
         floor3 (-> (shapes/plane)
-                   (shapes/update-material (materials/material :transparency 0.4))
+                   (shapes/update-material (fn [_] (materials/material :transparency 0.4)))
                    (shapes/change-transform (transform/translate 0 30 0)))]
    (-> (world/create)
        (world/set-objects [floor0 floor1 floor2 floor3])
@@ -356,11 +356,11 @@
     (testing "CUSTOM objects between the light and the point are attenuated by the transparency"
       (is (eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
                                                      (point/point 0 0.0001 0))))
-      (is (eps= 0.1 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
+      (is (eps= 0.2 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
                                                      (point/point 0 0 0))))
-      (is (eps= 0.02 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
+      (is (eps= 0.06 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
                                                      (point/point 0 0 0))))
-      (is (eps= 0.006 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
+      (is (eps= 0.024 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
                                                      (point/point 0 0 0)))))))
 
 (defn- update-ambient [shape]
