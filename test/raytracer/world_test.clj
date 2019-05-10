@@ -212,8 +212,12 @@
                        (svector/svector 0 (- half√2) half√2))
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
-      (is (v= [1.314506174115707 0.6864253889815014 0.6864253889815014]
-              (world/shade-hit world intermediate-results 5)))))
+      (with-redefs [world/*basic-shade-detection* true]
+       (is (v= [0.9364253889815014 0.6864253889815014 0.6864253889815014]
+               (world/shade-hit world intermediate-results 5))))
+      (with-redefs [world/*basic-shade-detection* false]
+       (is (v= [1.1254657815486042 0.6864253889815014 0.6864253889815014]
+               (world/shade-hit world intermediate-results 5))))))
   (testing "shade_hit() with a reflective, transparent material"
     (let [ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- half√2) half√2))
@@ -231,8 +235,12 @@
                     (world/add-object ball))
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
-      (is (v= [1.29609 0.69643423 0.692430697]
-              (world/shade-hit world intermediate-results 5))))))
+      (with-redefs [world/*basic-shade-detection* true]
+        (is (v= [0.9339151479206158 0.6964342355067606 0.6924306968966569]
+                (world/shade-hit world intermediate-results 5))))
+      (with-redefs [world/*basic-shade-detection* false]
+        (is (v= [1.1150027485812746 0.6964342355067606 0.6924306968966569]
+               (world/shade-hit world intermediate-results 5)))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
@@ -308,7 +316,6 @@
         (is (eps= 1 (world/select-shadow-attenuation world (point/point -20 20 -20)))))
       (testing "BASIC There is no shadow when an object is behind the point"
         (is (eps= 1 (world/select-shadow-attenuation world (point/point -2 2 -2))))))))
-
 (deftest test-select-shadow-attenuation
   (with-redefs [world/*basic-shade-detection* false]
     (let [world (world/default-world)]

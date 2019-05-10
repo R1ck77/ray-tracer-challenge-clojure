@@ -49,7 +49,7 @@
          ambient-color (compute-ambient effective-color material)]
      (let [light-vector (svector/normalize (tuple/sub (:position light-source) position))
            light-dot-normal (svector/dot light-vector normal)]
-       (if (< (Math/abs shadow-attenuation) EPSILON)
+       (if (< (Math/abs (float shadow-attenuation)) EPSILON)
          ambient-color
          (tuple/add ambient-color
                     (color/scale (compute-diffuse light-dot-normal effective-color material) shadow-attenuation)
