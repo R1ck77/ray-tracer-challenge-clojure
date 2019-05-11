@@ -4,6 +4,7 @@
             [raytracer.camera :as camera]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.color :as color]
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]            
             [raytracer.canvas :as canvas]
@@ -81,6 +82,6 @@
                                           (svector/svector 0 1 0))
           camera (camera/set-transform (camera/camera 11 11 halfπ)
                                        transform)]
-      (is (v= [0.38066 0.47583 0.2855]
+      (is (c= (color/color 0.38066 0.47583 0.2855)
               (canvas/read (camera/render camera world) 5 5))))))
 

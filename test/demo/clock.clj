@@ -1,5 +1,6 @@
 (ns demo.clock
   (:require [raytracer.svector :as svector]
+            [raytracer.color :as color]
             [raytracer.point :as point]
             [raytracer.canvas :as canvas]
             [raytracer.matrix :as matrix]            
@@ -32,6 +33,6 @@
         (canvas/canvas-to-ppm (reduce (fn [canvas point]
                                         (let [x (:x point)
                                               y (:y point)]
-                                         (canvas/write canvas (int x) (int y) [1 1 1])))
+                                         (canvas/write canvas (int x) (int y) (color/color 1 1 1))))
                                       (apply canvas/create-canvas canvas-size)          
                                       (compute-clock-positions)))))

@@ -9,15 +9,16 @@
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.materials :as materials]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
 (def ^:dynamic canvas-size {:width 320, :height 200})
 (def ^:dynamic canvas-scale [0.1 0.1])
-(def color [255 0 0])
+(def color (color/color 255 0 0))
 (def sphere-template (shapes/change-material (shapes/sphere)
-                                             (assoc (materials/material) :color [1 0.2 1])))
+                                             (assoc (materials/material) :color (color/color 1 0.2 1))))
 
 (defn- create-simple-scene
   "Naive setup: the screen position in the scene decides the FOV and VFOV
@@ -29,7 +30,7 @@
                                     (transform/scale 5 5 5))
    :screen-z 0
    :light-source (light-sources/create-point-light (point/point -10 10 -10)
-                                                   [1 1 1])})
+                                                   (color/color 1 1 1))})
 
 ;;; TODO/FIXME most stuff can probably be cached
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 
@@ -57,7 +58,7 @@
                                   light-source
                                   point
                                   (.neg (:direction ray))
-                                  ((:normal object) object point))]
+                                  (shared/compute-normal object point))]
        (canvas/write canvas (first pixel) (second pixel) color))
       canvas)))
 

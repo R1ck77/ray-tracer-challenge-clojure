@@ -3,6 +3,7 @@
             [raytracer.test-utils :refer :all]
             [raytracer.world :as world]
             [raytracer.point :as point]
+            [raytracer.color :as color]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
@@ -33,14 +34,14 @@
   (testing "The default world"
     (let [world (world/default-world)
           expected-sphere1 (shapes/change-material (shapes/sphere)
-                                                   (materials/material :color [0.8 1.0 0.6]
+                                                   (materials/material :color (color/color 0.8 1.0 0.6)
                                                                        :diffuse 0.7
                                                                        :specular 0.2))
           expected-sphere2 (shapes/change-transform (shapes/sphere)
                                                     (transform/scale 0.5 0.5 0.5))]
       (is (contains? (:light-sources world)
                      (light-sources/create-point-light (point/point -10 10 -10)
-                                                       [1 1 1])))
+                                                       (color/color 1 1 1))))
       (is (some #(= expected-sphere1 %) (:objects world)))
       (is (some #(= expected-sphere2 %) (:objects world))))))
 
@@ -53,17 +54,17 @@
               (map :t (world/intersect world ray)))))))
 
 (deftest test-prepare-computation
-(testing "Precomputing the state of an intersection"
-  (let [ray (ray/ray (point/point 0 0 -5)
-                     (svector/svector 0 0 1))
-        intersection (intersection/intersection 4 (shapes/sphere))
-        result (world/prepare-computations ray intersection [] 1)]
-    (is (= (shapes/sphere) (:object result)))
-    (is (= 4 (:t result)))
-    (is (t= (point/point 0 0 -1) (:point result)))
-    (is (t= (svector/svector 0 0 -1) (:eye-v result)))
-    (is (t= (svector/svector 0 0 -1) (:normal-v result)))
-    (is (not (:inside result)))))
+  (testing "Precomputing the state of an intersection"
+    (let [ray (ray/ray (point/point 0 0 -5)
+                       (svector/svector 0 0 1))
+          intersection (intersection/intersection 4 (shapes/sphere))
+          result (world/prepare-computations ray intersection [] 1)]
+      (is (= (shapes/sphere) (:object result)))
+      (is (= 4 (:t result)))
+      (is (t= (point/point 0 0 -1) (:point result)))
+      (is (t= (svector/svector 0 0 -1) (:eye-v result)))
+      (is (t= (svector/svector 0 0 -1) (:normal-v result)))
+      (is (not (:inside result)))))
   (testing "The hit, when an intersection occurs on the outside"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
@@ -155,19 +156,19 @@
                                                    (intersection/intersection 4 (first (:objects world)))
                                                    []
                                                    1)]
-      (is (v= [0.38066 0.47583 0.2855]
+      (is (c= (color/color 0.38066 0.47583 0.2855)
               (world/shade-hit world
                                intermediate 1)))))
   (testing "Shading an intersection from the inside"
     (let [world (world/set-light-sources (world/default-world)
                                          (light-sources/create-point-light (point/point 0 0.25 0)
-                                                                           [1 1 1]))
+                                                                           (color/color 1 1 1)))
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
                                                    (intersection/intersection 0.5 (second (:objects world)))
                                                    []
                                                    1)]
-      (is (v= [0.90498 0.90498 0.90498]
+      (is (c= (color/color 0.90498 0.90498 0.90498)
               (world/shade-hit world
                                intermediate 1)))))
   (testing "shade_hit() is given an intersection in shadow"
@@ -175,27 +176,27 @@
           sphere2 (shapes/change-transform (shapes/sphere)
                                            (transform/translate 0 0 10))
           world (-> (world/create)
-                    (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) [1 1 1]))
+                    (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) (color/color 1 1 1)))
                     (world/set-objects [sphere1 sphere2]))
           ray (ray/ray (point/point 0 0 5)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 sphere2)
           comp (world/prepare-computations ray intersection [] 1)
           color (world/shade-hit world comp 1)]
-      (is (v= [0.1 0.1 0.1]
+      (is (c= (color/color 0.1 0.1 0.1)
               color))))
-    (testing "Lighting with reflection enabled"
-      (let [template-shape (shapes/plane)
-            shape (shapes/change-material (shapes/change-transform template-shape
-                                                                   (transform/translate 0 -1 0))
-                                          (materials/update-material (:material template-shape)
-                                                                     :reflectivity 0.5))
-            world (world/add-object (world/default-world) shape)
-            ray (ray/ray (point/point 0 0 -3)
-                         (svector/svector 0 (- half√2) half√2))
-            intersection (intersection/intersection √2 shape)]
-        (is (v= [0.87677 0.92436 0.82918]
-                (world/shade-hit world (world/prepare-computations ray intersection [] 1) 1)))))
+  (testing "Lighting with reflection enabled"
+    (let [template-shape (shapes/plane)
+          shape (shapes/change-material (shapes/change-transform template-shape
+                                                                 (transform/translate 0 -1 0))
+                                        (materials/update-material (:material template-shape)
+                                                                   :reflectivity 0.5))
+          world (world/add-object (world/default-world) shape)
+          ray (ray/ray (point/point 0 0 -3)
+                       (svector/svector 0 (- half√2) half√2))
+          intersection (intersection/intersection √2 shape)]
+      (is (c= (color/color 0.87677 0.92436 0.82918)
+              (world/shade-hit world (world/prepare-computations ray intersection [] 1) 1)))))
   (testing "shade_hit() with a transparent material"
     (let [floor (-> (shapes/plane)
                     (shapes/change-transform (transform/translate 0 -1 0))
@@ -203,7 +204,7 @@
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (materials/material :color [1 0 0]
+                   (shapes/change-material (materials/material :color (color/color 1 0 0)
                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
@@ -213,11 +214,11 @@
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
       (with-redefs [world/*basic-shade-detection* true]
-       (is (v= [0.9364253889815014 0.6864253889815014 0.6864253889815014]
-               (world/shade-hit world intermediate-results 5))))
+        (is (c= (color/color 0.9364253889815014 0.6864253889815014 0.6864253889815014)
+                (world/shade-hit world intermediate-results 5))))
       (with-redefs [world/*basic-shade-detection* false]
-       (is (v= [1.1254657815486042 0.6864253889815014 0.6864253889815014]
-               (world/shade-hit world intermediate-results 5))))))
+        (is (c= (color/color 1.1254657815486042 0.6864253889815014 0.6864253889815014)
+                (world/shade-hit world intermediate-results 5))))))
   (testing "shade_hit() with a reflective, transparent material"
     (let [ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- half√2) half√2))
@@ -228,7 +229,7 @@
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (materials/material :color [1 0 0]
+                   (shapes/change-material (materials/material :color (color/color 1 0 0)
                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
@@ -236,11 +237,11 @@
           intersections [(intersection/intersection √2 floor)]
           intermediate-results (world/prepare-computations ray (first intersections) intersections 1)]
       (with-redefs [world/*basic-shade-detection* true]
-        (is (v= [0.9339151479206158 0.6964342355067606 0.6924306968966569]
+        (is (c= (color/color 0.9339151479206158 0.6964342355067606 0.6924306968966569)
                 (world/shade-hit world intermediate-results 5))))
       (with-redefs [world/*basic-shade-detection* false]
-        (is (v= [1.1150027485812746 0.6964342355067606 0.6924306968966569]
-               (world/shade-hit world intermediate-results 5)))))))
+        (is (c= (color/color 1.1150027485812746 0.6964342355067606 0.6924306968966569)
+                (world/shade-hit world intermediate-results 5)))))))
 
 (defn reset-ambient-color [object]
   (let [new-material (assoc (:material object) :ambient 1)]
@@ -248,12 +249,12 @@
 
 (deftest test-color-at
   (testing "The color when a ray misses"
-    (is (v= [0 0 0]
+    (is (c= (color/color 0 0 0)
             (world/color-at (world/default-world)
                             (ray/ray (point/point 0 0 -5)
                                      (svector/svector 0 1 0))))))
   (testing "The color when a ray hits"
-    (is (v= [0.38066 0.47583 0.2855]
+    (is (c= (color/color 0.38066 0.47583 0.2855)
             (world/color-at (world/default-world)
                             (ray/ray (point/point 0 0 -5)
                                      (svector/svector 0 0 1))))))
@@ -261,11 +262,11 @@
     (let [world (world/set-objects (world/default-world)
                                    (map reset-ambient-color (:objects (world/default-world))))
           ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
-      (is (v= (:color (:material (second (:objects world))))
+      (is (c= (:color (:material (second (:objects world))))
               (world/color-at world ray)))))
   (testing "color_at() with mutually reflective surfaces"
     (let [light (light-sources/create-point-light (point/point 0 0 0)
-                                                  [1 1 1])
+                                                  (color/color 1 1 1))
           reflective-plane (shapes/change-material (shapes/plane)
                                                    (materials/material :reflectivity 1))
           lower-plane (shapes/change-transform reflective-plane (transform/translate 0 -1 0))
@@ -317,10 +318,10 @@
         floor3 (-> (shapes/plane)
                    (shapes/update-material (fn [_] (materials/material :transparency 0.4)))
                    (shapes/change-transform (transform/translate 0 30 0)))]
-   (-> (world/create)
-       (world/set-objects [floor0 floor1 floor2 floor3])
-       (world/set-light-sources (light-sources/create-point-light (apply point/point light-position)
-                                                                  [1 1 1])))))
+    (-> (world/create)
+        (world/set-objects [floor0 floor1 floor2 floor3])
+        (world/set-light-sources (light-sources/create-point-light (apply point/point light-position)
+                                                                   (color/color 1 1 1))))))
 
 (deftest test-select-shadow-attenuation-basic
   (with-redefs [world/*basic-shade-detection* true]
@@ -337,7 +338,7 @@
       (is (eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
                                                      (point/point 0 0.0001 0))))
       (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
-                                                       (point/point 0 0 0))))
+                                                     (point/point 0 0 0))))
       (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
                                                      (point/point 0 0 0))))
       (is (eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
@@ -359,9 +360,9 @@
       (is (eps= 0.2 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
                                                      (point/point 0 0 0))))
       (is (eps= 0.06 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
-                                                     (point/point 0 0 0))))
+                                                      (point/point 0 0 0))))
       (is (eps= 0.024 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
-                                                     (point/point 0 0 0)))))))
+                                                       (point/point 0 0 0)))))))
 
 (defn- update-ambient [shape]
   (shapes/change-material shape
@@ -379,7 +380,7 @@
           ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 1 (second (:objects world)))]
-      (is (v= [0 0 0]
+      (is (c= (color/color 0 0 0)
               (world/reflected-color world
                                      (world/prepare-computations ray
                                                                  intersection
@@ -396,9 +397,9 @@
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
-      (is (v= [0.19032 0.2379 0.14274]
+      (is (c= (color/color 0.19032 0.2379 0.14274)
               (world/reflected-color world (world/prepare-computations ray intersection [] 1) 1)))))
-    (testing "The reflected color at the maximum recursive depth"
+  (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
                     (shapes/change-material (materials/material :reflectivity 0.5))
                     (shapes/change-transform (transform/translate 0 -1 0)))
@@ -406,7 +407,7 @@
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 plane)]
-      (is (v= [0 0 0]
+      (is (c= (color/color 0 0 0)
               (world/reflected-color world (world/prepare-computations ray intersection [] 1) 0))))))
 
 (deftest test-refracted-color
@@ -417,7 +418,7 @@
                        (svector/svector 0 0 1))
           intersections [(intersection/intersection 4 shape)
                          (intersection/intersection 6 shape)]]
-      (is (v= [0 0 0]
+      (is (c= (color/color 0 0 0)
               (world/refracted-color world
                                      (world/prepare-computations ray (first intersections) intersections 1)
                                      1)))))
@@ -430,7 +431,7 @@
                        (svector/svector 0 0 1))
           intersections [(intersection/intersection 4 shape)
                          (intersection/intersection 6 shape)]]
-      (is (v= [0 0 0]
+      (is (c= (color/color 0 0 0)
               (world/refracted-color world
                                      (world/prepare-computations ray (first intersections) intersections 1)
                                      0)))))
@@ -444,7 +445,7 @@
           intersections (vector (intersection/intersection (- half√2) shape)
                                 (intersection/intersection half√2 shape))
           intermediate-result (world/prepare-computations ray (second intersections) intersections 1)]
-      (is (v= [0 0 0] (world/refracted-color world intermediate-result 10)))))
+      (is (c= (color/color 0 0 0) (world/refracted-color world intermediate-result 10)))))
   (testing "The refracted color with a refracted ray"
     (let [shape-a (shapes/change-material (first (:objects (world/default-world)))
                                           (materials/material :ambient 1.0
@@ -463,7 +464,7 @@
                                                            (nth intersections 2)
                                                            intersections
                                                            1)]
-      (is (v= [0 0.99888 0.04725]
+      (is (c= (color/color 0 0.99888 0.04725)
               (world/refracted-color world intermediate-results 5))))))
 
 (deftest test-schlick

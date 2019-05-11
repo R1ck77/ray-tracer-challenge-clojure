@@ -2,6 +2,7 @@
   (:require [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.canvas :as canvas]            
+            [raytracer.color :as color]
             [raytracer.ray :as ray]
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
@@ -21,7 +22,8 @@
 (def perlin-data (perlin/create-perlin-data [3 3 3]))
 
 (def room-material (materials/material :specular 0.0
-                                       :pattern (pattern/change-transform (pattern/checker [1 0 0] [0 0 1])
+                                       :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
+                                                                                           (color/color 0 0 1))
                                                                           matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
@@ -30,7 +32,8 @@
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (materials/material :diffuse 0.7, :specular 0.3
-                                                                 :pattern (pattern/change-transform (pattern/stripe [1 0 0] [1 1 1])
+                                                                 :pattern (pattern/change-transform (pattern/stripe (color/color 1 0 0)
+                                                                                                                    (color/color 1 1 1))
                                                                                                     (transform/scale 0.2 0.2 0.2
                                                                                                                      (transform/rotate-y (/ Math/PI 5))))))
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
@@ -39,14 +42,16 @@
 (def middle-sphere (-> (shapes/sphere)
                        (shapes/change-material (materials/material :diffuse 0.7
                                                                    :specular 0.3
-                                                                   :pattern (pattern/change-transform (pattern/gradient [1 0 0] [0 0 1])
+                                                                   :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
+                                                                                                                        (color/color 0 0 1))
                                                                                                       (transform/rotate-x (/ Math/PI 2)))))
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (materials/material :diffuse 0.7
                                                                   :specular 0.3
-                                                                  :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring [1 1 1] [0.0 0 0.0]) 
+                                                                  :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
+                                                                                                                                            (color/color 0.0 0 0.0)) 
                                                                                                                               (fn [point]
                                                                                                                                 (let [noise (perlin/noise perlin-data
                                                                                                                                                           (vector (:x point)
@@ -62,7 +67,7 @@
 
 (def world (world/set-light-sources (world/set-objects (world/create) [floor left-sphere middle-sphere right-sphere])
                                     (light-sources/create-point-light (point/point -10 10 -10)
-                                                                      [1 1 1])))
+                                                                      (color/color 1 1 1))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))

@@ -1,11 +1,12 @@
 (ns raytracer.canvas-test
   (:require [clojure.test :refer :all]
             [clojure.string :as string]
-            [raytracer.test-utils :refer [v=]]
+            [raytracer.color :as color]
+            [raytracer.test-utils :refer :all]
             [raytracer.canvas :as canvas]))
 
-(def red [1 0 0])
-(def black [0 0 0])
+(def red (color/color 1 0 0))
+(def black (color/color 0 0 0))
 
 (defmacro for-each-pixel
   [width height function]
@@ -22,7 +23,7 @@
   (testing "canvas starting color is black"
     (let [canvas (canvas/create-canvas 10 20)]
       (for-each-pixel 10 20
-                      #(v= black
+                      #(c= black
                            (canvas/read canvas % %2))))))
 
 (deftest test-write-pixel
@@ -31,10 +32,10 @@
           updated-canvas (canvas/write canvas 2 3 red)]
       (for-each-pixel 10 20
                       (fn [x y]
-                        (= (if (= [2 3] [x y])
-                             red
-                             black)
-                           (canvas/read updated-canvas x y)))))))
+                        (c= (if (= [2 3] [x y])
+                              red
+                              black)
+                            (canvas/read updated-canvas x y)))))))
 
 (deftest test-fix-length
   (testing "doesn't change the size of lines that are short already"
@@ -55,9 +56,9 @@
              (take 3 (string/split-lines ppm-text))))))
   (testing "the pixels are written correctly"
     (let [canvas (canvas/create-canvas 5 3)
-          c1 [1.5 0 0]
-          c2 [0 0.5 0]
-          c3 [-0.5 0 1]
+          c1 (color/color 1.5 0 0)
+          c2 (color/color 0 0.5 0)
+          c3 (color/color -0.5 0 1)
           ppm (canvas/canvas-to-ppm (-> canvas
                                         (canvas/write 0 0 c1)
                                         (canvas/write 2 1 c2)
@@ -67,7 +68,7 @@
               "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"]
              (take 3 (drop 3 (string/split-lines ppm)))))))
   (testing "lines don't exceed 70 characters"
-    (let [color [1 0.8 0.6]
+    (let [color (color/color 1 0.8 0.6)
           lines (string/split-lines (canvas/canvas-to-ppm (reduce (fn [canvas [x y]]
                                                                     (canvas/write canvas x y color))
                                                                   (canvas/create-canvas 10 2)

@@ -3,6 +3,7 @@
             [raytracer.test-utils :refer :all]
             [raytracer.svector :as svector]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.point :as point]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
@@ -14,11 +15,11 @@
   (let [expected-normal (svector/svector 0 1 0)]
     (testing "The normal of a plane is constant everywhere"
       (is (t= expected-normal
-              ((:normal plane) plane (point/point 0 0 0))))
+              (shared/compute-normal plane (point/point 0 0 0))))
       (is (t= expected-normal
-              ((:normal plane) plane (point/point 10 0 -10))))
+              (shared/compute-normal plane (point/point 10 0 -10))))
       (is (t= expected-normal
-              ((:normal plane) plane (point/point 5 0 150)))))))
+              (shared/compute-normal plane (point/point 5 0 150)))))))
 
 (deftest test-ray-plane-intersect
   (testing "Intersect with a ray parallel to the plane"

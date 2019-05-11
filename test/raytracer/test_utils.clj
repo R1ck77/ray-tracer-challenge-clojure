@@ -49,3 +49,8 @@
        (eps= (:y t1) (:y t2))
        (eps= (:z t1) (:z t2))
        (eps= (:w t1) (:w t2))))
+
+(defn c= [c1 c2]
+  (and (eps= (:r c1) (:r c2))
+       (eps= (:g c1) (:g c2))
+       (eps= (:b c1) (:b c2))))

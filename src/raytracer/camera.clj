@@ -2,6 +2,7 @@
   (:require [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.color :as color]
             [raytracer.matrix :as matrix]
             [raytracer.canvas :as canvas]
             [raytracer.ray :as ray]

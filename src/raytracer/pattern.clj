@@ -33,9 +33,9 @@
   (create-pattern white black gradient-function))
 
 (defn- test-pattern-function [pattern point]
-  [(:x point)
-   (:y point)
-   (:z point)])
+  (color/color (:x point)
+               (:y point)
+               (:z point)))
 
 (defn test []
   (create-pattern nil nil test-pattern-function))

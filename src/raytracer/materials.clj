@@ -1,5 +1,6 @@
-(ns raytracer.materials
-  (:require [raytracer.pattern :as pattern])) ;;;TODO/FIXME change the name to material
+(ns raytracer.materials ;;;TODO/FIXME change the name to material
+  (:require [raytracer.color :as color]
+            [raytracer.pattern :as pattern]))
 
 (defrecord Material
     [color
@@ -9,7 +10,7 @@
 
 (defn material
   ([]
-   (map->Material {:color [1 1 1]
+   (map->Material {:color (color/color 1 1 1)
                    :ambient 0.1
                    :diffuse 0.9
                    :specular 0.9
@@ -22,7 +23,7 @@
   ([& {:as args}]
    (merge (material) args)))
 
-(def void-material (material :color [0 0 0]
+(def void-material (material :color (color/color 0 0 0)
                              :transparency 1.0
                              :refractive-index 1.0))
 

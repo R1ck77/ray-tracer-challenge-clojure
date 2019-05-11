@@ -1,5 +1,6 @@
 (ns demo.perlin-demo
   (:require [raytracer.perlin :as perlin]
+            [raytracer.color :as color]
             [raytracer.canvas :as canvas]))
 
 (def grid-width 10)
@@ -16,7 +17,8 @@
   (map
    (fn noise-to-color [[x y noise]]
                       (let [value (/ (+ 1 noise) 2)]
-                        (vector [value value value] (vector x y))))
+                        (vector (color/color value value value)
+                                (vector x y))))
    noise))
 
 (defn create-noise [perlin-data width height time]
@@ -33,7 +35,7 @@
      (spit "noise.ppm" (canvas/canvas-to-ppm
                         (write-color-to-canvas width height
                                                (convert-noise-to-color           
-                                                (create-noise perlin-data width height))))))))
+                                                (create-noise perlin-data width height 0))))))))
 
 (defn render-animation
   ([width height frames]

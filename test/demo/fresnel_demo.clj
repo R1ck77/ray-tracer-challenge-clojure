@@ -1,6 +1,7 @@
 (ns demo.fresnel-demo
   (:require [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.color :as color]
             [raytracer.canvas :as canvas]            
             [raytracer.ray :as ray]
             [raytracer.matrix :as matrix]
@@ -21,19 +22,18 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def room-material )
-
 (def wall (-> (shapes/plane)
               (shapes/change-material (materials/material :specular 0.0
                                                           :reflectivity 0.0
                                                           :transparency 0.0
-                                       :pattern (pattern/checker [1 1 1] [0 0 0])))
+                                                          :pattern (pattern/checker (color/color 1 1 1)
+                                                                                    (color/color 0 0 0))))
               (shapes/change-transform (transform/rotate-x (/ Math/PI 2)
-                                                           (transform/translate 0 40 0 )))))
+                                                           (transform/translate 0 40 0)))))
 
 
 (def glass-sphere (-> (shapes/sphere)
-                      (shapes/change-material (materials/material :color [0 0 0.002]
+                      (shapes/change-material (materials/material :color (color/color 0 0 0.002)
                                                                   :shiness 400
                                                                   :specular 0.999
                                                                   :diffuse 0.7
@@ -54,10 +54,10 @@
 
 
 (def world (-> (world/create)
-               (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
-                                                                          [2 2 2]))
+               (world/set-light-sources (light-sources/create-point-light (point/point -100 100 -100)
+                                                                          (color/color 2 2 2)))
                (world/set-objects [wall glass-sphere air-bubble])
-               (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
+               (update :material #(materials/update-material % :color (color/color 0.1 0.1 0.3)))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))

@@ -9,9 +9,13 @@
 
 (set! *unchecked-math* true)
 
+(def center (point/point 0 0 0))
+
+(defrecord Sphere [material transform inverse-transform])
+
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
-                                 (:center this-sphere))
+                                 center)
         a (tuple/dot (:direction ray)
                      (:direction ray))
         b (* 2 (tuple/dot (:direction ray)
@@ -38,11 +42,16 @@
                       (tuple/sub (matrix/transform (:inverse-transform shape) point)
                                  (point/point 0 0 0))))))
 
+(extend-type Sphere
+  shared/Intersectable
+  (local-intersect [this ray-in-plane-space]
+    (intersect-sphere-space this ray-in-plane-space))
+  shared/Surface
+  (compute-normal [this point]
+    (compute-normal this point)))
+
 (defn sphere []
-  {:center (point/point 0 0 0)
-   :radius 1.0
-   :material (materials/material)
-   :transform matrix/identity-matrix
-   :inverse-transform matrix/identity-matrix
-   :local-intersect intersect-sphere-space
-   :normal compute-normal})
+  (map->Sphere 
+   {:material (materials/material)
+    :transform matrix/identity-matrix
+    :inverse-transform matrix/identity-matrix}))

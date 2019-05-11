@@ -6,6 +6,7 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]
             [raytracer.matrix :as matrix]
             [raytracer.materials :as materials]
@@ -17,7 +18,7 @@
 
 (def EPSILON 1e-6)
 
-(def zero-color [0 0 0])
+(def zero-color (color/color 0 0 0))
 
 (defn create [] ;;; TODO/FIXME change name to "world"
   {:objects []
@@ -45,13 +46,13 @@
   []
   (-> (create)
       (add-object (shapes/change-material (shapes/sphere)
-                                          (materials/material :color [0.8 1.0 0.6]
+                                          (materials/material :color (color/color 0.8 1.0 0.6)
                                                               :diffuse 0.7
                                                               :specular 0.2)))
       (add-object (shapes/change-transform (shapes/sphere)
                                            (transform/scale 0.5 0.5 0.5)))    
       (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
-                                                          [1 1 1]))))
+                                                          (color/color 1 1 1)))))
 
 (defn- unsorted-intersections [world ray]
   (flatten
@@ -135,7 +136,7 @@
                                     (:t intersection)))
         eye-v (tuple/neg (:direction ray))
         object (:object intersection)
-        normal-v ((:normal object) object point)
+        normal-v (shared/compute-normal object point)
         inside (is-inside? eye-v normal-v)
         normal-v (if inside (tuple/neg normal-v) normal-v)
         [n1 n2] (compute-refractive-indices intersection all-intersections world-refractive-index)]
@@ -257,7 +258,7 @@
                          (:normal-v intermediate-result))
         sin-t-squared (* n-ratio n-ratio (- 1 (* cos-i cos-i)))]
     (if (> sin-t-squared 1)
-      [0 0 0]
+      (color/color 0 0 0)
       (color/scale (color-at world
                              (compute-refracted-ray intermediate-result n-ratio sin-t-squared cos-i)
                              (dec remaining))

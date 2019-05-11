@@ -3,10 +3,6 @@
             [raytracer.materials :as materials]
             [raytracer.shapes :as shapes]))
 
-(deftest test-sphere
-  (testing "sphere creates a shape with a radius"
-    (is (:radius (shapes/sphere)))))
-
 (deftest test-glass-object
   (testing "A helper for producing a sphere with a glassy material"
     (let [glass-sphere-material (:material (shapes/glass-sphere))]

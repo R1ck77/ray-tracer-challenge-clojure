@@ -4,6 +4,7 @@
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.point :as point]
+            [raytracer.color :as color]
             [raytracer.canvas :as canvas]))
 
 (def dt 0.0001)
@@ -101,7 +102,7 @@
     (reduce (fn inner-write [canvas [x y]]
               (let [[px py] (scaler-f x y)]
                 (try
-                  (canvas/write canvas px (- canvas-height py 1) [1 0 0])      
+                  (canvas/write canvas px (- canvas-height py 1) (color/color 1 0 0))      
                   (catch Exception e canvas))))
                   canvas data)))
 

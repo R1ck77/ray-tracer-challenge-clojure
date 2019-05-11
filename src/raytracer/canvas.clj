@@ -1,17 +1,19 @@
-(ns raytracer.canvas)
+(ns raytracer.canvas
+  (:require [raytracer.color :as color]))
 
 (def max-value 255)
 
 (defn create-canvas [width height]
   {:width width
    :height height
-   :pixels (vec (repeat (* width height) [0 0 0]))})
+   :pixels (vec (repeat (* width height) (color/color 0 0 0)))})
 
 (defn- index [width x y]
   (+ x (* y width)))
 
 (defn read [canvas x y]
-  (nth (:pixels canvas) (index (:width canvas) x y)))
+  (nth (:pixels canvas)
+       (index (:width canvas) x y)))
 
 (defn write [canvas x y color]
   ;;; TODO/FIXME this is gonna cost me *a lot* :)
@@ -63,7 +65,9 @@
       :default (Math/round (double (* component max-value)))))
 
 (defn- format-color [color]
-  (map color-to-ppm color))
+  (vector (color-to-ppm (:r color))
+          (color-to-ppm (:g color))
+          (color-to-ppm (:b color))))
 
 (defn- format-line [colors]
   (apply str (interpose " " (mapcat format-color colors))))

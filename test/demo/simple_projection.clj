@@ -11,7 +11,7 @@
 
 (def canvas-size {:width 160, :height 100})
 (def canvas-scale [0.2 0.2])
-(def color [255 0 0])
+(def color (color/color 255 0 0))
 
 (defn- create-simple-scene
   "Naive setup: the screen position in the scene decides the FOV and VFOV

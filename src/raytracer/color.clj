@@ -1,26 +1,33 @@
 (ns raytracer.color
   (:require [raytracer.tuple :as tuple]))
 
-(def black [0 0 0])
+(defrecord Color [r g b])
 
-(defn add [a b]
-  (vector (+ (nth a 0) (nth b 0))
-          (+ (nth a 1) (nth b 1))
-          (+ (nth a 2) (nth b 2))))
+(defn color [r g b]
+  (->Color r g b))
 
-(defn sub [a b]
-  (vector (- (nth a 0) (nth b 0))
-          (- (nth a 1) (nth b 1))
-          (- (nth a 2) (nth b 2))))
+(defprotocol Algebra
+  (add [color-1 color-2])
+  (sub [color-1 color-2])
+  (mul [color-1 color-2])
+  (scale [color value]))
 
-(defn mul [[r1 g1 b1] [r2 g2 b2]]
-  (vector (* r1 r2)
-          (* g1 g2)
-          (* b1 b2)))
+(def black (color 0 0 0))
 
-(defn scale [[r g b] s]
-  (vector (* r s)
-          (* g s)
-          (* b s)))
+(defmacro binary-operation [operator color-1 color-2]
+  `(color (~operator (:r ~color-1) (:r ~color-2))
+          (~operator (:g ~color-1) (:g ~color-2))
+          (~operator (:b ~color-1) (:b ~color-2))))
 
-
+(extend-type Color
+  Algebra
+  (add [this that]
+    (binary-operation + this that))
+  (sub [this that]
+    (binary-operation - this that))
+  (mul [this that]
+    (binary-operation * this that))
+  (scale [this value]
+    (color (* (:r this) value)
+           (* (:g this) value)
+           (* (:b this) value))))

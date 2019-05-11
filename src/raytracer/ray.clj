@@ -1,6 +1,7 @@
 (ns raytracer.ray
   (:require [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.utils :as utils]
             [raytracer.tuple :as tuple]
             [raytracer.point :as point]
@@ -25,7 +26,7 @@
 (extend-type Ray
   RayCaster
   (intersect [this shape]
-    ((:local-intersect shape) shape (transform this (:inverse-transform shape)))))
+    (shared/local-intersect shape (transform this (:inverse-transform shape)))))
 
 
 (defn normalize [ray]

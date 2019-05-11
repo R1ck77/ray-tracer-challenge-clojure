@@ -3,6 +3,7 @@
             [raytracer.test-utils :refer :all]
             [raytracer.svector :as svector]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.point :as point]
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
@@ -13,8 +14,6 @@
 (deftest test-sphere
   (let [sphere (shapes/sphere)]
     (testing "create a sphere"
-      (is (t= (point/point 0 0 0) (:center sphere)))
-      (is (eps= 1.0 (:radius sphere)))
       (is (= (materials/material) (:material sphere)))
       (is (identical? matrix/identity-matrix (:transform sphere))))
     (testing "update a sphere's transformation"
@@ -95,28 +94,28 @@
         third√3 (/ √3 3)]
     (testing "The normal on a sphere at a point on the x axis"
       (is (t= (svector/svector 1 0 0)
-              ((:normal sphere) sphere
+              (shared/compute-normal sphere
                (point/point 1 0 0)))))
     (testing "The normal on a sphere at a point on the y axis"
       (is (t= (svector/svector 0 1 0)
-              ((:normal sphere) sphere
+              (shared/compute-normal sphere
                (point/point 0 1 0)))))
     (testing "The normal on a sphere at a point on the z axis"
       (is (t= (svector/svector 0 0 1)
-              ((:normal sphere) sphere
+              (shared/compute-normal sphere
                (point/point 0 0 1)))))
     (testing "The normal on a sphere at a nonaxial point"
       (is (t= (svector/svector third√3 third√3 third√3)
-              ((:normal sphere) sphere
+              (shared/compute-normal sphere
                (point/point third√3 third√3 third√3)))))
     (testing "Computing the normal on a translated sphere"
       (let [transformed-sphere (shapes/change-transform sphere (transform/translate 0 1 0))]
         (is (t= (svector/svector 0 0.70711 -0.70711)
-                ((:normal transformed-sphere) transformed-sphere
+                (shared/compute-normal transformed-sphere
                  (point/point 0 1.70711 -0.70711))))))
     (testing "Computing the normal on a transformed sphere"
       (let [new-transform (transform/scale 1 0.5 1 (transform/rotate-z (/ Math/PI 5)))
             transformed-sphere (shapes/change-transform sphere new-transform)]
         (is (t= (svector/svector 0 0.97014 -0.24254)
-                ((:normal transformed-sphere) transformed-sphere
+                (shared/compute-normal transformed-sphere
                  (point/point 0 half√2 (- half√2)))))))))
