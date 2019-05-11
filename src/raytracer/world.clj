@@ -119,35 +119,35 @@
       (schlick-partial-reflection n1 n2 (Math/sqrt (- 1 sin2-t))))))
 
 (defn schlick [{:keys [n1 n2 eye-v normal-v]}]
-  (let [cos (.dot eye-v normal-v)]
+  (let [cos (tuple/dot eye-v normal-v)]
     (if (> n1 n2)
       (schlick-total-internal-reflection n1 n2 cos)
       (schlick-partial-reflection n1 n2 cos))))
 
 (defn- is-inside? [eye-v normal-v]
-  (< (.dot eye-v normal-v) 0))
+  (< (tuple/dot eye-v normal-v) 0))
 
 ;;; TODO/FIXME I don't care what the books says: too many arguments for my tastes, even without the world refractive-index
 (defn prepare-computations
   [ray intersection all-intersections world-refractive-index]
   (let [point (tuple/add (:origin ray)
-                         (.mul (:direction ray)
-                               (:t intersection)))
-        eye-v (.neg (:direction ray))
+                         (tuple/mul (:direction ray)
+                                    (:t intersection)))
+        eye-v (tuple/neg (:direction ray))
         object (:object intersection)
         normal-v ((:normal object) object point)
         inside (is-inside? eye-v normal-v)
-        normal-v (if inside (.neg normal-v) normal-v)
+        normal-v (if inside (tuple/neg normal-v) normal-v)
         [n1 n2] (compute-refractive-indices intersection all-intersections world-refractive-index)]
     {:inside inside
      :object object
      :t (:t intersection)
      :point  point
-     :over-point (tuple/add point (.mul normal-v EPSILON))
-     :under-point (tuple/add point (.mul normal-v (- EPSILON)))
+     :over-point (tuple/add point (tuple/mul normal-v EPSILON))
+     :under-point (tuple/add point (tuple/mul normal-v (- EPSILON)))
      :eye-v eye-v
      :normal-v normal-v
-     :reflection (.reflect (:direction ray) normal-v)
+     :reflection (tuple/reflect (:direction ray) normal-v)
      :n1 n1
      :n2 n2}))
 
@@ -167,8 +167,8 @@
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
-        transparencies (filtered-transparencies (intersect world (ray/ray point (.normalize pos->light)))
-                                                (.mag pos->light))]
+        transparencies (filtered-transparencies (intersect world (ray/ray point (tuple/normalize pos->light)))
+                                                (tuple/mag pos->light))]
     (apply * (conj transparencies 1))))
 
 (defn- basic-is-shadowed?
@@ -176,8 +176,8 @@
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
         intersection (intersection/hit (filter #(< (:t %)
-                                                   (.mag pos->light))
-                                               (intersect world (ray/ray point (.normalize pos->light)))))]
+                                                   (tuple/mag pos->light))
+                                               (intersect world (ray/ray point (tuple/normalize pos->light)))))]
     intersection))
 
 (defn select-shadow-attenuation
@@ -192,26 +192,26 @@
 (defn combine-colors
   [intermediate-result surface reflected refracted]
   (let [ material (-> intermediate-result :object :material)]
-   (if (and (> (:transparency material) 0)
-            (> (:reflectivity material) 0))
-     (let [reflectance (schlick intermediate-result)]
-       (-> surface
-           (color/add (color/scale reflected reflectance))
-           (color/add (color/scale refracted (- 1 reflectance)))))      
-     (-> surface
-         (color/add reflected)
-         (color/add refracted)))))
+    (if (and (> (:transparency material) 0)
+             (> (:reflectivity material) 0))
+      (let [reflectance (schlick intermediate-result)]
+        (-> surface
+            (color/add (color/scale reflected reflectance))
+            (color/add (color/scale refracted (- 1 reflectance)))))      
+      (-> surface
+          (color/add reflected)
+          (color/add refracted)))))
 
 ;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit
   [world intermediate-result remaining]
   (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))
         surface (phong/lighting (:object intermediate-result)
-                                         (first (:light-sources world)) ;;; first light source, for now
-                                         (:point intermediate-result)
-                                         (:eye-v intermediate-result)
-                                         (:normal-v intermediate-result)
-                                         shadow-attenuation)
+                                (first (:light-sources world)) ;;; first light source, for now
+                                (:point intermediate-result)
+                                (:eye-v intermediate-result)
+                                (:normal-v intermediate-result)
+                                shadow-attenuation)
         reflected (reflected-color world intermediate-result remaining)
         refracted (refracted-color world intermediate-result remaining)]
     (combine-colors intermediate-result surface reflected refracted)))
@@ -246,15 +246,15 @@
 (defn- compute-refracted-ray [intermediate-result n-ratio sin-t-squared cos-i]
   (let [cos-t (Math/sqrt (- 1 sin-t-squared))]
     (ray/ray (:under-point intermediate-result)
-             (.sub (.mul (:normal-v intermediate-result)
-                         (- (* n-ratio cos-i) cos-t))
-                   (.mul (:eye-v intermediate-result) n-ratio)))))
+             (tuple/sub (tuple/mul (:normal-v intermediate-result)
+                                   (- (* n-ratio cos-i) cos-t))
+                        (tuple/mul (:eye-v intermediate-result) n-ratio)))))
 
 (defn- refraction-color [world intermediate-result remaining]
   (let [n-ratio (/ (:n1 intermediate-result)
                    (:n2 intermediate-result))
-        cos-i (.dot (:eye-v intermediate-result)
-                    (:normal-v intermediate-result))
+        cos-i (tuple/dot (:eye-v intermediate-result)
+                         (:normal-v intermediate-result))
         sin-t-squared (* n-ratio n-ratio (- 1 (* cos-i cos-i)))]
     (if (> sin-t-squared 1)
       [0 0 0]
@@ -275,9 +275,9 @@
     zero-color))
 
 (defn view-transform [from to up]
-  (let [forward (.normalize (.sub to from))
-        left (.cross forward (.normalize up))
-        true-up (.cross left forward)]
+  (let [forward (tuple/normalize (tuple/sub to from))
+        left (tuple/cross forward (tuple/normalize up))
+        true-up (tuple/cross left forward)]
     (matrix/mul4 (vector (:x left)      (:y left)      (:z left)      0
                          (:x true-up)   (:y true-up)   (:z true-up)   0
                          (- (:x forward))   (- (:y forward))   (- (:z forward))   0

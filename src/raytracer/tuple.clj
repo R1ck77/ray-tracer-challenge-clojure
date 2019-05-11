@@ -20,11 +20,11 @@
   (reflect [this normal]))
 
 (defmacro binary-tuple-operation [operator op1 op2]
-    (let [function# operator]
-   `(->Tuple (~function# (:x ~op1) (:x ~op2))
-             (~function# (:y ~op1) (:y ~op2))
-             (~function# (:z ~op1) (:z ~op2))
-             (~function# (:w ~op1) (:w ~op2)))))
+  (let [function# operator]
+    `(->Tuple (~function# (:x ~op1) (:x ~op2))
+              (~function# (:y ~op1) (:y ~op2))
+              (~function# (:z ~op1) (:z ~op2))
+              (~function# (:w ~op1) (:w ~op2)))))
 
 (defmacro multi-binary-tuple-operation [operator op args]
   `(reduce #(binary-tuple-operation ~operator % %2) ~op ~args))
@@ -69,7 +69,7 @@
              (- (* (:x this) (:y that)) (* (:y this) (:x that)))
              0))
   (reflect [this normal]
-    (.sub this (.mul normal (* 2 (.dot normal this))))))
+    (.sub this (mul normal (* 2 (dot normal this))))))
 
 (defn tuple [x y z w]
   (->Tuple x y z w))

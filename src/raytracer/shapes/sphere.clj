@@ -12,11 +12,11 @@
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
                                  (:center this-sphere))
-        a (.dot (:direction ray)
-                (:direction ray))
-        b (* 2 (.dot (:direction ray)
-                     sphere-to-ray))
-        c (- (.dot sphere-to-ray sphere-to-ray) 1)]
+        a (tuple/dot (:direction ray)
+                     (:direction ray))
+        b (* 2 (tuple/dot (:direction ray)
+                          sphere-to-ray))
+        c (- (tuple/dot sphere-to-ray sphere-to-ray) 1)]
     [a b c (- (* b b ) (* 4 a c))]))
 
 (defn- intersect-sphere-space [this-sphere ray-in-sphere-space]
@@ -32,11 +32,11 @@
                                   this-sphere)])))
 
 (defn compute-normal [shape point]
-  (.normalize
+  (tuple/normalize
    (shared/as-vector
     (matrix/transform (matrix/transpose (:inverse-transform shape))
-                      (.sub (matrix/transform (:inverse-transform shape) point)
-                            (point/point 0 0 0))))))
+                      (tuple/sub (matrix/transform (:inverse-transform shape) point)
+                                 (point/point 0 0 0))))))
 
 (defn sphere []
   {:center (point/point 0 0 0)

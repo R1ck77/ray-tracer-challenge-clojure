@@ -30,11 +30,11 @@
 
 (defn normalize [ray]
   (assoc ray
-         :direction (.normalize (:direction ray))))
+         :direction (tuple/normalize (:direction ray))))
 
 (defn position [ray t]
   (tuple/add (:origin ray)
-             (.mul (:direction ray) t)))
+             (tuple/mul (:direction ray) t)))
 
 
 
