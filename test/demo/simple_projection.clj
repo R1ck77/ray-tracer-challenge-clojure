@@ -25,10 +25,9 @@
 
 ;;; TODO/FIXME most stuff can probably be cached
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 
-  (vector (* (first canvas-scale) (- x half-width))
-          (* (second canvas-scale) (- half-height y))
-          scene-z
-          1))
+  (point/point (* (first canvas-scale) (- x half-width))
+               (* (second canvas-scale) (- half-height y))
+               scene-z))
 
 (defn- seq-ray [scene]
   (let [pixel-to-coord-f (partial compute-pixel-coordinates
