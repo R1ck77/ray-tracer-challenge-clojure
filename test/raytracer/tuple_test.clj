@@ -15,10 +15,10 @@
                            (tuple/tuple 10 100 200 0)))))
   (testing "add more tuples"
     (is (t= (tuple/tuple 8 8 8 8)
-            (tuple/add-all (tuple/tuple 1 2 1 2)
-                           (tuple/tuple 2 1 2 1)
-                           (tuple/tuple 1 1 1 1)
-                           (tuple/tuple 4 4 4 4))))))
+            (tuple/add-all (vector (tuple/tuple 1 2 1 2)
+                                   (tuple/tuple 2 1 2 1)
+                                   (tuple/tuple 1 1 1 1)
+                                   (tuple/tuple 4 4 4 4)))))))
 
 (deftest test-sub
   (testing "subtracting two points"

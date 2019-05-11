@@ -74,5 +74,7 @@
 (defn tuple [x y z w]
   (->Tuple x y z w))
 
-(defn add-all [op & args]
-  (multi-binary-tuple-operation + op args))
+(defn add-all [args]
+  (reduce #(add % %2)
+          (tuple 0 0 0 0)
+          args))
