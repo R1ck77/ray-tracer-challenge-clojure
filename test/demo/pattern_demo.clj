@@ -47,11 +47,14 @@
                       (shapes/change-material (materials/material :diffuse 0.7
                                                                   :specular 0.3
                                                                   :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring [1 1 1] [0.0 0 0.0]) 
-                                                                                                                              (fn [[x y z]]
-                                                                                                                                (let [noise (perlin/noise perlin-data [x y z])]
-                                                                                                                                  (vector (+ x noise)
-                                                                                                                                          y
-                                                                                                                                          (+ z noise)))))
+                                                                                                                              (fn [point]
+                                                                                                                                (let [noise (perlin/noise perlin-data
+                                                                                                                                                          (vector (:x point)
+                                                                                                                                                                  (:y point)
+                                                                                                                                                                  (:z point)))]
+                                                                                                                                  (point/point (+ (:x point) noise)
+                                                                                                                                               (:y point)
+                                                                                                                                               (+ (:z point) noise)))))
                                                                                                      (transform/scale 0.5 0.125 0.125
                                                                                                                       (transform/rotate-z 0.23423)))))
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
