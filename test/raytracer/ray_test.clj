@@ -21,16 +21,16 @@
   (let [ray (ray/ray (point/point 2 3 4)
                      (svector/svector 1 0 0))]
     (testing "t=0"
-      (is (v= (point/point 2 3 4)
+      (is (t= (point/point 2 3 4)
               (ray/position ray 0))))
     (testing "t=1"
-      (is (v= (point/point 3 3 4)
+      (is (t= (point/point 3 3 4)
               (ray/position ray 1))))
     (testing "t=-1"
-      (is (v= (point/point 1 3 4)
+      (is (t= (point/point 1 3 4)
               (ray/position ray -1))))
     (testing "t=2.5"
-      (is (v= (point/point 4.5 3 4)
+      (is (t= (point/point 4.5 3 4)
               (ray/position ray 2.5))))))
 
 (deftest test-transform
@@ -38,11 +38,11 @@
                      (svector/svector 0 1 0))]
     (testing "translating a ray"
       (let [result (ray/transform ray (transform/translate 3 4 5))]
-        (is (v= [4 6 8 1] (:origin result)))
-        (is (v= [0 1 0 0] (:direction result)))))
+        (is (t= (point/point 4 6 8) (:origin result)))
+        (is (t= (svector/svector 0 1 0) (:direction result)))))
     (testing "scaling a ray"
       (let [result (ray/transform ray (transform/scale 2 3 4))]
-        (is (v= [2 6 12 1] (:origin result)))
-        (is (v= [0 3 0 0] (:direction result)))))))
+        (is (t= (point/point 2 6 12) (:origin result)))
+        (is (t= (svector/svector 0 3 0) (:direction result)))))))
 
 

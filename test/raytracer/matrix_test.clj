@@ -1,6 +1,7 @@
 (ns raytracer.matrix-test
   (:require [clojure.test :refer :all]
-            [raytracer.test-utils :refer [v= eps=]]
+            [raytracer.test-utils :refer [v= eps= t=]]
+            [raytracer.point :as point]
             [raytracer.matrix :as matrix]))
 
 ;;; TODO/FIXME trying hard not to use types
@@ -94,9 +95,8 @@
              2 4 4 2
              8 6 4 1
              0 0 0 1]
-          b [1 2 3 1]]
-      (is (v= [18 24 33 1]
-                 (matrix/transform a b))))))
+          b (point/point 1 2 3)]
+      (is (t= (point/point 18 24 33) (matrix/transform a b))))))
 
 (deftest test-transpose
   (testing "transposing a matrix"

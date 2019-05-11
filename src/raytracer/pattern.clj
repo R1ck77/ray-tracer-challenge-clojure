@@ -16,7 +16,7 @@
   (create-pattern color color solid-function))
 
 (defn- stripe-function [pattern point]
-  (if (zero? (mod (int (Math/floor (first point))) 2))
+  (if (zero? (mod (int (Math/floor (:x point))) 2))
     (:a pattern)
     (:b pattern)))
 
@@ -24,7 +24,7 @@
   (create-pattern white black stripe-function))
 
 (defn- gradient-function [pattern point]
-  (let [x (first point)
+  (let [x (:x point)
         p (- x (Math/floor x))]
     (color/add (color/scale (:a pattern) (- 1 x))
                (color/scale (:b pattern) x))))
@@ -32,14 +32,18 @@
 (defn gradient [white black]
   (create-pattern white black gradient-function))
 
-(defn- test-pattern-function [pattern [x y z _]]
-  [x y z])
+(defn- test-pattern-function [pattern point]
+  [(:x point)
+   (:y point)
+   (:z point)])
 
 (defn test []
   (create-pattern nil nil test-pattern-function))
 
-(defn- ring-function [pattern [x _ z _]]
-  (let [distance (Math/sqrt (+ (* x x) (* z z)))]
+(defn- ring-function [pattern point]
+  (let [x (:x point)
+        z (:z point)
+        distance (Math/sqrt (+ (* x x) (* z z)))]
                         (if (zero? (mod (int (Math/floor distance)) 2))
                           (:a pattern)
                           (:b pattern))))
@@ -47,10 +51,10 @@
 (defn ring [white black]
   (create-pattern white black ring-function))
 
-(defn- checker-function [pattern [x y z _]]
-  (if (zero? (mod (+ (int (Math/floor (+ 2e9 x)))
-                     (int (Math/floor (+ 2e9 y)))
-                     (int (Math/floor (+ 2e9 z)))) 2))
+(defn- checker-function [pattern point]
+  (if (zero? (mod (+ (int (Math/floor (+ 2e9 (:x point))))
+                     (int (Math/floor (+ 2e9 (:y point))))
+                     (int (Math/floor (+ 2e9 (:z point))))) 2))
     (:a pattern)
     (:b pattern)))
 

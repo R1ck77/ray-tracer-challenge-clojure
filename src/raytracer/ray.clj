@@ -10,10 +10,23 @@
 
 (set! *unchecked-math* true)
 
+(defprotocol RayCaster
+  (intersect [this direction]))
+
 (defrecord Ray [origin direction])
 
-(defn ray [origin direction]
-  (->Ray origin direction))
+(defn ray [origin shape]
+  (->Ray origin shape))
+
+(defn transform [input-ray matrix]
+  (ray (matrix/transform matrix (:origin input-ray))
+       (matrix/transform matrix (:direction input-ray))))
+
+(extend-type Ray
+  RayCaster
+  (intersect [this shape]
+    ((:local-intersect shape) shape (transform this (:inverse-transform shape)))))
+
 
 (defn normalize [ray]
   (assoc ray
@@ -23,9 +36,7 @@
   (tuple/add (:origin ray)
              (.mul (:direction ray) t)))
 
-(defn transform [input-ray matrix]
-  (ray (matrix/transform matrix (:origin input-ray))
-       (matrix/transform matrix (:direction input-ray))))
 
-(defn intersect [ray shape]
-  ((:local-intersect shape) shape (transform ray (:inverse-transform shape))))
+
+
+

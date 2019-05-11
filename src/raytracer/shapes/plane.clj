@@ -11,14 +11,14 @@
 (def EPSILON 1e-6)
 
 (defn- xz-plane-intersection [ray]
-  (- (/ (second (:origin ray))
-        (second (:direction ray)))))
+  (- (/ (:y (:origin ray))
+        (:y (:direction ray)))))
 
 (defn- intersect-plane-space [this-plane ray-in-plane-space]
-  (if (< (Math/abs (float (second (:direction ray-in-plane-space)))) EPSILON)
+  (if (< (Math/abs (float (:y (:direction ray-in-plane-space)))) EPSILON)
     []
-    (vector (intersection/intersection  (xz-plane-intersection ray-in-plane-space)
-                                        this-plane))))
+    (vector (intersection/intersection (xz-plane-intersection ray-in-plane-space)
+                                       this-plane))))
 
 (defn plane []
   {:material (materials/material)

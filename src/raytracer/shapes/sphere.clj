@@ -39,7 +39,7 @@
                             (point/point 0 0 0))))))
 
 (defn sphere []
-  {:center [0 0 0 1]
+  {:center (point/point 0 0 0)
    :radius 1.0
    :material (materials/material)
    :transform matrix/identity-matrix

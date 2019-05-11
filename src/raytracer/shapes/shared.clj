@@ -2,8 +2,8 @@
   (:require [raytracer.point :as point]
             [raytracer.svector :as svector]))
 
-(defn as-point [[x y z _]]
-  (point/point x y z))
+(defn as-point [v]
+  (point/point (:x v) (:y v) (:z v)))
 
-(defn as-vector [[x y z _]]
-  (svector/svector x y z))
+(defn as-vector [p]
+  (svector/svector (:x p) (:y p) (:z p)))

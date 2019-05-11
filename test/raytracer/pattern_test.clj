@@ -97,14 +97,14 @@
 (deftest test-perturb-pattern
   (testing "Perturbing a pattern changes the coordinates received by the pattern"
     (let [perturbed-pattern (pattern/perturb-pattern (pattern/checker white black)
-                                                     (fn [[x y z]]
-                                                       (vector 1.1 0 0)))]
+                                                     (fn [point]
+                                                       (point/point 1.1 0 0)))]
       (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 0 0 0))))
       (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 0 0))))
       (is (v= black ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 1.1 0)))))
     (let [perturbed-pattern (pattern/perturb-pattern (pattern/checker white black)
-                                                     (fn [[x y z]]
-                                                       (vector 1.1 1.1 0)))]
+                                                     (fn [point]
+                                                       (point/point 1.1 1.1 0)))]
       (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 0 0 0))))
       (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 0 0))))
       (is (v= white ((:color-at perturbed-pattern) perturbed-pattern (point/point 1.1 1.1 0)))))))

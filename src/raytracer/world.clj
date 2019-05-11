@@ -57,7 +57,7 @@
   (flatten
    (persistent!
     (reduce (fn [acc object]
-              (conj! acc (.intersect ray object)))
+              (conj! acc (ray/intersect ray object)))
             (transient [])
             (:objects world)))))
 

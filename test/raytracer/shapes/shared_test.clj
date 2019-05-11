@@ -6,9 +6,9 @@
             [raytracer.shapes.shared :as shared]))
 
 (deftest test-as-point
-  (is (v= (point/point 1 2 3)
+  (is (t= (point/point 1 2 3)
           (shared/as-point (svector/svector 1 2 3)))))
 
 (deftest test-as-vector
-  (is (v= (svector/svector 1 2 3)
+  (is (t= (svector/svector 1 2 3)
           (shared/as-vector (point/point 1 2 3)))))
