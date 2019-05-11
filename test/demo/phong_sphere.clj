@@ -33,10 +33,9 @@
 
 ;;; TODO/FIXME most stuff can probably be cached
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 
-  (vector (* (first canvas-scale) (- x half-width))
-          (* (second canvas-scale) (- half-height y))
-          scene-z
-          1))
+  (point/point (* (first canvas-scale) (- x half-width))
+               (* (second canvas-scale) (- half-height y))
+               scene-z))
 
 (defn- seq-ray [scene]
   (let [pixel-to-coord-f (partial compute-pixel-coordinates
@@ -51,7 +50,7 @@
                                                (:camera scene))))})))
 
 (defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
-  (let [hit (intersection/hit (.intersect ray object))]
+  (let [hit (intersection/hit (ray/intersect ray object))]
     (if hit
       (let [point (ray/position ray (:t hit))
             color (phong/lighting object
