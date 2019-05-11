@@ -274,14 +274,14 @@
         (refraction-color world intermediate-result remaining)))
     zero-color))
 
-(defn view-transform [[from-x from-y from-z _ :as from] to up]
-  (let [[fwd-x fwd-y fwd-z _ :as forward] (.normalize (.sub to from))
-        [left-x left-y left-z _ :as left] (.cross forward (.normalize up))
-        [true-up-x true-up-y true-up-z _ :as true-up] (.cross left forward)]
-    (matrix/mul4 (vector left-x      left-y      left-z      0
-                         true-up-x   true-up-y   true-up-z   0
-                         (- fwd-x)   (- fwd-y)   (- fwd-z)   0
+(defn view-transform [from to up]
+  (let [forward (.normalize (.sub to from))
+        left (.cross forward (.normalize up))
+        true-up (.cross left forward)]
+    (matrix/mul4 (vector (:x left)      (:y left)      (:z left)      0
+                         (:x true-up)   (:y true-up)   (:z true-up)   0
+                         (- (:x forward))   (- (:y forward))   (- (:z forward))   0
                          0           0           0           1)
-                 (transform/translate (- from-x)
-                                      (- from-y)
-                                      (- from-z)))))
+                 (transform/translate (- (:x from))
+                                      (- (:y from))
+                                      (- (:z from))))))

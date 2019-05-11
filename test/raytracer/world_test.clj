@@ -60,9 +60,9 @@
         result (world/prepare-computations ray intersection [] 1)]
     (is (= (shapes/sphere) (:object result)))
     (is (= 4 (:t result)))
-    (is (v= (point/point 0 0 -1) (:point result)))
-    (is (v= (svector/svector 0 0 -1) (:eye-v result)))
-    (is (v= (svector/svector 0 0 -1) (:normal-v result)))
+    (is (t= (point/point 0 0 -1) (:point result)))
+    (is (t= (svector/svector 0 0 -1) (:eye-v result)))
+    (is (t= (svector/svector 0 0 -1) (:normal-v result)))
     (is (not (:inside result)))))
   (testing "The hit, when an intersection occurs on the outside"
     (let [ray (ray/ray (point/point 0 0 -5)
@@ -75,15 +75,15 @@
           intersection (intersection/intersection 1 (shapes/sphere))
           result (world/prepare-computations ray intersection [] 1)]
       (is (:inside result))
-      (is (v= (point/point 0 0 1) (:point result)))
-      (is (v= (svector/svector 0 0 -1) (:eye-v result)))
-      (is (v= (svector/svector 0 0 -1) (:normal-v result)))))
+      (is (t= (point/point 0 0 1) (:point result)))
+      (is (t= (svector/svector 0 0 -1) (:eye-v result)))
+      (is (t= (svector/svector 0 0 -1) (:normal-v result)))))
   (testing "Precomputing the reflection vector"
     (let [shape (shapes/plane)
           ray (ray/ray (point/point 0 1 -1)
                        (svector/svector 0 (- half√2) half√2))
           intersection (intersection/intersection √2 shape)]
-      (is (v= (svector/svector 0 half√2 half√2)
+      (is (t= (svector/svector 0 half√2 half√2)
               (:reflection (world/prepare-computations ray intersection [] 1))))))
   (testing "The hit should offset the point"
     (let [ray (ray/ray (point/point 0 0 -5)
@@ -93,10 +93,10 @@
           intersection (intersection/intersection 5 sphere)
           intermediate (world/prepare-computations ray intersection [] 1)
           ]
-      (is (< (nth (:over-point intermediate) 2)
+      (is (< (:z (:over-point intermediate))
              (/ (- world/EPSILON) 2)))
-      (is (> (nth (:point intermediate) 2)
-             (nth (:over-point intermediate) 2)))))
+      (is (> (:z (:point intermediate))
+             (:z (:over-point intermediate))))))
   (testing "Finding n1 and n2 at various intersections"
     (let [sphere-a (-> (shapes/glass-sphere)
                        (shapes/change-transform (transform/scale 2 2 2))
@@ -142,8 +142,8 @@
                                                           intersection
                                                           [intersection]
                                                           1.0)
-          z-point (nth (:point intermediate-result) 2)
-          z-under-point (nth (:under-point intermediate-result) 2)]
+          z-point (:z (:point intermediate-result))
+          z-under-point (:z (:under-point intermediate-result))]
       (is (<= (* 0.5 world/EPSILON) z-under-point))
       (is (< z-point z-under-point)))))
 

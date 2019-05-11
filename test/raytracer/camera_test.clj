@@ -52,25 +52,25 @@
   (testing "Constructing a ray through the center of the canvas"
     (let [camera (camera/camera 201 101 halfπ)
           ray (camera/ray-for-pixel camera 100 50)]
-      (is (v= (point/point 0 0 0)
+      (is (t= (point/point 0 0 0)
               (:origin ray)))
-      (is (v= (svector/svector 0 0 -1)
+      (is (t= (svector/svector 0 0 -1)
               (:direction ray)))))
   (testing "Constructing a ray through a corner of the canvas"
     (let [camera (camera/camera 201 101 halfπ)
           ray (camera/ray-for-pixel camera 0 0)]
-      (is (v= (point/point 0 0 0)
+      (is (t= (point/point 0 0 0)
               (:origin ray)))
-      (is (v= (svector/svector 0.66519, 0.33259, -0.66851)
+      (is (t= (svector/svector 0.66519, 0.33259, -0.66851)
               (:direction ray)))))
   (testing "Constructing a ray when the camera is transformed"
     (let [camera (camera/camera 201 101 halfπ)
           transform (transform/rotate-y partπ (transform/translate 0 -2 5)) 
           transformed-camera (camera/set-transform camera transform)
           ray (camera/ray-for-pixel transformed-camera 100 50)]
-      (is (v= (point/point 0 2 -5)
+      (is (t= (point/point 0 2 -5)
               (:origin ray)))
-      (is (v= (svector/svector half√2 0 (- half√2))
+      (is (t= (svector/svector half√2 0 (- half√2))
               (:direction ray))))))
 
 (deftest test-render
