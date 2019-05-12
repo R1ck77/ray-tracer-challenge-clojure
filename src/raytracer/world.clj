@@ -14,7 +14,7 @@
             [raytracer.phong :as phong]))
 
 (def ^:dynamic *maximum-reflections* 8)
-(def ^:dynamic *basic-shade-detection* false)
+(def ^:dynamic *basic-shade-detection* true)
 
 (def EPSILON 1e-6)
 
