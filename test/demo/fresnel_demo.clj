@@ -36,7 +36,7 @@
                       (shapes/change-material (materials/material :color (color/color 0 0 0.002)
                                                                   :shiness 400
                                                                   :specular 0.999
-                                                                  :diffuse 0.7
+                                                                  :diffuse 0.1
                                                                   :specular 0.3
                                                                   :refractive-index 1.52
                                                                   :reflectivity 0.05
@@ -44,13 +44,13 @@
                       (shapes/change-transform (transform/translate 0.0 0 0.0))))
 
 (def air-bubble (-> (shapes/sphere)
-                    (shapes/change-material (materials/material :diffuse 0.7
+                    (shapes/change-material (materials/material :diffuse 0.01
                                                                 :specular 0.3
                                                                 :refractive-index 1.000290
-                                                                :reflectivity 0.05
-                                                                :transparency 0.95))
+                                                                :reflectivity 0.1
+                                                                :transparency 0.99))
                        
-                    (shapes/change-transform (transform/translate 0.0 0 0.0))))
+                    (shapes/change-transform (transform/scale 0.98 0.98 0.98))))
 
 
 (def world (-> (world/create)
