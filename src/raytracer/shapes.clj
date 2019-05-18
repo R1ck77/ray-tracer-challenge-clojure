@@ -19,14 +19,5 @@
 (defn sphere []
   (sphere-ns/sphere))
 
-(defn- glass-object [shape] ;;; TODO/FIXME is this a fixture and belongs to the tests?
-  (change-material shape
-                   (material/update-material (:material shape)
-                                              :transparency 1.0
-                                              :refractive-index 1.5)))
-
-(defn glass-sphere []
-  (glass-object (sphere-ns/sphere)))
-
 (defn plane []
   (plane-ns/plane))

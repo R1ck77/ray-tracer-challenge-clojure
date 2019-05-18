@@ -9,6 +9,7 @@
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes-test :as shapes-test]
             [raytracer.material :as material]
             [raytracer.transform :as transform]
             [raytracer.pattern :as pattern]
@@ -99,13 +100,13 @@
       (is (> (:z (:point intermediate))
              (:z (:over-point intermediate))))))
   (testing "Finding n1 and n2 at various intersections"
-    (let [sphere-a (-> (shapes/glass-sphere)
+    (let [sphere-a (-> (shapes-test/glass-sphere)
                        (shapes/change-transform (transform/scale 2 2 2))
                        (shapes/update-material #(material/update-material % :refractive-index 1.5)))
-          sphere-b (-> (shapes/glass-sphere)
+          sphere-b (-> (shapes-test/glass-sphere)
                        (shapes/change-transform (transform/translate 0 0 -0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.0)))
-          sphere-c (-> (shapes/glass-sphere)
+          sphere-c (-> (shapes-test/glass-sphere)
                        (shapes/change-transform (transform/translate 0 0 0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.5)))
           ray (ray/ray (point/point 0 0 -4)
@@ -136,7 +137,7 @@
         (is (eps= 1.0 (:n2 intermediate-result))))))
   (testing "The under point is offset below the surface"
     (let [intersection (intersection/intersection 5
-                                                  (shapes/change-transform (shapes/glass-sphere)
+                                                  (shapes/change-transform (shapes-test/glass-sphere)
                                                                            (transform/translate 0 0 1)))
           intermediate-result (world/prepare-computations (ray/ray (point/point 0 0 -5)
                                                                    (svector/svector 0 0 1))
@@ -469,7 +470,7 @@
 
 (deftest test-schlick
   (testing "The Schlick approximation under total internal reflection"
-    (let [shape (shapes/glass-sphere)
+    (let [shape (shapes-test/glass-sphere)
           ray (ray/ray (point/point 0 0 half√2)
                        (svector/svector 0 1 0))
           intersections [(intersection/intersection (- half√2) shape)
@@ -479,7 +480,7 @@
                                                            intersections 1)]
       (is (eps= 1 (world/schlick intermediate-results)))))
   (testing "The Schlick approximation with a perpendicular viewing angle"
-    (let [shape (shapes/glass-sphere)
+    (let [shape (shapes-test/glass-sphere)
           ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 1 0))
           intersections [(intersection/intersection -1 shape)
@@ -489,7 +490,7 @@
                                                            intersections 1)]
       (is (eps= 0.04 (world/schlick intermediate-results)))))
   (testing "The Schlick approximation with small angle and n2 > n1"
-    (let [shape (shapes/glass-sphere)
+    (let [shape (shapes-test/glass-sphere)
           ray (ray/ray (point/point 0 0.99 -2)
                        (svector/svector 0 0 1))
           intersections [(intersection/intersection 1.8589 shape)]
