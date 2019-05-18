@@ -1,44 +1,41 @@
-# raytracer
+# Clojure implementation of "The Ray Tracing Challenge" by Jamis Buck
 
-FIXME: description
+Made for educational and entertainment purposes. Still work in progress.
 
-## Installation
+The first part of the project was put together deliberately avoiding Object Oriented design and disregarding otimizations in favor of a clean FP approach, as a way to better appreciate both OO and FP.
 
-Download from http://example.com/FIXME.
+Being an educational project and a way to enjoy programming for its own sake, experimentation and fun design are favored above everything else.
 
-## Usage
+## Installation and Usage
 
-FIXME: explanation
+This is a leiningen project (If you don't know what this is, check https://leiningen.org/): after you have cloned the project you can get a very quick rendering using the 
 
-    $ java -jar raytracer-0.1.0-standalone.jar [args]
+    lein with-profile timed-run run
 
-## Options
+command. 
 
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
+A bunch of other demos (loosely matching the end of chapter exercises) can be found in the ``demo`` namespace (in the ``tests`` package).
 
 ### Bugs
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+Probably many: use at your own risk.
 
 ## License
 
-Copyright © 2019 FIXME
+Copyright © 2019 Riccardo Di Meo
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+THIS WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+Distribution or inclusion of this work as a compiled jar not including the source
+code is provided under the Creative Commons CC0 1.0 license, which is available
+here: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Other forms of distributions are covered under the terms of the Creative
+Commons "Attribution 4.0 International" license, which is available at 
+https://creativecommons.org/licenses/by/4.0/legalcode 
