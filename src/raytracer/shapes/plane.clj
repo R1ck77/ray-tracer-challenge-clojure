@@ -27,8 +27,9 @@
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))
   shared/Surface
-  (compute-normal [_ _]
-    (svector/svector 0 1 0)))
+  (compute-normal [this _]
+    (matrix/transform (:inverse-transform this)
+                      (svector/svector 0 1 0))))
 
 (defn plane []
   (map->Plane {:material (materials/material)
