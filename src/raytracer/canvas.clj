@@ -16,7 +16,6 @@
        (index (:width canvas) x y)))
 
 (defn write [canvas x y color]
-  ;;; TODO/FIXME this is gonna cost me *a lot* :)
   (update canvas :pixels
           (fn [pixels]
             (assoc pixels (index (:width canvas) x y) color))))
