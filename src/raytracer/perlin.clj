@@ -74,10 +74,12 @@
   {:corners (compute-corners neighbors scaled-point)
    :point scaled-point})
 
-(defn get-pbc [perlin-data [x y :as point]]
+(defn- to-pbc-coordinates [perlin-data point]
+  (map #(mod % %2) point (:dimensions perlin-data)))
+
+(defn get-pbc [perlin-data point]
   (apply (partial aget (:grid perlin-data))
-         ;;; TODO/FIXME name this thing!
-         (reverse (map #(mod % %2) point (:dimensions perlin-data)))))
+         (reverse (to-pbc-coordinates perlin-data point))))
 
 (defn- recover-gradients
   [perlin-data corners]
