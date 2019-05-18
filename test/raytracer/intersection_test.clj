@@ -8,7 +8,7 @@
             [raytracer.intersection :as intersection]
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
-            [raytracer.materials :as materials]))
+            [raytracer.material :as material]))
 
 (deftest test-intersection
   (testing "create new intersection"

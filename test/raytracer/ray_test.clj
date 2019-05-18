@@ -7,7 +7,7 @@
             [raytracer.ray :as ray]
             [raytracer.shapes :as shapes]
             [raytracer.transform :as transform]
-            [raytracer.materials :as materials]))
+            [raytracer.material :as material]))
 
 (deftest test-ray
   (testing "ray creation"

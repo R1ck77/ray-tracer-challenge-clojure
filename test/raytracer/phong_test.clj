@@ -6,12 +6,12 @@
             [raytracer.svector :as svector]
             [raytracer.color :as color]            
             [raytracer.shapes :as shapes]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]))
 
 (def half√2 (/ (Math/sqrt 2) 2))
-(def material (materials/material))
+(def material (material/material))
 (def position (point/point 0 0 0))
 
 (defn test-object [material]
@@ -61,7 +61,7 @@
       (is (c= (color/color 0.1 0.1 0.1)
               (phong/lighting (test-object material) light position eye normal)))))
   (testing "Lighting with a pattern applied"
-    (let [material (materials/material :ambient 1, :diffuse 0, :specular 0,
+    (let [material (material/material :ambient 1, :diffuse 0, :specular 0,
                                        :pattern (pattern/stripe (color/color 1 1 1)
                                                                 (color/color 0 0 0)))
           eye (svector/svector 0 0 -1)
@@ -73,7 +73,7 @@
       (is (c= (color/color 0 0 0)
               (phong/lighting (test-object material) light (point/point 1.1 0 0) eye normal 1.0)))))
   (testing "Lighting with a pattern applied: golden master with partial shadowing"
-    (let [material (materials/material :ambient 1, :diffuse 0, :specular 0,
+    (let [material (material/material :ambient 1, :diffuse 0, :specular 0,
                                        :pattern (pattern/stripe (color/color 1 1 1)
                                                                 (color/color 0 0 0)))
           eye (svector/svector 0 0 -1)

@@ -4,7 +4,7 @@
             [raytracer.point :as point]
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
 (set! *unchecked-math* true)
@@ -52,6 +52,6 @@
 
 (defn sphere []
   (map->Sphere 
-   {:material (materials/material)
+   {:material (material/material)
     :transform matrix/identity-matrix
     :inverse-transform matrix/identity-matrix}))

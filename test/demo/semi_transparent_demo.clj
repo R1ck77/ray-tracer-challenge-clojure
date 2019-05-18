@@ -6,7 +6,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
             [raytracer.pattern :as pattern]
@@ -23,7 +23,7 @@
 
 ;;; Set the y to 5 and stranger things start happening
 (def water (-> (shapes/plane)
-               (shapes/change-material (materials/material :color [0 0 0.01]
+               (shapes/change-material (material/material :color [0 0 0.01]
                                                            :specular 1
                                                            :shiness 300
                                                            :reflectivity 0.8
@@ -32,7 +32,7 @@
                (shapes/change-transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
-                     (shapes/change-material (materials/material :specular 0.1
+                     (shapes/change-material (material/material :specular 0.1
                                                                  :ambient 0.05
                                                                  :reflectivity 0.0
                                                                  :transparency 0.0
@@ -41,7 +41,7 @@
 
 
 (def matte-sphere (-> (shapes/sphere)
-                      (shapes/change-material (materials/material :color [0.9 0 0]
+                      (shapes/change-material (material/material :color [0.9 0 0]
                                                                   :shiness 100
                                                                   :specular 0.8
                                                                   :diffuse 0.7
@@ -55,7 +55,7 @@
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           [1 1 1]))
                (world/set-objects [water pool-bottom matte-sphere])
-               (update :material #(materials/update-material % :color [0.1 0.1 0.3]))))
+               (update :material #(material/update-material % :color [0.1 0.1 0.3]))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))

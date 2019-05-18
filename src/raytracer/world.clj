@@ -9,7 +9,7 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]
             [raytracer.matrix :as matrix]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
@@ -23,7 +23,7 @@
 (defn create [] ;;; TODO/FIXME change name to "world"
   {:objects []
    :light-sources #{}
-   :material materials/void-material})
+   :material material/void-material})
 
 (defn add-object [world object]
   (update world :objects #(conj % object)))
@@ -46,7 +46,7 @@
   []
   (-> (create)
       (add-object (shapes/change-material (shapes/sphere)
-                                          (materials/material :color (color/color 0.8 1.0 0.6)
+                                          (material/material :color (color/color 0.8 1.0 0.6)
                                                               :diffuse 0.7
                                                               :specular 0.2)))
       (add-object (shapes/change-transform (shapes/sphere)

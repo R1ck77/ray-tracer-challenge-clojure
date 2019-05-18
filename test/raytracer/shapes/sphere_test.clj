@@ -8,13 +8,13 @@
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.shapes.sphere :as sphere]))
 
 (deftest test-sphere
   (let [sphere (shapes/sphere)]
     (testing "create a sphere"
-      (is (= (materials/material) (:material sphere)))
+      (is (= (material/material) (:material sphere)))
       (is (identical? matrix/identity-matrix (:transform sphere))))
     (testing "update a sphere's transformation"
       (let [transform (transform/translate 2 3 4)
@@ -22,7 +22,7 @@
         (is (identical? transform
                         (:transform new-sphere)))))
     (testing "a sphere may be assigned a material"
-      (let [new-material (assoc (materials/material) :ambient 0.25)]
+      (let [new-material (assoc (material/material) :ambient 0.25)]
         (is (= new-material
                (:material (shapes/change-material sphere new-material))))))))
 

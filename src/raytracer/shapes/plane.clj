@@ -3,7 +3,7 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
 (set! *unchecked-math* true)
@@ -32,6 +32,6 @@
                       (svector/svector 0 1 0))))
 
 (defn plane []
-  (map->Plane {:material (materials/material)
+  (map->Plane {:material (material/material)
                :transform matrix/identity-matrix
                :inverse-transform matrix/identity-matrix}))

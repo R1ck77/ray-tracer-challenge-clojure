@@ -6,7 +6,7 @@
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
             [raytracer.world :as world]))
@@ -16,7 +16,7 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def room-material (materials/material :specular 0.0
+(def room-material (material/material :specular 0.0
                                        :color (color/color 1 0.9 0.9)))
 
 (def floor (-> (shapes/sphere)
@@ -38,16 +38,16 @@
                                                (transform/translate 0 0 5)))))
 
 (def left-sphere (-> (shapes/sphere)
-                     (shapes/change-material (materials/material :color (color/color 1 0.8 0.1), :diffuse 0.7, :specular 0.3))
+                     (shapes/change-material (material/material :color (color/color 1 0.8 0.1), :diffuse 0.7, :specular 0.3))
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                                 (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
-                       (shapes/change-material (materials/material :color (color/color 0.1 1 0.5), :diffuse 0.7, :specular 0.3))
+                       (shapes/change-material (material/material :color (color/color 0.1 1 0.5), :diffuse 0.7, :specular 0.3))
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
-                      (shapes/change-material (materials/material :color (color/color 0.5 1 0.1), :diffuse 0.7, :specular 0.3))
+                      (shapes/change-material (material/material :color (color/color 0.5 1 0.1), :diffuse 0.7, :specular 0.3))
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
 

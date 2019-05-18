@@ -1,6 +1,6 @@
 (ns raytracer.shapes-test
   (:require [clojure.test :refer :all]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.shapes :as shapes]))
 
 (deftest test-glass-object
@@ -12,4 +12,4 @@
 (deftest test-update-maerial
   (testing "Can update a material using a specific function"
     (is (= 10 (:shiness (:material (shapes/update-material (shapes/glass-sphere)
-                                                           #(materials/update-material % :shiness 10))))))))
+                                                           #(material/update-material % :shiness 10))))))))

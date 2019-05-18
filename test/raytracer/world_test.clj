@@ -9,7 +9,7 @@
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.transform :as transform]
             [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]))
@@ -34,7 +34,7 @@
   (testing "The default world"
     (let [world (world/default-world)
           expected-sphere1 (shapes/change-material (shapes/sphere)
-                                                   (materials/material :color (color/color 0.8 1.0 0.6)
+                                                   (material/material :color (color/color 0.8 1.0 0.6)
                                                                        :diffuse 0.7
                                                                        :specular 0.2))
           expected-sphere2 (shapes/change-transform (shapes/sphere)
@@ -101,13 +101,13 @@
   (testing "Finding n1 and n2 at various intersections"
     (let [sphere-a (-> (shapes/glass-sphere)
                        (shapes/change-transform (transform/scale 2 2 2))
-                       (shapes/update-material #(materials/update-material % :refractive-index 1.5)))
+                       (shapes/update-material #(material/update-material % :refractive-index 1.5)))
           sphere-b (-> (shapes/glass-sphere)
                        (shapes/change-transform (transform/translate 0 0 -0.25))
-                       (shapes/update-material #(materials/update-material % :refractive-index 2.0)))
+                       (shapes/update-material #(material/update-material % :refractive-index 2.0)))
           sphere-c (-> (shapes/glass-sphere)
                        (shapes/change-transform (transform/translate 0 0 0.25))
-                       (shapes/update-material #(materials/update-material % :refractive-index 2.5)))
+                       (shapes/update-material #(material/update-material % :refractive-index 2.5)))
           ray (ray/ray (point/point 0 0 -4)
                        (svector/svector 0 0 1))
           intersections (vec (map #(apply intersection/intersection %) [[2 sphere-a]
@@ -189,7 +189,7 @@
     (let [template-shape (shapes/plane)
           shape (shapes/change-material (shapes/change-transform template-shape
                                                                  (transform/translate 0 -1 0))
-                                        (materials/update-material (:material template-shape)
+                                        (material/update-material (:material template-shape)
                                                                    :reflectivity 0.5))
           world (world/add-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
@@ -200,11 +200,11 @@
   (testing "shade_hit() with a transparent material"
     (let [floor (-> (shapes/plane)
                     (shapes/change-transform (transform/translate 0 -1 0))
-                    (shapes/change-material (materials/material :transparency 0.5
+                    (shapes/change-material (material/material :transparency 0.5
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (materials/material :color (color/color 1 0 0)
+                   (shapes/change-material (material/material :color (color/color 1 0 0)
                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
@@ -224,12 +224,12 @@
                        (svector/svector 0 (- half√2) half√2))
           floor (-> (shapes/plane)
                     (shapes/change-transform (transform/translate 0 -1 0))
-                    (shapes/change-material (materials/material :reflectivity 0.5
+                    (shapes/change-material (material/material :reflectivity 0.5
                                                                 :transparency 0.5
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (materials/material :color (color/color 1 0 0)
+                   (shapes/change-material (material/material :color (color/color 1 0 0)
                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
@@ -268,7 +268,7 @@
     (let [light (light-sources/create-point-light (point/point 0 0 0)
                                                   (color/color 1 1 1))
           reflective-plane (shapes/change-material (shapes/plane)
-                                                   (materials/material :reflectivity 1))
+                                                   (material/material :reflectivity 1))
           lower-plane (shapes/change-transform reflective-plane (transform/translate 0 -1 0))
           upper-plane (shapes/change-transform reflective-plane (transform/translate 0 1 0))
           world (-> (world/default-world)
@@ -308,15 +308,15 @@
 
 (defn- create-shadow-test-world [light-position]
   (let [floor0 (-> (shapes/plane)
-                   (shapes/update-material (fn [_] (materials/material :transparency 0.0))))
+                   (shapes/update-material (fn [_] (material/material :transparency 0.0))))
         floor1 (-> (shapes/plane)
-                   (shapes/update-material (fn [_] (materials/material :transparency 0.2)))
+                   (shapes/update-material (fn [_] (material/material :transparency 0.2)))
                    (shapes/change-transform (transform/translate 0 10 0)))
         floor2 (-> (shapes/plane)
-                   (shapes/update-material (fn [_] (materials/material :transparency 0.3)))
+                   (shapes/update-material (fn [_] (material/material :transparency 0.3)))
                    (shapes/change-transform (transform/translate 0 20 0)))
         floor3 (-> (shapes/plane)
-                   (shapes/update-material (fn [_] (materials/material :transparency 0.4)))
+                   (shapes/update-material (fn [_] (material/material :transparency 0.4)))
                    (shapes/change-transform (transform/translate 0 30 0)))]
     (-> (world/create)
         (world/set-objects [floor0 floor1 floor2 floor3])
@@ -366,7 +366,7 @@
 
 (defn- update-ambient [shape]
   (shapes/change-material shape
-                          (materials/update-material (:material shape)
+                          (material/update-material (:material shape)
                                                      :ambient 1)))
 
 (defn- change-second-object-material [world]
@@ -391,7 +391,7 @@
     (let [template-shape (shapes/plane)
           shape (shapes/change-material (shapes/change-transform template-shape
                                                                  (transform/translate 0 -1 0))
-                                        (materials/update-material (:material template-shape)
+                                        (material/update-material (:material template-shape)
                                                                    :reflectivity 0.5))
           world (world/add-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
@@ -401,7 +401,7 @@
               (world/reflected-color world (world/prepare-computations ray intersection [] 1) 1)))))
   (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
-                    (shapes/change-material (materials/material :reflectivity 0.5))
+                    (shapes/change-material (material/material :reflectivity 0.5))
                     (shapes/change-transform (transform/translate 0 -1 0)))
           world (world/set-objects (world/default-world) plane)
           ray (ray/ray (point/point 0 0 -3)
@@ -424,7 +424,7 @@
                                      1)))))
   (testing "The refracted color at maximum recursive depth"
     (let [shape (shapes/change-material (first (:objects (world/default-world)))
-                                        (materials/material :transparency 1.0
+                                        (material/material :transparency 1.0
                                                             :refractive-index 1.5))
           world (world/set-objects (world/default-world) (vector shape))
           ray (ray/ray (point/point 0 0 -5)                       
@@ -437,7 +437,7 @@
                                      0)))))
   (testing "The refracted color under total internal refraction"
     (let [shape (shapes/change-material (first (:objects (world/default-world)))
-                                        (materials/material :refractive-index 1.5
+                                        (material/material :refractive-index 1.5
                                                             :transparency 1.0))
           world (world/set-objects (world/default-world) [shape])
           ray (ray/ray (point/point 0 0 half√2)
@@ -448,10 +448,10 @@
       (is (c= (color/color 0 0 0) (world/refracted-color world intermediate-result 10)))))
   (testing "The refracted color with a refracted ray"
     (let [shape-a (shapes/change-material (first (:objects (world/default-world)))
-                                          (materials/material :ambient 1.0
+                                          (material/material :ambient 1.0
                                                               :pattern (pattern/test)))
           shape-b (shapes/change-material (second (:objects (world/default-world)))
-                                          (materials/material :transparency 1.0
+                                          (material/material :transparency 1.0
                                                               :refractive-index 1.5))
           world (world/set-objects (world/default-world) [shape-a shape-b])
           ray (ray/ray (point/point 0 0 0.1)

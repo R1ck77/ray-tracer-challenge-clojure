@@ -10,7 +10,7 @@
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
@@ -18,7 +18,7 @@
 (def ^:dynamic canvas-scale [0.1 0.1])
 (def color (color/color 255 0 0))
 (def sphere-template (shapes/change-material (shapes/sphere)
-                                             (assoc (materials/material) :color (color/color 1 0.2 1))))
+                                             (assoc (material/material) :color (color/color 1 0.2 1))))
 
 (defn- create-simple-scene
   "Naive setup: the screen position in the scene decides the FOV and VFOV

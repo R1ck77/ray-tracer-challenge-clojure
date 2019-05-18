@@ -2,7 +2,7 @@
   (:require [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.color :as color]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.ray :as ray]))
 
 (def EPSILON 1e-5)
@@ -44,7 +44,7 @@
    (lighting object light-source position eye normal 1))
   ([object light-source position eye normal shadow-attenuation]
    (let [material (:material object)
-         effective-color (color/mul (materials/get-color object position)
+         effective-color (color/mul (material/get-color object position)
                                     (:intensity light-source))
          ambient-color (compute-ambient effective-color material)]
      (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))

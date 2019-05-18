@@ -1,4 +1,4 @@
-(ns raytracer.materials ;;;TODO/FIXME change the name to material
+(ns raytracer.material
   (:require [raytracer.color :as color]
             [raytracer.pattern :as pattern]))
 

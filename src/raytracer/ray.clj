@@ -7,7 +7,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
-            [raytracer.materials :as materials]))
+            [raytracer.material :as material]))
 
 (set! *unchecked-math* true)
 

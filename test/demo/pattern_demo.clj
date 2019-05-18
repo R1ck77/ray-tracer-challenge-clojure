@@ -7,7 +7,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
-            [raytracer.materials :as materials]
+            [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
             [raytracer.pattern :as pattern]
@@ -21,7 +21,7 @@
 
 (def perlin-data (perlin/create-perlin-data [3 3 3]))
 
-(def room-material (materials/material :specular 0.0
+(def room-material (material/material :specular 0.0
                                        :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
                                                                                            (color/color 0 0 1))
                                                                           matrix/identity-matrix)))
@@ -31,7 +31,7 @@
                (shapes/change-transform (transform/translate 0 -0.0001 0))))
 
 (def left-sphere (-> (shapes/sphere)
-                     (shapes/change-material (materials/material :diffuse 0.7, :specular 0.3
+                     (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
                                                                  :pattern (pattern/change-transform (pattern/stripe (color/color 1 0 0)
                                                                                                                     (color/color 1 1 1))
                                                                                                     (transform/scale 0.2 0.2 0.2
@@ -40,7 +40,7 @@
                                                 (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
-                       (shapes/change-material (materials/material :diffuse 0.7
+                       (shapes/change-material (material/material :diffuse 0.7
                                                                    :specular 0.3
                                                                    :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
                                                                                                                         (color/color 0 0 1))
@@ -48,7 +48,7 @@
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
-                      (shapes/change-material (materials/material :diffuse 0.7
+                      (shapes/change-material (material/material :diffuse 0.7
                                                                   :specular 0.3
                                                                   :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
                                                                                                                                             (color/color 0.0 0 0.0)) 
