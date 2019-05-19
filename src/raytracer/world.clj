@@ -203,7 +203,6 @@
           (color/add reflected)
           (color/add refracted)))))
 
-;; TODO/FIXME the rendering throws without a light source set!
 (defn shade-hit
   [world intermediate-result remaining]
   (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))

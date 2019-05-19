@@ -18,6 +18,8 @@
   (shapes/change-material (shapes/sphere) material))
 
 (deftest test-lighting
+  (testing "Lighting without a light source"
+    (is (c= color/black (phong/lighting (test-object material) nil (point/point 0 1 2) (svector/svector 0 1 4) (svector/svector 1 3 4)))))
   (testing "Lighting with the eye between the light and the surface"
     (let [eye (svector/svector 0 0 -1)
           normal (svector/svector 0 0 -1)

@@ -57,10 +57,12 @@
   ([object light-source position eye normal]
    (lighting object light-source position eye normal 1))
   ([object light-source position eye normal shadow-attenuation]
-   (let [effective-color (color/mul (material/get-color object position)
-                                    (:intensity light-source))
-         ambient-color (compute-ambient effective-color (:material object))]
-     (if (< (Math/abs (float shadow-attenuation)) EPSILON)
-             ambient-color
-             (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))]
-               (full-phong-lighting ambient-color (:material object) effective-color light-source light-vector eye normal shadow-attenuation))))))
+   (if (nil? light-source)
+     color/black
+     (let [effective-color (color/mul (material/get-color object position)
+                                      (:intensity light-source))
+           ambient-color (compute-ambient effective-color (:material object))]
+       (if (< (Math/abs (float shadow-attenuation)) EPSILON)
+         ambient-color
+         (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))]
+           (full-phong-lighting ambient-color (:material object) effective-color light-source light-vector eye normal shadow-attenuation)))))))
