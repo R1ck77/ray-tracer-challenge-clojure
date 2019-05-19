@@ -20,7 +20,7 @@
 
 (deftest test-create
   (testing "Creating a world"
-    (let [world (world/create)]
+    (let [world (world/world)]
       (is (empty? (:objects world)))
       (is (empty? (:light-sources world))))))
 
@@ -176,7 +176,7 @@
     (let [sphere1 (shapes/sphere)
           sphere2 (shapes/change-transform (shapes/sphere)
                                            (transform/translate 0 0 10))
-          world (-> (world/create)
+          world (-> (world/world)
                     (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) (color/color 1 1 1)))
                     (world/set-objects [sphere1 sphere2]))
           ray (ray/ray (point/point 0 0 5)
@@ -319,7 +319,7 @@
         floor3 (-> (shapes/plane)
                    (shapes/update-material (fn [_] (material/material :transparency 0.4)))
                    (shapes/change-transform (transform/translate 0 30 0)))]
-    (-> (world/create)
+    (-> (world/world)
         (world/set-objects [floor0 floor1 floor2 floor3])
         (world/set-light-sources (light-sources/create-point-light (apply point/point light-position)
                                                                    (color/color 1 1 1))))))

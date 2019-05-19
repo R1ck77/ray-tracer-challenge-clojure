@@ -51,7 +51,7 @@
                                                                   :transparency 0.01))                       
                       (shapes/change-transform (transform/translate -4 2 0 (transform/scale 4 4 4)))))
 
-(def world (-> (world/create)
+(def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           [1 1 1]))
                (world/set-objects [water pool-bottom matte-sphere])

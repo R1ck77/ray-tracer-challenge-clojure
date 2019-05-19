@@ -95,7 +95,7 @@
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                     (transform/translate 1.5 0.5 -0.5)))))
 
-(def world (-> (world/create)
+(def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
                (world/set-objects [floor left-sphere middle-sphere air-sphere back-sphere right-sphere])

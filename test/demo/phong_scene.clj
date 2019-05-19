@@ -51,7 +51,7 @@
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
 
-(def world (world/set-light-sources (world/set-objects (world/create) [floor left-wall right-wall
+(def world (world/set-light-sources (world/set-objects (world/world) [floor left-wall right-wall
                                                                        left-sphere middle-sphere right-sphere])
                                     (light-sources/create-point-light (point/point -10 10 -10)
                                                                       (color/color 1 1 1))))

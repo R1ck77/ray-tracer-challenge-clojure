@@ -20,7 +20,7 @@
 
 (def zero-color (color/color 0 0 0))
 
-(defn create [] ;;; TODO/FIXME change name to "world"
+(defn world []
   {:objects []
    :light-sources #{}
    :material material/void-material})
@@ -44,7 +44,7 @@
   but at least at the moment I'll keep it here because
   \"The Book made me do it.\""
   []
-  (-> (create)
+  (-> (world)
       (add-object (shapes/change-material (shapes/sphere)
                                           (material/material :color (color/color 0.8 1.0 0.6)
                                                               :diffuse 0.7

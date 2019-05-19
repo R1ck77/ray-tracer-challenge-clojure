@@ -53,7 +53,7 @@
                     (shapes/change-transform (transform/scale 0.98 0.98 0.98))))
 
 
-(def world (-> (world/create)
+(def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -100 100 -100)
                                                                           (color/color 2 2 2)))
                (world/set-objects [wall glass-sphere air-bubble])
