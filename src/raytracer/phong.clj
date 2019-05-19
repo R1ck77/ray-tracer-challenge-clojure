@@ -35,35 +35,32 @@
   (compute-if-positive light-dot-normal
                        #(compute-diffuse-value % effective-color material)))
 
+
+(defn- scaled-color [color shadow-attenuation]
+  (color/scale color shadow-attenuation))
+
+(defn- full-phong-lighting [ambient-color material effective-color light-source light-vector eye normal shadow-attenuation]
+  (let [light-dot-normal (tuple/dot light-vector normal)
+        diffuse (compute-diffuse light-dot-normal effective-color material)
+        specular (compute-specular light-dot-normal
+                                   (tuple/mul light-vector -1)
+                                   light-source
+                                   normal eye material)]
+    (-> ambient-color
+        (color/add (scaled-color diffuse shadow-attenuation))
+        (color/add (scaled-color specular shadow-attenuation)))))
+
 (defn- compute-ambient [effective-color material]
   (color/scale effective-color (:ambient material)))
-
-;;; TODO/FIXME can still be made tidier
-(defn- full-phong-lighting [object light-source position eye normal shadow-attenuation]
-  (let [material (:material object)
-        effective-color (color/mul (material/get-color object position)
-                                   (:intensity light-source))
-        light-vector (tuple/normalize (tuple/sub (:position light-source) position))
-        light-dot-normal (tuple/dot light-vector normal)]
-    (let [diffuse (color/scale (compute-diffuse light-dot-normal effective-color material) shadow-attenuation)
-          specular (color/scale (compute-specular light-dot-normal
-                                      (tuple/mul light-vector -1)
-                                      light-source
-                                      normal eye material) shadow-attenuation)]
-      (-> (compute-ambient effective-color material)
-          (color/add diffuse)
-          (color/add specular)))))
-
-;;; TODO/FIXME duplicated code, can be probably pushed up in the caller
-(defn- ambient-lighting [object light-source position]
-  (compute-ambient (color/mul (material/get-color object position)
-                              (:intensity light-source))
-                   (:material object)))
 
 (defn lighting
   ([object light-source position eye normal]
    (lighting object light-source position eye normal 1))
   ([object light-source position eye normal shadow-attenuation]
-   (if (< (Math/abs (float shadow-attenuation)) EPSILON)
-     (ambient-lighting object light-source position)
-     (full-phong-lighting object light-source position eye normal shadow-attenuation))))
+   (let [effective-color (color/mul (material/get-color object position)
+                                    (:intensity light-source))
+         ambient-color (compute-ambient effective-color (:material object))]
+     (if (< (Math/abs (float shadow-attenuation)) EPSILON)
+             ambient-color
+             (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))]
+               (full-phong-lighting ambient-color (:material object) effective-color light-source light-vector eye normal shadow-attenuation))))))
