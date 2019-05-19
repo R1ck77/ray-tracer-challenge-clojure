@@ -63,29 +63,21 @@
                                    2 6 10 14
                                    3 7 11 15]))
 
-(defn submatrix-fast [m n row column]
-  (let [get-f #(get-n m n % %2)
-        result (atom (transient []))]
-    (doseq [i (range n) j (range n)]
-      (when (and (not= i row) (not= j column))
-        (swap! result #(conj! % (get-f i j)))))
-    (persistent! @result)))
-
 (defn cells-indices-seq [n]
   (for [i (range n) j (range n)]
     (vector i j)))
 
-(defn submatrix-slow [m n row column]
+(defn submatrix
+  "Compute the submatrix of a matrix of size n
+
+  Probably on the slow side, but it's irrelevant given the number of inversions the ray tracer does"
+  [m n row column]
   (vec (let [get-f #(get-n m n % %2)]
      (map (fn [[i j]]
             (get-f i j))
           (filter (fn [[i j]]
                     (and (not= i row) (not= j column)))
                   (cells-indices-seq n))))))
-
-;;; TODO/FIXME let's see how many of those I'll have to use before throwing the fast version away
-(def submatrix submatrix-slow)
-
 
 (def det)
 
