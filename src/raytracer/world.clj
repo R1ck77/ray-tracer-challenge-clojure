@@ -102,11 +102,11 @@
                                (update frequencies (first reversed-list) #(dec %)))
      (get-first-odd-recurrence reversed-list frequencies)]))
 
-(defn- compute-refractive-indices [checked-intersection intersections world-refractive-index]
+(defn compute-refractive-indices [checked-intersection intersections world-refractive-index]
   (let [objects-transitions (compute-transitions intersections checked-intersection)
         [obj1 obj2] (compute-transition objects-transitions)]
-    [(convert-to-refractive-index obj1 world-refractive-index)
-     (convert-to-refractive-index obj2 world-refractive-index)]))
+    {:n1 (convert-to-refractive-index obj1 world-refractive-index)
+     :n2 (convert-to-refractive-index obj2 world-refractive-index)}))
 
 (defn- schlick-partial-reflection [n1 n2 cos]
   (let [r0 (Math/pow (/ (- n1 n2) (+ n1 n2)) 2)]
@@ -128,29 +128,30 @@
 (defn- is-inside? [eye-v normal-v]
   (< (tuple/dot eye-v normal-v) 0))
 
-;;; TODO/FIXME I don't care what the books says: too many arguments for my tastes, even without the world refractive-index
-(defn prepare-computations
-  [ray intersection all-intersections world-refractive-index]
-  (let [point (tuple/add (:origin ray)
-                         (tuple/mul (:direction ray)
-                                    (:t intersection)))
-        eye-v (tuple/neg (:direction ray))
-        object (:object intersection)
-        normal-v (shared/compute-normal object point)
-        inside (is-inside? eye-v normal-v)
-        normal-v (if inside (tuple/neg normal-v) normal-v)
-        [n1 n2] (compute-refractive-indices intersection all-intersections world-refractive-index)]
-    {:inside inside
-     :object object
-     :t (:t intersection)
-     :point  point
+(defn- compute-surface-parameters [ray object point eye-v]
+  (let [basic-normal-v (shared/compute-normal object point)
+        inside (is-inside? eye-v basic-normal-v)
+        normal-v (if inside (tuple/neg basic-normal-v) basic-normal-v)]
+    {:inside inside     
+     :normal-v normal-v
      :over-point (tuple/add point (tuple/mul normal-v EPSILON))
      :under-point (tuple/add point (tuple/mul normal-v (- EPSILON)))
-     :eye-v eye-v
-     :normal-v normal-v
-     :reflection (tuple/reflect (:direction ray) normal-v)
-     :n1 n1
-     :n2 n2}))
+     :reflection (tuple/reflect (:direction ray) normal-v)}))
+
+(defn prepare-computations
+  [ray intersection refractive-indices]
+  (let [object (:object intersection)
+        ray-direction (:direction ray)
+        point (tuple/add (:origin ray)
+                         (tuple/mul ray-direction
+                                    (:t intersection)))
+        eye-v (tuple/neg ray-direction)]
+    (merge {:object object
+            :point point
+            :eye-v eye-v
+            :t (:t intersection)}
+           refractive-indices
+           (compute-surface-parameters ray object point eye-v))))
 
 (defn- filtered-transparencies [intersections light-distance]
   (map #(-> % :object :material :transparency)
@@ -225,8 +226,9 @@
      (if intersection
        (shade-hit world (prepare-computations ray
                                               intersection
-                                              intersections
-                                              (-> world :material :refractive-index))
+                                              (compute-refractive-indices intersection
+                                                                          intersections
+                                                                          (-> world :material :refractive-index)))
                   remaining)
        (-> world :material :color)))))
 
