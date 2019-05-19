@@ -21,6 +21,7 @@
      :half-width half-width
      :half-height half-height}))
 
+;;; TODO/FIXME use a record!
 (defn camera [h-size v-size field-of-view]
   (let [partial-camera {:h-size h-size
                         :v-size v-size
