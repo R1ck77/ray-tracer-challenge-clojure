@@ -6,8 +6,6 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
-(set! *unchecked-math* true)
-
 (def EPSILON 1e-6)
 
 (defrecord Plane [material transform inverse-transform])

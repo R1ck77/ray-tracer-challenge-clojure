@@ -1,7 +1,5 @@
 (ns raytracer.tuple)
 
-(set! *unchecked-math* true)
-
 (defprotocol AboutComparable
   (aboutEqual [this tuple]))
 

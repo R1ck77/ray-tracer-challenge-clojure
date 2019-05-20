@@ -6,8 +6,6 @@
             [raytracer.matrix :as matrix]
             [raytracer.material :as material]))
 
-(set! *unchecked-math* true)
-
 (defrecord Intersection [t object])
 
 (defn intersection [t object]

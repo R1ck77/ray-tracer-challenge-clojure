@@ -9,8 +9,6 @@
             [raytracer.matrix :as matrix]
             [raytracer.material :as material]))
 
-(set! *unchecked-math* true)
-
 (defprotocol RayCaster
   (intersect [this direction]))
 

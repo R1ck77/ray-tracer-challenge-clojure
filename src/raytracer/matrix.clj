@@ -1,8 +1,6 @@
 (ns raytracer.matrix
   (:require [raytracer.tuple :as tuple]))
 
-(set! *unchecked-math* true)
-
 (def ^:private max-error 0.0001)
 
 (def identity-matrix [1 0 0 0

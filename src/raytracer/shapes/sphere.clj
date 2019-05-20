@@ -7,8 +7,6 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
-(set! *unchecked-math* true)
-
 (def center (point/point 0 0 0))
 
 (defrecord Sphere [material transform inverse-transform])

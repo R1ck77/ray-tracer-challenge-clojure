@@ -2,8 +2,6 @@
   (:require [raytracer.tuple :as tuple]
             [raytracer.point :as point]))
 
-(set! *unchecked-math* true)
-
 (def ^:private max-error 1e-6)
 
 (defn svector? [tuple]

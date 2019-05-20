@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.9.0"]]
   :target-path "target/%s"
+  :global-vars {*unchecked-math* true}
   :profiles {:demo-coverage {:main ^:skip-aot demo.all-demos-coverage}
              :timed-run {:global-vars {*warn-on-reflection* true}
                          :main ^:skip-aot demo.timed-run
