@@ -11,6 +11,11 @@
 
 (def cube (cube/cube))
 
+(defmacro test-no-intersection [name origin direction]
+ `(testing ~(format "A ray misses a cube (%s)" name)
+   (let [ray# (ray/ray (apply point/point ~origin) (apply svector/svector ~direction))]
+     (is (empty? (shared/local-intersect cube ray#))))))
+
 (defmacro test-intersection
   "Generate a test for the intersection between the AABB and a ray"
   [id origin direction t1 t2]
@@ -28,5 +33,10 @@
   (test-intersection "-y" [0.5 -5 0] [0 1 0] 4 6)
   (test-intersection "+z" [0.5 0 5] [0 0 -1] 4 6)
   (test-intersection "-z" [0.5 0 -5] [0 0 1] 4 6)
-  (test-intersection "inside"  [0 0.5 0] [0 0 1] -1 1))
-
+  (test-intersection "inside"  [0 0.5 0] [0 0 1] -1 1)
+  (test-no-intersection "case 0" [-2, 0, 0] [0.2673, 0.5345, 0.8018])
+  (test-no-intersection "case 1" [0, -2, 0] [0.8018, 0.2673, 0.5345])
+  (test-no-intersection "case 2" [0, 0, -2] [0.5345, 0.8018, 0.2673])
+  (test-no-intersection "case 3" [2, 0, 2] [0, 0, -1])
+  (test-no-intersection "case 4" [0, 2, 2] [0, -1, 0])
+  (test-no-intersection "case 5" [2, 2, 0] [-1, 0, 0]))
