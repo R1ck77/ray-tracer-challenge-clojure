@@ -11,7 +11,9 @@
 
 (def cube (cube/cube))
 
-(defmacro test-intersection [id origin direction t1 t2]
+(defmacro test-intersection
+  "Generate a test for the intersection between the AABB and a ray"
+  [id origin direction t1 t2]
   `(let [ray# (ray/ray (apply point/point ~origin)
                       (apply svector/svector ~direction))
          intersections# (shared/local-intersect cube ray#)]
@@ -20,11 +22,11 @@
                (map :t intersections#))))))
 
 (deftest test-cube-local-intersect
-  (test-intersection "+x" [5, 0.5, 0] [-1, 0, 0] 4 6)
-  (test-intersection "-x" [-5, 0.5, 0] [1, 0, 0] 4 6)
-  (test-intersection "+y" [0.5, 5, 0] [0, -1, 0] 4 6)
-  (test-intersection "-y" [0.5, -5, 0] [0, 1, 0] 4 6)
-  (test-intersection "+z" [0.5, 0, 5] [0, 0, -1] 4 6)
-  (test-intersection "-z" [0.5, 0, -5] [0, 0, 1] 4 6)
-  (test-intersection "inside"  [0, 0.5, 0] [0, 0, 1] -1 1))
+  (test-intersection "+x" [5 0.5 0] [-1 0 0] 4 6)
+  (test-intersection "-x" [-5 0.5 0] [1 0 0] 4 6)
+  (test-intersection "+y" [0.5 5 0] [0 -1 0] 4 6)
+  (test-intersection "-y" [0.5 -5 0] [0 1 0] 4 6)
+  (test-intersection "+z" [0.5 0 5] [0 0 -1] 4 6)
+  (test-intersection "-z" [0.5 0 -5] [0 0 1] 4 6)
+  (test-intersection "inside"  [0 0.5 0] [0 0 1] -1 1))
 
