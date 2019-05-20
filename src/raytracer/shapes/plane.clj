@@ -6,6 +6,7 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
+;;; TODO/FIXME unify all those epsilon!!!
 (def EPSILON 1e-6)
 
 (defrecord Plane [material transform inverse-transform])
