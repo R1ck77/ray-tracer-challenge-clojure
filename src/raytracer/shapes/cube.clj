@@ -1,6 +1,7 @@
 (ns raytracer.shapes.cube
   (:require [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
+            [raytracer.point :as point]
             [raytracer.color :as color]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
@@ -33,13 +34,34 @@
          (intersection/intersection t2 cube)]
         []))))
 
+(defn- sign [value]
+  (if (< value 0) -1 1))
+
+(defn- compare [point field-1 field-2]
+  (if (> (Math/abs (get point field-1))
+         (Math/abs (get point field-2)))
+    field-1
+    field-2))
+
+(defn- get-field-of-largest-component [point]
+  (compare point :z (compare point :y :x)))
+
+(defn- compute-cube-normal [cube point]
+  (let [field (get-field-of-largest-component point)
+        value (sign (get point field))]
+    (cond
+      (= field :x) (svector/svector value 0 0)
+      (= field :y) (svector/svector 0 value 0)
+      (= field :z) (svector/svector 0 0 value)
+      :default (throw (IllegalStateException. "Unexpected condition in cube/compute-normal")))))
+
 (extend-type Cube
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
   shared/Surface
   (compute-normal [this point]
-    nil))
+    (compute-cube-normal this point)))
 
 (defn cube []
   (->Cube nil nil nil))
