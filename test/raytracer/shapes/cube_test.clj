@@ -43,7 +43,7 @@
 
 (defmacro test-compute-normal [id point expected-normal]
   `(testing ~(format "The normal on the surface of a cube (%s)" id)
-     (is (v= (apply svector/svector ~expected-normal)
+     (is (t= (apply svector/svector ~expected-normal)
              (shared/compute-normal cube (apply point/point ~point))))))
 
 (deftest test-cube-compute-normal
