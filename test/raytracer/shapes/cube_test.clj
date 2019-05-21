@@ -1,4 +1,4 @@
-(ns raytracer.shapes.plane-test
+(ns raytracer.shapes.cube-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
             [raytracer.svector :as svector]
