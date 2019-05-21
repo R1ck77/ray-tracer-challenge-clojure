@@ -36,7 +36,10 @@
 (extend-type Cube
   shared/Intersectable
   (local-intersect [this ray-object-space]
-   (local-intersect this ray-object-space)))
+    (local-intersect this ray-object-space))
+  shared/Surface
+  (compute-normal [this point]
+    nil))
 
 (defn cube []
   (->Cube nil nil nil))
