@@ -26,8 +26,12 @@
   (let [[tminx tmaxx] (check-axis (:x (:origin ray)) (:x (:direction ray)))
         [tminy tmaxy] (check-axis (:y (:origin ray)) (:y (:direction ray)))
         [tminz tmaxz] (check-axis (:z (:origin ray)) (:z (:direction ray)))]
-    [(intersection/intersection (max tminx tminy tminz) cube)
-     (intersection/intersection (min tmaxx tmaxy tmaxz) cube)]))
+    (let [t1 (max tminx tminy tminz)
+          t2 (min tmaxx tmaxy tmaxz)]
+      (if (> t2 t1) 
+        [(intersection/intersection t1 cube)
+         (intersection/intersection t2 cube)]
+        []))))
 
 (extend-type Cube
   shared/Intersectable
