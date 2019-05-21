@@ -27,8 +27,9 @@
     (intersect-plane-space this ray-in-plane-space))
   shared/Surface
   (compute-normal [this _]
-    (matrix/transform (:inverse-transform this) ;;; TODO/FIXME this may be really wrong
-                      (svector/svector 0 1 0))))
+    (shared/as-vector
+     (matrix/transform (matrix/transpose (:inverse-transform this)) ;;; TODO/FIXME this may be really wrong
+                       (svector/svector 0 1 0)))))
 
 (defn plane []
   (map->Plane {:material (material/material)
