@@ -10,7 +10,8 @@
             [demo.fresnel-demo :as fresnel]
             [demo.perlin-demo :as perlin]
             [demo.pattern-demo :as pattern-demo]
-            [demo.reflection-demo :as reflections-demo]))
+            [demo.reflection-demo :as reflections-demo]
+            [demo.cubes-demo :as cubes-demo]))
 
 
 (defmacro run-demo [name demo-code]
@@ -36,6 +37,9 @@
   (run-demo "tiny reflections demo"
             (with-redefs [world/*maximum-reflections* 2]
               (reflections-demo/render-demo 10 5)))
+  (run-demo "tiny cubes demo"
+            (with-redefs [world/*maximum-reflections* 2]
+              (cubes-demo/render-demo 10 5)))
   (run-demo "tiny fresnel demo"
             (fresnel/render-demo 10 5))
   (run-demo "tiny perlin demo"
