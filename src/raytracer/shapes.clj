@@ -4,7 +4,8 @@
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.sphere :as sphere-ns]
-            [raytracer.shapes.plane :as plane-ns]))
+            [raytracer.shapes.plane :as plane-ns]
+            [raytracer.shapes.cube :as cube-ns]))
 
 (defn change-transform [shape new-transform]
   (merge shape {:transform new-transform
@@ -21,3 +22,6 @@
 
 (defn plane []
   (plane-ns/plane))
+
+(defn cube []
+  (cube-ns/cube))
