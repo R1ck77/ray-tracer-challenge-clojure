@@ -1,5 +1,6 @@
 (ns raytracer.world
-  (:require [raytracer.tuple :as tuple]
+  (:require [raytracer.const :as const]
+            [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.color :as color]
@@ -15,8 +16,6 @@
 
 (def ^:dynamic *maximum-reflections* 8)
 (def ^:dynamic *basic-shade-detection* true)
-
-(def EPSILON 1e-6)
 
 (def zero-color (color/color 0 0 0))
 
@@ -134,8 +133,8 @@
         normal-v (if inside (tuple/neg basic-normal-v) basic-normal-v)]
     {:inside inside     
      :normal-v normal-v
-     :over-point (tuple/add point (tuple/mul normal-v EPSILON))
-     :under-point (tuple/add point (tuple/mul normal-v (- EPSILON)))
+     :over-point (tuple/add point (tuple/mul normal-v const/EPSILON))
+     :under-point (tuple/add point (tuple/mul normal-v (- const/EPSILON)))
      :reflection (tuple/reflect (:direction ray) normal-v)}))
 
 (defn prepare-computations
@@ -238,7 +237,7 @@
 (defn reflected-color [world intermediate-result remaining]
   (if (> remaining 0)
     (let [reflectivity (get-reflectivity intermediate-result)]
-      (if (< reflectivity EPSILON)
+      (if (< reflectivity const/EPSILON)
         zero-color
         (let [reflection (ray/ray (:over-point intermediate-result)
                                   (:reflection intermediate-result))]
@@ -271,7 +270,7 @@
 (defn refracted-color [world intermediate-result remaining]
   (if (> remaining 0)
     (let [transparency (get-transparency intermediate-result)]
-      (if (< transparency EPSILON)
+      (if (< transparency const/EPSILON)
         zero-color
         (refraction-color world intermediate-result remaining)))
     zero-color))

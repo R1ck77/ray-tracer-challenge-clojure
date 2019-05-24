@@ -1,11 +1,10 @@
 (ns raytracer.phong
-  (:require [raytracer.tuple :as tuple]
+  (:require [raytracer.const :as const]
+            [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.color :as color]
             [raytracer.material :as material]
             [raytracer.ray :as ray]))
-
-(def EPSILON 1e-5)
 
 (defn- compute-if-positive [value function]
   (if (< value 0)
@@ -62,7 +61,7 @@
      (let [effective-color (color/mul (material/get-color object position)
                                       (:intensity light-source))
            ambient-color (compute-ambient effective-color (:material object))]
-       (if (< (Math/abs (float shadow-attenuation)) EPSILON)
+       (if (< (Math/abs (float shadow-attenuation)) const/EPSILON)
          ambient-color
          (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))]
            (full-phong-lighting ambient-color (:material object) effective-color light-source light-vector eye normal shadow-attenuation)))))))

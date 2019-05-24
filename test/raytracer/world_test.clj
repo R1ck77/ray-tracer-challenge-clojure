@@ -1,6 +1,7 @@
 (ns raytracer.world-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.world :as world]
             [raytracer.point :as point]
             [raytracer.color :as color]
@@ -97,7 +98,7 @@
           intersection (intersection/intersection 5 sphere)
           intermediate (world/prepare-computations ray intersection dummy-indices)]
       (is (< (:z (:over-point intermediate))
-             (/ (- world/EPSILON) 2)))
+             (/ (- const/EPSILON) 2)))
       (is (> (:z (:point intermediate))
              (:z (:over-point intermediate))))))
   (testing "The under point is offset below the surface"
@@ -110,7 +111,7 @@
                                                           dummy-indices)
           z-point (:z (:point intermediate-result))
           z-under-point (:z (:under-point intermediate-result))]
-      (is (<= (* 0.5 world/EPSILON) z-under-point))
+      (is (<= (* 0.5 const/EPSILON) z-under-point))
       (is (< z-point z-under-point)))))
 
 (deftest test-compute-refractive-indices

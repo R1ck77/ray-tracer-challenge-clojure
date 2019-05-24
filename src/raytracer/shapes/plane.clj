@@ -1,13 +1,11 @@
 (ns raytracer.shapes.plane
-  (:require [raytracer.tuple :as tuple]
+  (:require [raytracer.const :as const]
+            [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
-
-;;; TODO/FIXME unify all those epsilon!!!
-(def EPSILON 1e-6)
 
 (defrecord Plane [material transform inverse-transform])
 
@@ -16,7 +14,7 @@
         (:y (:direction ray)))))
 
 (defn- intersect-plane-space [this-plane ray-in-plane-space]
-  (if (< (Math/abs (float (:y (:direction ray-in-plane-space)))) EPSILON)
+  (if (< (Math/abs (float (:y (:direction ray-in-plane-space)))) const/EPSILON)
     []
     (vector (intersection/intersection (xz-plane-intersection ray-in-plane-space)
                                        this-plane))))

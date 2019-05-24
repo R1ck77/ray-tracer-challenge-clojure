@@ -1,5 +1,6 @@
 (ns raytracer.shapes.cube
-  (:require [raytracer.tuple :as tuple]
+  (:require [raytracer.const :as const]
+            [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.point :as point]
             [raytracer.color :as color]
@@ -7,12 +8,10 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]))
 
-(def EPSILON 1e-6) ;;; TODO/FIXME unify!
-
 (defrecord Cube [material transform inverse-transform])
 
 (defn- axis-intersection [numerator direction]
-  (if (> (Math/abs direction) EPSILON)
+  (if (> (Math/abs (float direction)) const/EPSILON)
     (/ numerator direction)
     (if (> numerator 0)
       Double/POSITIVE_INFINITY
@@ -38,8 +37,8 @@
   (if (< value 0) -1 1))
 
 (defn- compare [point field-1 field-2]
-  (if (> (Math/abs (get point field-1))
-         (Math/abs (get point field-2)))
+  (if (> (Math/abs (float (get point field-1)))
+         (Math/abs (float (get point field-2))))
     field-1
     field-2))
 
