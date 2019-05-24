@@ -22,6 +22,9 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
+(defmacro new-shape []
+  `(shapes/cube))
+
 (def perlin-data (perlin/create-perlin-data [3 3 3]))
 
 (def room-material (material/material :specular 0.0
@@ -34,7 +37,7 @@
                (shapes/change-material room-material)
                (shapes/change-transform (transform/translate 0 -0.0001 0))))
 
-(def left-cube (-> (shapes/cube)
+(def left-cube (-> (new-shape)
                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
                                                                  :reflectivity 0.3
                                                                  :pattern (pattern/change-transform (pattern/stripe (color/color 0 1 0)
@@ -44,7 +47,7 @@
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                                    (transform/translate -1.5 0.33 -0.75)))))
 
-(def middle-cube (-> (shapes/cube)
+(def middle-cube (-> (new-shape)
                        (shapes/change-material (material/material :color (color/color 0 0.05 0.1)
                                                                    :diffuse 0.1
                                                                    :specular 0.3
@@ -54,7 +57,7 @@
                        
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
-(def air-cube (-> (shapes/cube)
+(def air-cube (-> (new-shape)
                     (shapes/change-material (material/material :color (color/color 0 0 0)
                                                                 :diffuse 0.0
                                                                 :specular 0.0
@@ -65,7 +68,7 @@
                     (shapes/change-transform (transform/translate -0.5 1 0.5
                                                                   (transform/scale 0.5 0.5 0.5)))))
 
-(def back-cube (-> (shapes/cube)
+(def back-cube (-> (new-shape)
                      (shapes/change-material (material/material :color (apply color/color (map #(/ % 255) [200 110 200]))
                                                                  :diffuse 0.4
                                                                  :specular 0.5
@@ -77,7 +80,7 @@
                      (shapes/change-transform (transform/translate 1.75 2 5.5
                                                                    (transform/scale 2 2 2)))))
 
-(def right-cube (-> (shapes/cube)
+(def right-cube (-> (new-shape)
                       (shapes/change-material (material/material :diffuse 0.7
                                                                   :specular 0.3
                                                                   :reflectivity 0.2
