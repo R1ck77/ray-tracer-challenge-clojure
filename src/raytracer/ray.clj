@@ -17,6 +17,7 @@
 (defn ray [origin shape]
   (->Ray origin shape))
 
+;;; TODO/FIXME this accounts for 20% of execution time as of 25/5/19
 (defn transform [input-ray matrix]
   (ray (matrix/transform matrix (:origin input-ray))
        (matrix/transform matrix (:direction input-ray))))
