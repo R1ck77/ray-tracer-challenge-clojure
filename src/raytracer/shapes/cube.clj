@@ -6,21 +6,32 @@
             [raytracer.color :as color]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.intersection :as intersection])
-  (:import [raytracer CheckAxis]))
+            [raytracer.intersection :as intersection]))
 
 (defrecord Cube [material transform inverse-transform])
 
+(defn- axis-intersection [numerator direction]
+  (if (> (Math/abs (float direction)) const/EPSILON)
+    (/ numerator direction)
+    (if (> numerator 0)
+      Double/POSITIVE_INFINITY
+      Double/NEGATIVE_INFINITY)))
+
+(defn- check-axis [origin direction]
+  (let [a (axis-intersection (- 0 1 origin) direction)
+        b (axis-intersection (- 1 origin) direction)]
+    (if (> a b) [b a] [a b])))
+
 (defn- local-intersect [cube ray]
-  (let [origin (:origin ray)
-        direction (:direction ray)
-        t-list (CheckAxis/localIntersect (:x origin) (:y origin) (:z origin)
-                                         (:x direction) (:y direction) (:z direction))]
-    (if t-list
-      [(intersection/intersection (aget t-list 0) cube)
-       (intersection/intersection (aget t-list 1) cube)]
-      []))
-)
+  (let [[tminx tmaxx] (check-axis (:x (:origin ray)) (:x (:direction ray)))
+        [tminy tmaxy] (check-axis (:y (:origin ray)) (:y (:direction ray)))
+        [tminz tmaxz] (check-axis (:z (:origin ray)) (:z (:direction ray)))]
+    (let [t1 (max tminx tminy tminz)
+          t2 (min tmaxx tmaxy tmaxz)]
+      (if (> t2 t1) 
+        [(intersection/intersection t1 cube)
+         (intersection/intersection t2 cube)]
+        []))))
 
 (defn- sign [value]
   (if (< value 0) -1 1))
