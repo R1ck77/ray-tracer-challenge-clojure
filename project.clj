@@ -7,6 +7,7 @@
   :target-path "target/%s"
   :global-vars {*unchecked-math* true
                 *warn-on-reflection* true}
+  :java-source-paths ["java-src"]
   :profiles {:demo-coverage {:main ^:skip-aot demo.all-demos-coverage}
              :timed-run {:main ^:skip-aot demo.timed-run
                          :aot :all}
