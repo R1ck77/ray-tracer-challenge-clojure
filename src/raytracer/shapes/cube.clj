@@ -2,6 +2,7 @@
   (:require [raytracer.const :as const]
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]
             [raytracer.point :as point]
             [raytracer.color :as color]
             [raytracer.material :as material]
@@ -13,7 +14,7 @@
 (defn- axis-intersection [numerator direction]
   (if (> (Math/abs (float direction)) const/EPSILON)
     (/ numerator direction)
-    (if (> numerator 0)
+    (if (>= numerator 0)
       Double/POSITIVE_INFINITY
       Double/NEGATIVE_INFINITY)))
 
@@ -60,8 +61,17 @@
     (local-intersect this ray-object-space))
   shared/Surface
   (compute-normal [this point]
-    (compute-cube-normal this point)))
+    ;;; TODO/FIXME test needed
+    (tuple/normalize
+     (shared/as-vector
+      (matrix/transform (matrix/transpose (:inverse-transform this))
+                        (compute-cube-normal this
+                                             ;;; TODO/FIXME test needed…
+                                             (matrix/transform (:inverse-transform this) point)))))))
 
+;;; TODO/FIXME test needed
 (defn cube []
-  (->Cube nil nil nil))
+  (->Cube (material/material)
+          matrix/identity-matrix
+          matrix/identity-matrix))
 
