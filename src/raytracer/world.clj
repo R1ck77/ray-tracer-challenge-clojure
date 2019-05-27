@@ -14,7 +14,7 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.phong :as phong]))
 
-(def ^:dynamic *maximum-reflections* 8)
+(def ^:dynamic *maximum-reflections* 4)
 (def ^:dynamic *basic-shade-detection* true)
 
 (def zero-color (color/color 0 0 0))
