@@ -11,28 +11,35 @@
 
 (defrecord Cube [material transform inverse-transform])
 
-(defn- axis-intersection [numerator direction]
-  (if (> (Math/abs (float direction)) const/EPSILON)
-    (/ numerator direction)
-    (if (>= numerator 0)
-      Double/POSITIVE_INFINITY
-      Double/NEGATIVE_INFINITY)))
+(defn- signed-infinity [numerator _]
+  (if (>= numerator 0)
+    Double/POSITIVE_INFINITY
+    Double/NEGATIVE_INFINITY))
 
 (defn- check-axis [origin direction]
-  (let [a (axis-intersection (- 0 1 origin) direction)
-        b (axis-intersection (- 1 origin) direction)]
-    (if (> a b) [b a] [a b])))
+  (let [operator (if (> (Math/abs (float direction)) const/EPSILON)
+                   /
+                   signed-infinity)]
+    (let [a (operator (- 0 1 origin) direction)
+          b (operator (- 1 origin) direction)]
+      (if (> a b) [b a] [a b]))))
 
 (defn- local-intersect [cube ray]
-  (let [[tminx tmaxx] (check-axis (:x (:origin ray)) (:x (:direction ray)))
-        [tminy tmaxy] (check-axis (:y (:origin ray)) (:y (:direction ray)))
-        [tminz tmaxz] (check-axis (:z (:origin ray)) (:z (:direction ray)))]
-    (let [t1 (max tminx tminy tminz)
-          t2 (min tmaxx tmaxy tmaxz)]
-      (if (> t2 t1) 
-        [(intersection/intersection t1 cube)
-         (intersection/intersection t2 cube)]
-        []))))
+  (let [origin (:origin ray)
+        direction (:direction ray)]
+    (let [[tminx tmaxx] (check-axis (:x origin) (:x direction))
+          [tminy tmaxy] (check-axis (:y origin) (:y direction))
+          min (Math/max (float  tminx) (float tminy))
+          max (Math/min (float tmaxx) (float tmaxy))]
+      (if (> min max)
+        []
+        (let [[tminz tmaxz] (check-axis (:z origin) (:z direction))
+              min (Math/max (float min) (float tminz))
+              max (Math/min (float max) (float tmaxz))]
+          (if (> min max)
+            []
+            [(intersection/intersection min cube)
+             (intersection/intersection max cube)]))))))
 
 (defn- sign [value]
   (if (< value 0) -1 1))
