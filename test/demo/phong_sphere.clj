@@ -57,7 +57,7 @@
             color (phong/lighting object
                                   light-source
                                   point
-                                  (.neg (:direction ray))
+                                  (tuple/neg (:direction ray))
                                   (shared/compute-normal object point))]
        (canvas/write canvas (first pixel) (second pixel) color))
       canvas)))

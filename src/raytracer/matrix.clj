@@ -8,7 +8,7 @@
                                     0 0 1 0
                                     0 0 0 1]))
 
-(defn get-n [matrix n i j]
+(defn get-n [^doubles matrix n i j]
   (aget matrix (+ j (* n i))))
 
 (defn get4 [matrix i j]
@@ -33,7 +33,7 @@
       (mul4-cell ~a ~b ~row ~column ~b-columns 2)
       (mul4-cell ~a ~b ~row ~column ~b-columns 3)))
 
-(defmacro mul4 [a b]
+(defmacro mul4-macro [a b]
   `(let [a# ~a
          b# ~b]
      (double-array
@@ -42,13 +42,16 @@
               (rowp4 a# b# 2 0 4) (rowp4 a# b# 2 1 4) (rowp4 a# b# 2 2 4) (rowp4 a# b# 2 3 4)
               (rowp4 a# b# 3 0 4) (rowp4 a# b# 3 1 4) (rowp4 a# b# 3 2 4) (rowp4 a# b# 3 3 4)))))
 
+(defn mul4 [^doubles a ^doubles b]
+  (mul4-macro a b))
+
 (defmacro line-vector-prod [m v row]
   `(+ (* (cell4 ~m ~row 0 4) (:x ~v))
       (* (cell4 ~m ~row 1 4) (:y ~v))
       (* (cell4 ~m ~row 2 4) (:z ~v))
       (* (cell4 ~m ~row 3 4) (:w ~v))))
 
-(defmacro transform [m v]
+(defmacro transform-macro [m v]
   `(let [m# ~m
          v# ~v]
      (tuple/tuple (line-vector-prod m# v# 0)
@@ -56,7 +59,10 @@
                   (line-vector-prod m# v# 2)
                   (line-vector-prod m# v# 3))))
 
-(defn transpose [m]
+(defn transform [^doubles m v]
+  (transform-macro m v))
+
+(defn transpose [^doubles m]
   (double-array
    (reduce #(conj % (aget m %2)) [] [0 4 8 12
                                      1 5 9 13
@@ -89,7 +95,7 @@
   (* (if (odd? (+ row column)) -1 1)
      (minor m n row column)))
 
-(defn det2 [m]
+(defn det2 [^doubles m]
   (- (* (aget m 0) (aget m 3))
      (* (aget m 1) (aget m 2))))
 
