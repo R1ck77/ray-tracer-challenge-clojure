@@ -1,19 +1,19 @@
 (ns raytracer.test-utils
   (:require [clojure.test :refer :all]))
 
-(def ^:private eps 1e-6)
+(def ^:dynamic *eps* 1e-6)
 (def ^:private max-percent-error 0.001)
 
 (defn- absolute-error [a b]
   (< (Math/abs (double (- a b)))
-     eps))
+     *eps*))
 
 (defn- relative-error [a b]
   (< (Math/abs (/ (double (- a b)) a))
      max-percent-error))
 
 (defn eps= [a b]
-  (if (< (Math/abs (double a)) eps)
+  (if (< (Math/abs (double a)) *eps*)
     (absolute-error a b)
     (relative-error a b)))
 
@@ -39,10 +39,10 @@
       (is (v= [4.3 2.3 6.7 1] (map #(+ small-eps %) [4.3 2.3 6.7 1])))
       (is (v= [0 0 0 0] [small-eps small-eps small-eps small-eps]))))
   (testing "v= returns false for tuple that are too dissimilar"
-    (is (not (v= [0 0 0 0] [eps 0 0 0])))
-    (is (not (v= [0 0 0 0] [0 eps 0 0])))
-    (is (not (v= [0 0 0 0] [0 0 eps 0])))
-    (is (not (v= [0 0 0 0] [0 0 0 eps])))))
+    (is (not (v= [0 0 0 0] [*eps* 0 0 0])))
+    (is (not (v= [0 0 0 0] [0 *eps* 0 0])))
+    (is (not (v= [0 0 0 0] [0 0 *eps* 0])))
+    (is (not (v= [0 0 0 0] [0 0 0 *eps*])))))
 
 (defn t= [t1 t2]
   (and (eps= (:x t1) (:x t2))

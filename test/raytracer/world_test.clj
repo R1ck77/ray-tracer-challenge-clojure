@@ -47,7 +47,11 @@
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
       (is (some #(= expected-sphere1 %) (:objects world)))
-      (is (some #(= expected-sphere2 %) (:objects world))))))
+      (is (some #(and
+                  (v= (transform/scale 0.5 0.5 0.5) (:transform %))
+                  (= (dissoc % :transform :inverse-transform)
+                     (dissoc expected-sphere2 :transform :inverse-transform)))
+                (:objects world))))))
 
 (deftest test-intersect
   (testing "Intersect a world with a ray"
@@ -306,10 +310,10 @@
     (let [from (point/point 1 3 2)
           to (point/point 4 -2 8)
           up (svector/svector 1 1 0)]
-      (is (v= [-0.50709 0.50709 0.67612 -2.36643
-               0.76772 0.60609 0.12122 -2.82843
-               -0.35857 0.59761 -0.71714 0.00000
-               0.00000 0.00000 0.00000 1.00000]
+      (is (v= (double-array [-0.50709 0.50709 0.67612 -2.36643
+                             0.76772 0.60609 0.12122 -2.82843
+                             -0.35857 0.59761 -0.71714 0.00000
+                             0.00000 0.00000 0.00000 1.00000])
               (world/view-transform from to up))))))
 
 (defn- create-shadow-test-world [light-position]

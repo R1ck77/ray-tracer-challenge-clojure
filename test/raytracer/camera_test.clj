@@ -40,14 +40,14 @@
     (is (v= matrix/identity-matrix (:transform (camera/camera 1 2 3)))))
   (testing "Change the transform matrix for a camera"
     (let [new-transform-matrix (transform/translate 1 2 3)]
-      (is (= new-transform-matrix
+      (is (v= new-transform-matrix
              (:transform (camera/set-transform (camera/camera 1 2 3)
                                                new-transform-matrix))))))
   (testing "Changing the transform matrix also computes the inverse"
-        (let [new-transform-matrix (transform/translate 1 2 3)]
-      (is (= (matrix/invert new-transform-matrix 4)
-             (:inverse-transform (camera/set-transform (camera/camera 1 2 3)
-                                               new-transform-matrix)))))))
+    (let [new-transform-matrix (transform/translate 1 2 3)]
+      (is (v= (matrix/invert new-transform-matrix 4)
+              (:inverse-transform (camera/set-transform (camera/camera 1 2 3)
+                                                        new-transform-matrix)))))))
 
 (deftest test-ray-for-pixel
   (testing "Constructing a ray through the center of the canvas"
