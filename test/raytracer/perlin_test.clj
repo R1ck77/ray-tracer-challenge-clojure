@@ -28,7 +28,7 @@
       (is (= 30 (first (:dimensions perlin-data))))
       (is (= 20 (second (:dimensions perlin-data))))
       (is (= 20 (count (:grid perlin-data))))
-      (is (= 30 (count (aget (:grid perlin-data) 0)))))))
+      (is (= 30 (count (aget ^"[Ljava.util.List;" (:grid perlin-data) 0)))))))
 
 (deftest test-scale-point
   (let [perlin-data (perlin/create-perlin-data [5 3])]
@@ -134,23 +134,24 @@
         values)))
 
 (defn- set-3D-grid-values!
-  [{grid :grid} values]
+  [{^"[Ljava.util.List;" grid :grid} values]
   (dorun
    (map (fn [[[i j k] v]]
           (aset grid k j i v))
         values)))
 
 (defn- set-2D-grid-values!
-  [{grid :grid} values]
+  [{^"[Ljava.util.List;" grid :grid} values]
   (dorun
    (map (fn [[[i j] v]]
           (aset grid j i v))
         values)))
 
 (defn- set-1D-grid-values!
-  [{grid :grid} values]
+  [{^"[Ljava.util.List;" grid :grid} values]
   (dorun
-   (map-indexed #(aset grid % (vector %2)) values)))
+   (map-indexed (fn [counter ^:java.util.List value]
+                  (aset grid counter (vector value))) values)))
 
 (deftest test-normalization
   (testing "noise extremes for the 1D noise"

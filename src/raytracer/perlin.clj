@@ -34,7 +34,7 @@
 (defn- fill-grid [grid dimensions]
   (fill-array grid #(random-gradient (count dimensions)) dimensions))
 
-(defn create-grid [dimensions]
+(defn create-grid ^"[Ljava.util.List;" [dimensions]
   (doto (empty-grid dimensions)
     (fill-grid dimensions)))
 
