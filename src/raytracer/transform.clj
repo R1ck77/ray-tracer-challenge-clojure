@@ -1,8 +1,6 @@
 (ns raytracer.transform
   (:require [raytracer.matrix :as matrix]))
 
-;;; TODO/FIXME what a nice, nice place for some polymorphism
-
 (defn- translation [tx ty tz]
   (double-array [1 0 0 tx
                  0 1 0 ty
