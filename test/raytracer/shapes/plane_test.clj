@@ -9,38 +9,50 @@
             [raytracer.ray :as ray]
             [raytracer.shapes.plane :as plane]))
 
-(def plane (plane/plane))
+(def a-plane (plane/plane))
+
+(deftest test-constructor
+  (testing "The courtesy constructor function fills material, transform and inverse"
+    (is (:material (plane/plane)))
+    (is (:transform (plane/plane)))
+    (is (:inverse-transform (plane/plane)))))
 
 (deftest test-plane-normal
   (let [expected-normal (svector/svector 0 1 0)]
     (testing "The normal of a plane is constant everywhere"
       (is (t= expected-normal
-              (shared/compute-normal plane (point/point 0 0 0))))
+              (shared/compute-normal a-plane (point/point 0 0 0))))
       (is (t= expected-normal
-              (shared/compute-normal plane (point/point 10 0 -10))))
+              (shared/compute-normal a-plane (point/point 10 0 -10))))
       (is (t= expected-normal
-              (shared/compute-normal plane (point/point 5 0 150)))))))
+              (shared/compute-normal a-plane (point/point 5 0 150)))))
+    (testing "The normal of the plane is computed accounting for the transform"
+      (let [transformed-plane (shapes/change-transform a-plane
+                                                       (transform/rotate-x (/ Math/PI 2)))]
+        (is (t= (svector/svector 0 0 1)
+                (shared/compute-normal transformed-plane
+                                       (point/point 1000 1000 0))))))))
 
 (deftest test-ray-plane-intersect
   (testing "Intersect with a ray parallel to the plane"
     (is (empty? (ray/intersect (ray/ray (point/point 0 10 0)
                                         (svector/svector 0 0 1))
-                               plane))))
+                               a-plane))))
   (testing "Intersect with a coplanar ray"
     (is (empty? (ray/intersect (ray/ray (point/point 0 0 0)
                                         (svector/svector 0 0 1))
-                               plane))))
+                               a-plane))))
   (testing "A ray intersecting a plane from above"
     (let [intersections (ray/intersect (ray/ray (point/point 0 1 0)
                                                 (svector/svector 0 -1 0))
-                                       plane)]
+                                       a-plane)]
       (is (= 1 (count intersections)))
       (is (eps= 1 (:t (first intersections))))
-      (is (= plane (:object (first intersections))))))
+      (is (= a-plane (:object (first intersections))))))
   (testing "A ray intersecting a plane from below"
     (let [intersections (ray/intersect (ray/ray (point/point 0 -1 0)
                                                 (svector/svector 0 1 0))
-                                       plane)]
+                                       a-plane)]
       (is (= 1 (count intersections)))
       (is (eps= 1 (:t (first intersections))))
-      (is (= plane (:object (first intersections)))))))
+      (is (= a-plane (:object (first intersections)))))))

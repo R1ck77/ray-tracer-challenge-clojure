@@ -26,7 +26,7 @@
   shared/Surface
   (compute-normal [this _]
     (shared/as-vector
-     (matrix/transform (matrix/transpose (:inverse-transform this)) ;;; TODO/FIXME this may be really wrong
+     (matrix/transform (matrix/transpose (:inverse-transform this))
                        (svector/svector 0 1 0)))))
 
 (defn plane []
