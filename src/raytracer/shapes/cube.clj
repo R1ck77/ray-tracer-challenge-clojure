@@ -68,15 +68,12 @@
     (local-intersect this ray-object-space))
   shared/Surface
   (compute-normal [this point]
-    ;;; TODO/FIXME test needed
     (tuple/normalize
      (shared/as-vector
       (matrix/transform (matrix/transpose (:inverse-transform this))
                         (compute-cube-normal this
-                                             ;;; TODO/FIXME test needed…
                                              (matrix/transform (:inverse-transform this) point)))))))
 
-;;; TODO/FIXME test needed
 (defn cube []
   (->Cube (material/material)
           matrix/identity-matrix

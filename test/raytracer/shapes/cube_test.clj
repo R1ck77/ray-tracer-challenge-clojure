@@ -5,23 +5,31 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.point :as point]
+            [raytracer.transform :as transform]
             [raytracer.ray :as ray]            
             [raytracer.shapes.cube :as cube]
             [raytracer.shapes.shared :as shared]))
 
-(def cube (cube/cube))
+(def a-cube (cube/cube))
+
+(deftest test-constructor
+  (testing "The courtesy construction function creates a cube with material and transforms set"
+    (let [cube (cube/cube)]
+      (is (:material cube))
+      (is (:transform cube))
+      (is (:inverse-transform cube)))))
 
 (defmacro test-no-intersection [name origin direction]
  `(testing ~(format "A ray misses a cube (%s)" name)
    (let [ray# (ray/ray (apply point/point ~origin) (apply svector/svector ~direction))]
-     (is (empty? (shared/local-intersect cube ray#))))))
+     (is (empty? (shared/local-intersect a-cube ray#))))))
 
 (defmacro test-intersection
   "Generate a test for the intersection between the AABB and a ray"
   [id origin direction t1 t2]
   `(let [ray# (ray/ray (apply point/point ~origin)
                       (apply svector/svector ~direction))
-         intersections# (shared/local-intersect cube ray#)]
+         intersections# (shared/local-intersect a-cube ray#)]
      (testing ~(format "A ray intersects a cube (%s)" id)
        (is (v= [~t1 ~t2]
                (map :t intersections#))))))
@@ -44,7 +52,7 @@
 (defmacro test-compute-normal [id point expected-normal]
   `(testing ~(format "The normal on the surface of a cube (%s)" id)
      (is (t= (apply svector/svector ~expected-normal)
-             (shared/compute-normal cube (apply point/point ~point))))))
+             (shared/compute-normal a-cube (apply point/point ~point))))))
 
 (deftest test-cube-compute-normal
   (test-compute-normal "+x" [1 0.5 -0.8] [1 0 0])
@@ -54,4 +62,9 @@
   (test-compute-normal "+z" [-0.6 0.3 1] [0 0 1])
   (test-compute-normal "-z" [0.4 0.4 -1] [0 0 -1])
   (test-compute-normal "upper corner" [1 1 1] [1 0 0])
-  (test-compute-normal "lower corner" [-1 -1 -1] [-1 0 0])) 
+  (test-compute-normal "lower corner" [-1 -1 -1] [-1 0 0])
+  (testing "normal is computed accounting for the cube transforms"
+    (let [transformed-cube (shapes/change-transform a-cube
+                                                    (transform/rotate-y Math/PI))]
+      (is (t= (svector/svector 0 0 -1)
+              (shared/compute-normal transformed-cube (point/point 0.2 0.1 -0.5))))))) 
