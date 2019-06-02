@@ -6,5 +6,5 @@
 (defn -main [& args]
   (with-redefs [demo/*image-resolution* [(* 2 1920) (* 2 1080)]
                 camera/*map* map
-                world/*maximum-reflections* 1]
+                world/*maximum-reflections* 8]
     (time (demo/render-demo))))

@@ -22,9 +22,9 @@
 (def perlin-data (perlin/create-perlin-data [3 3 3]))
 
 (def room-material (material/material :specular 0.0
-                                       :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
-                                                                                           (color/color 0 0 1))
-                                                                          matrix/identity-matrix)))
+                                      :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
+                                                                                          (color/color 0 0 1))
+                                                                         matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
@@ -32,38 +32,38 @@
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
-                                                                 :pattern (pattern/change-transform (pattern/stripe (color/color 1 0 0)
-                                                                                                                    (color/color 1 1 1))
-                                                                                                    (transform/scale 0.2 0.2 0.2
-                                                                                                                     (transform/rotate-y (/ Math/PI 5))))))
+                                                                :pattern (pattern/change-transform (pattern/stripe (color/color 1 0 0)
+                                                                                                                   (color/color 1 1 1))
+                                                                                                   (transform/scale 0.2 0.2 0.2
+                                                                                                                    (transform/rotate-y (/ Math/PI 5))))))
                      (shapes/change-transform (->> (transform/scale 0.33 0.33 0.33)
-                                                (transform/translate -1.5 0.33 -0.75)))))
+                                                   (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
                        (shapes/change-material (material/material :diffuse 0.7
-                                                                   :specular 0.3
-                                                                   :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
-                                                                                                                        (color/color 0 0 1))
-                                                                                                      (transform/rotate-x (/ Math/PI 2)))))
+                                                                  :specular 0.3
+                                                                  :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
+                                                                                                                       (color/color 0 0 1))
+                                                                                                     (transform/rotate-x (/ Math/PI 2)))))
                        (shapes/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (material/material :diffuse 0.7
-                                                                  :specular 0.3
-                                                                  :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
-                                                                                                                                            (color/color 0.0 0 0.0)) 
-                                                                                                                              (fn [point]
-                                                                                                                                (let [noise (perlin/noise perlin-data
-                                                                                                                                                          (vector (:x point)
-                                                                                                                                                                  (:y point)
-                                                                                                                                                                  (:z point)))]
-                                                                                                                                  (point/point (+ (:x point) noise)
-                                                                                                                                               (:y point)
-                                                                                                                                               (+ (:z point) noise)))))
-                                                                                                     (transform/scale 0.5 0.125 0.125
-                                                                                                                      (transform/rotate-z 0.23423)))))
+                                                                 :specular 0.3
+                                                                 :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
+                                                                                                                                           (color/color 0.0 0 0.0)) 
+                                                                                                                             (fn [pattern point]
+                                                                                                                               (let [noise (perlin/noise perlin-data
+                                                                                                                                                         (vector (:x point)
+                                                                                                                                                                 (:y point)
+                                                                                                                                                                 (:z point)))]
+                                                                                                                                 (pattern/color-at pattern (point/point (+ (:x point) noise)
+                                                                                                                                                                        (:y point)
+                                                                                                                                                                        (+ (:z point) noise))))))
+                                                                                                    (transform/scale 0.5 0.125 0.125
+                                                                                                                     (transform/rotate-z 0.23423)))))
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
-                                                 (transform/translate 1.5 0.5 -0.5)))))
+                                                    (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (world/set-light-sources (world/set-objects (world/world) [floor left-sphere middle-sphere right-sphere])
                                     (light-sources/create-point-light (point/point -10 10 -10)
