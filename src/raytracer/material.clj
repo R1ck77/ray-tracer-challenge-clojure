@@ -30,7 +30,7 @@
 (defn get-color [object point]
   (let [material (:material object)]
     (if-let [pattern (:pattern material)]
-      (pattern/color-at-object pattern object point)
+      (pattern/color-at pattern object point)
       (:color material))))
 
 (defn update-material [material & {:as args}]

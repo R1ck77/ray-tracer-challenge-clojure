@@ -2,92 +2,79 @@
   (:require [raytracer.color :as color]
             [raytracer.matrix :as matrix]))
 
-(defn- create-pattern [white black function]
-  {:a white
-   :b black
-   :color-at function
-   :transform matrix/identity-matrix
-   :inverse-transform matrix/identity-matrix})
-
-(defn- solid-function [pattern _]
-  (:a pattern))
-
-(defn solid [color]
-  (create-pattern color color solid-function))
-
-(defn- stripe-function [pattern point]
-  (if (zero? (mod (int (Math/floor (:x point))) 2))
-    (:a pattern)
-    (:b pattern)))
-
-(defn stripe [white black]
-  (create-pattern white black stripe-function))
-
-(defn- gradient-function [pattern point]
-  (let [x (:x point)
-        p (- x (Math/floor x))]
-    (color/add (color/scale (:a pattern) (- 1 x))
-               (color/scale (:b pattern) x))))
-
-(defn gradient [white black]
-  (create-pattern white black gradient-function))
-
-(defn- test-pattern-function [pattern point]
-  (color/color (:x point)
-               (:y point)
-               (:z point)))
-
-(defn test []
-  (create-pattern nil nil test-pattern-function))
-
-(defn- ring-function [pattern point]
-  (let [x (:x point)
-        z (:z point)
-        distance (Math/sqrt (+ (* x x) (* z z)))]
-                        (if (zero? (mod (int (Math/floor distance)) 2))
-                          (:a pattern)
-                          (:b pattern))))
-
-(defn ring [white black]
-  (create-pattern white black ring-function))
-
-(defn- checker-function [pattern point]
-  (if (zero? (mod (+ (int (Math/floor (+ 2e9 (:x point))))
-                     (int (Math/floor (+ 2e9 (:y point))))
-                     (int (Math/floor (+ 2e9 (:z point))))) 2))
-    (:a pattern)
-    (:b pattern)))
-
-(defn checker [white black]
-  (create-pattern white black checker-function))
-
-(defn blend-function [pattern point]
-  (let [a (:a-pattern pattern)
-        b (:b-pattern pattern)]
-    (color/scale (color/add ((:color-at a) a point)
-                            ((:color-at b) b point))
-                 0.5)))
-
-(defn blend [_ pattern-a pattern-b]
-  {:transform matrix/identity-matrix
-   :inverse-transform matrix/identity-matrix
-   :a-pattern pattern-a
-   :b-pattern pattern-b
-   :color-at blend-function})
-
-(defn perturb-pattern [pattern perturbation-f]
-  (update pattern :color-at (fn [blend-function]
-                              (fn [pattern point]
-                                (blend-function pattern (perturbation-f point))))))
-
-(defn change-transform [pattern new-transform]
-  (merge pattern {:transform new-transform
-                  :inverse-transform (matrix/invert new-transform 4)}))
+(defprotocol ColorFunction
+  (color-at [this point] [this object point]))
 
 (defn- point-in-pattern-space [pattern object point]
   (->> point
        (matrix/transform (:inverse-transform object))
        (matrix/transform (:inverse-transform pattern))))
 
-(defn color-at-object [pattern object point]
-  ((:color-at pattern) pattern (point-in-pattern-space pattern object point)))
+(defrecord Pattern [inverse-transform function]
+  ColorFunction
+  (color-at [this point]
+    (function this point))
+  (color-at [this object point]
+    (function this (point-in-pattern-space this object point))))
+
+(defn- create-pattern
+  ([function]
+     (->Pattern matrix/identity-matrix
+                function))
+  ([function transform]
+     (->Pattern (matrix/invert transform 4)
+                function)))
+
+(defn solid [color]
+  (create-pattern (fn [_ _] color)))
+
+(defn stripe [color1 color2]
+  (create-pattern (fn [_ point]
+                    (if (zero? (mod (int (Math/floor (:x point))) 2))
+                      color1
+                      color2))))
+
+(defn gradient [color1 color2]
+  (create-pattern (fn [_ point]
+                    (let [x (:x point)
+                          p (- x (Math/floor x))]
+                      (color/add (color/scale color1 (- 1 x))
+                                 (color/scale color2 x))))))
+
+(defn test []
+  (create-pattern (fn [_ point]
+                    (color/color (:x point)
+                                 (:y point)
+                                 (:z point)))))
+
+(defn ring [color1 color2]
+  (create-pattern (fn [_ point]
+                    (let [x (:x point)
+                          z (:z point)
+                          distance (Math/sqrt (+ (* x x) (* z z)))]
+                      (if (zero? (mod (int (Math/floor distance)) 2))
+                        color1
+                        color2)))))
+
+(defn checker [white black]
+  (create-pattern (fn [_ point]
+                    (if (zero? (mod (+ (int (Math/floor (+ 2e9 (:x point))))
+                                       (int (Math/floor (+ 2e9 (:y point))))
+                                       (int (Math/floor (+ 2e9 (:z point))))) 2))
+                      white
+                      black))))
+
+(defn blend [pattern-a pattern-b]
+  (create-pattern (fn [_ point]
+                    (color/scale (color/add (color-at pattern-a point)
+                                            (color-at pattern-b point))
+                                 0.5))))
+
+(defn perturb-pattern [pattern perturbation-f]
+  (create-pattern (fn [_ point]
+                    (perturbation-f pattern point))
+                  (:inverse-transform pattern)))
+
+(defn change-transform [pattern new-transform]
+  (create-pattern (:function pattern)
+                  new-transform))
