@@ -4,7 +4,6 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.point :as point]
-            [raytracer.color :as color]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]))
