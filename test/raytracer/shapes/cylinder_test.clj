@@ -5,6 +5,7 @@
             [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.transform :as transform]
             [raytracer.shapes.cylinder :as cylinder]
             [raytracer.shapes.shared :as shared]))
 
@@ -34,7 +35,6 @@
     (assert-intersection-hits 4 6 [0 0 -5] [0 0 1])
     (assert-intersection-hits 6.80798 7.08872 [0.5 0 -5] [0.1 1 1])))
 
-
 (deftest test-compute-normal
   (testing "Normal vector on a cylinder"
     (is (t= (svector/svector 1 0 0)
@@ -50,5 +50,12 @@
             (shared/compute-normal a-cylinder (point/point 0 5 -1.1))))
     (is (t= (svector/svector half√2 0 (- half√2))
             (shared/compute-normal a-cylinder (point/point half√2 100 (- half√2)))))))
+
+(deftest test-equality
+  (testing "Two cylinders are equals if the share the same characteristics"
+    (is (= (cylinder/cylinder) (cylinder/cylinder)))
+    (let [transform (transform/translate 1 2 3 )]
+      (is (= (cylinder/cylinder transform) (cylinder/cylinder transform)))
+      (is (not= (cylinder/cylinder transform) (cylinder/cylinder))))))
 
 
