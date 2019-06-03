@@ -53,7 +53,8 @@
 
 (deftest test-equality
   (testing "Two cylinders are equals if the share the same characteristics"
-    (is (= (cylinder/cylinder) (cylinder/cylinder)))
+    (is (= (cylinder/cylinder)
+           (cylinder/cylinder)))
     (let [transform (transform/translate 1 2 3 )]
       (is (= (cylinder/cylinder transform) (cylinder/cylinder transform)))
       (is (not= (cylinder/cylinder transform) (cylinder/cylinder))))))
