@@ -9,7 +9,7 @@
             [raytracer.intersection :as intersection]))
 
 
-(defn- local-intersect [this ray-object-space]
+(defn- local-intersect [cylinder ray-object-space]
   (let [direction (:direction ray-object-space)
         a (+ (* (:x direction) (:x direction))
              (* (:z direction) (:z direction)))]
@@ -33,8 +33,20 @@
                                         cylinder)]))))))
 
 
+(defn- compute-cylinder-normal [point-object-space]
+  (svector/svector (:x point-object-space) 0 (:z point-object-space)))
 
-(defn cylinder []
-  (reify shared/Intersectable
-    (local-intersect [this ray-object-space]
-      (local-intersect this ray-object-space))))
+(defn cylinder 
+  ([] (cylinder matrix/identity-matrix))
+  ([transform]
+   (let [inverse-transform (matrix/invert transform 4)]
+     (reify
+       shared/Intersectable
+       (local-intersect [this ray-object-space]
+         (local-intersect this ray-object-space))
+       shared/Surface
+       (compute-normal [this point]
+         (tuple/normalize
+          (shared/as-vector
+           (matrix/transform (matrix/transpose inverse-transform)
+                             (compute-cylinder-normal (matrix/transform inverse-transform point))))))))))
