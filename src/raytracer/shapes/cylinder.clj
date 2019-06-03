@@ -37,22 +37,18 @@
 
 (defrecord Cylinder [inverse-transform])
 
-;;;(extend-type Cylinder
-;;;  shared/Intersectable
-;;;  (local-intersect [this ray-object-space]
-;;;    (local-intersect this ray-object-space))
-;;;  shared/Surface
-;;;  (compute-normal [this point]
-;;;    (tuple/normalize
-;;;     (shared/as-vector
-;;;      (matrix/transform (matrix/transpose (:inverse-transform this))
-;;;                        (compute-cylinder-normal (matrix/transform (:inverse-transform this) point)))))))
-;;;
-;;;(defn cylinder 
-;;;  ([] (cylinder matrix/identity-matrix))
-;;;  ([transform]
-;;;   (->Cylinder (matrix/invert transform 4))))
+(extend-type Cylinder
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    (local-intersect this ray-object-space))
+  shared/Surface
+  (compute-normal [this point]
+    (tuple/normalize
+     (shared/as-vector
+      (matrix/transform (matrix/transpose (:inverse-transform this))
+                        (compute-cylinder-normal (matrix/transform (:inverse-transform this) point)))))))
 
-(defn cylinder
-  ([] (->Cylinder nil))
-  ([a] (->Cylinder a)))
+(defn cylinder 
+  ([] (cylinder matrix/identity-matrix))
+  ([transform]
+   (->Cylinder (matrix/invert transform 4))))
