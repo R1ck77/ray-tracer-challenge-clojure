@@ -9,6 +9,25 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]))
 
+(defn- check-cap [ray t]
+  (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))]
+    (<= (+ (* (:x point) (:x point))
+           (* (:y point) (:y point)))
+        1)))
+
+(defn- intersect-cap [cylinder ray]
+  (let [y-direction (-> ray :direction :y)]
+    (if (or (not (:closed cylinder))
+            (< (-> y-direction float Math/abs) const/EPSILON))
+      []
+;;; slow, probably
+      (vec
+       (map #(intersection/intersection % cylinder)
+            (filter #(check-cap ray %)
+                    (map #(/ (- (get cylinder %)
+                                (-> ray :origin :y))
+                             y-direction)  [:minimum :maximum])))))))
+
 (defn is-within-bounds? [cylinder ray t]
   (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
     (and (> y-intersection (:minimum cylinder))
@@ -35,15 +54,18 @@
                  (* (:z origin) (:z origin))
                  -1)
             discriminant (- (* b b) (* 4 a c))]
-        (if (< discriminant 0)
-          []
-          (let [√discriminant (Math/sqrt discriminant)]
-            (create-intersections cylinder
-                                  ray-object-space
-                                  (- (/ (+ √discriminant b)
-                                        (* 2 a)))
-                                  (/ (- √discriminant  b)
-                                     (* 2 a)))))))))
+        (concat (if (< discriminant 0)
+                  []
+                  (let [√discriminant (Math/sqrt discriminant)]
+                    (create-intersections cylinder
+                                          ray-object-space
+                                          (- (/ (+ √discriminant b)
+                                                (* 2 a)))
+                                          (/ (- √discriminant  b)
+                                             (* 2 a)))))
+                (intersect-cap cylinder
+                               ray-object-space
+                               ))))))
 
 (defn- compute-cylinder-normal [point-object-space]
   (svector/svector (:x point-object-space) 0 (:z point-object-space)))

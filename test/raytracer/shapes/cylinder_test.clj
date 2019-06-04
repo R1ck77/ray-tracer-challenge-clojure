@@ -14,6 +14,21 @@
 (def √2 (Math/sqrt 2))
 (def half√2 (/ √2 2))
 
+(defmacro test-capped-intersections-count [name point direction n-intersections-expected]
+  `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2, :closed true)
+         point# (apply point/point ~point)
+         direction# (tuple/normalize (apply svector/svector ~direction))]
+     (is (= ~n-intersections-expected
+            (count (shared/local-intersect cylinder#
+                                           (ray/ray point# direction#)))))))
+
+(defmacro test-intersections-count [index point direction n-intersections-expected]
+  `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2)
+        ray# (ray/ray (apply point/point ~point)
+                     (tuple/normalize (apply svector/svector ~direction)))]
+    (is (= ~n-intersections-expected (count (shared/local-intersect cylinder# ray#)))
+        (format "capped cylinder intersection test #%d" ~index))))
+
 (defn assert-intersection-hits [t1 t2 origin direction]
   (is (v= [t1 t2]
           (map :t (shared/local-intersect a-cylinder
@@ -25,29 +40,28 @@
                                       (ray/ray (apply point/point origin)
                                                (tuple/normalize (apply svector/svector direction)))))))
 
-(defmacro test-intersections-count [index point direction n-intersections-expected]
-  `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2)
-        ray# (ray/ray (apply point/point ~point)
-                     (tuple/normalize (apply svector/svector ~direction)))]
-    (is (= ~n-intersections-expected (count (shared/local-intersect cylinder# ray#)))
-        (format "capped cylinder intersection test #%d" ~index))))
-
 (deftest test-local-intersect
   (testing "A ray misses a cylinder"
     (assert-missed-intersection [1 0 0] [0 1 0])
-    (assert-missed-intersection [0 0, 0] [0 1 0])
+    (assert-missed-intersection [0 0 0] [0 1 0])
     (assert-missed-intersection [0 0 -5] [1 1 1]))
   (testing "A ray hits the cylinder"
     (assert-intersection-hits 5 5 [1 0 -5] [0 0 1])
     (assert-intersection-hits 4 6 [0 0 -5] [0 0 1])
     (assert-intersection-hits 6.80798 7.08872 [0.5 0 -5] [0.1 1 1]))
   (testing "Intersecting a constrained cylinder"
-    (test-intersections-count 1 [0, 1.5, 0] [0.1, 1, 0] 0)
-    (test-intersections-count 2 [0, 3, -5] [0, 0, 1] 0)
-    (test-intersections-count 3 [0, 0, -5] [0, 0, 1] 0)
-    (test-intersections-count 4 [0, 2, -5] [0, 0, 1] 0)
-    (test-intersections-count 5 [0, 1, -5] [0, 0, 1] 0)
-    (test-intersections-count 6 [0, 1.5, -2] [0, 0, 1] 2)))
+    (test-intersections-count 1 [0 1.5 0] [0.1 1 0] 0)
+    (test-intersections-count 2 [0 3 -5] [0 0 1] 0)
+    (test-intersections-count 3 [0 0 -5] [0 0 1] 0)
+    (test-intersections-count 4 [0 2 -5] [0 0 1] 0)
+    (test-intersections-count 5 [0 1 -5] [0 0 1] 0)
+    (test-intersections-count 6 [0 1.5 -2] [0 0 1] 2))
+  (testing "Intersecting the caps of a closed cylinder"
+    (test-capped-intersections-count "1" [0 3 0] [0 -1 0] 2)
+    (test-capped-intersections-count "2" [0 3 -2] [0 -1 2] 2)
+    (test-capped-intersections-count "3 - corner case" [0 4 -2] [0 -1 1] 2)
+    (test-capped-intersections-count "4" [0 0 -2] [0 1 2] 2)
+    (test-capped-intersections-count "5 - corner case" [0 -1 -2] [0 1 1] 2)))
 
 (deftest test-compute-normal
   (testing "Normal vector on a cylinder"
