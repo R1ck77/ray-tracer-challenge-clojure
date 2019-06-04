@@ -1,3 +1,4 @@
+;;; TODO/FIXME refactor this eldritch horror
 (ns raytracer.shapes.cylinder
   (:require [raytracer.const :as const]
             [raytracer.tuple :as tuple]
@@ -8,6 +9,18 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]))
 
+(defn is-within-bounds? [cylinder ray t]
+  (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
+    (and (> y-intersection (:minimum cylinder))
+         (< y-intersection (:maximum cylinder)))))
+
+(defn- create-intersections [cylinder ray t1 t2]
+  (let [partial (if (is-within-bounds? cylinder ray t1)
+                  [(intersection/intersection t1 cylinder)]
+                  [])]
+    (if (is-within-bounds? cylinder ray t2)
+      (conj partial (intersection/intersection t2 cylinder))
+      partial)))
 
 (defn- local-intersect [cylinder ray-object-space]
   (let [direction (:direction ray-object-space)
@@ -25,17 +38,17 @@
         (if (< discriminant 0)
           []
           (let [√discriminant (Math/sqrt discriminant)]
-            [(intersection/intersection (- (/ (+ √discriminant b)
-                                              (* 2 a)))
-                                        cylinder)
-             (intersection/intersection (/ (- √discriminant  b)
-                                           (* 2 a))
-                                        cylinder)]))))))
+            (create-intersections cylinder
+                                  ray-object-space
+                                  (- (/ (+ √discriminant b)
+                                        (* 2 a)))
+                                  (/ (- √discriminant  b)
+                                     (* 2 a)))))))))
 
 (defn- compute-cylinder-normal [point-object-space]
   (svector/svector (:x point-object-space) 0 (:z point-object-space)))
 
-(defrecord Cylinder [inverse-transform])
+(defrecord Cylinder [minimum maximum inverse-transform])
 
 (extend-type Cylinder
   shared/Intersectable
@@ -49,6 +62,11 @@
                         (compute-cylinder-normal (matrix/transform (:inverse-transform this) point)))))))
 
 (defn cylinder 
-  ([] (cylinder matrix/identity-matrix))
-  ([transform]
-   (->Cylinder (matrix/invert transform 4))))
+  [& {:as args-map}]
+  (let [args (merge {:transform matrix/identity-matrix
+                     :minimum Double/NEGATIVE_INFINITY
+                     :maximum Double/POSITIVE_INFINITY}
+                    args-map)]
+    (->Cylinder (:minimum args)
+                (:maximum args)
+                (matrix/invert (:transform args) 4))))

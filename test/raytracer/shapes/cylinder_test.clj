@@ -25,6 +25,13 @@
                                       (ray/ray (apply point/point origin)
                                                (tuple/normalize (apply svector/svector direction)))))))
 
+(defmacro test-intersections-count [index point direction n-intersections-expected]
+  `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2)
+        ray# (ray/ray (apply point/point ~point)
+                     (tuple/normalize (apply svector/svector ~direction)))]
+    (is (= ~n-intersections-expected (count (shared/local-intersect cylinder# ray#)))
+        (format "capped cylinder intersection test #%d" ~index))))
+
 (deftest test-local-intersect
   (testing "A ray misses a cylinder"
     (assert-missed-intersection [1 0 0] [0 1 0])
@@ -33,7 +40,14 @@
   (testing "A ray hits the cylinder"
     (assert-intersection-hits 5 5 [1 0 -5] [0 0 1])
     (assert-intersection-hits 4 6 [0 0 -5] [0 0 1])
-    (assert-intersection-hits 6.80798 7.08872 [0.5 0 -5] [0.1 1 1])))
+    (assert-intersection-hits 6.80798 7.08872 [0.5 0 -5] [0.1 1 1]))
+  (testing "Intersecting a constrained cylinder"
+    (test-intersections-count 1 [0, 1.5, 0] [0.1, 1, 0] 0)
+    (test-intersections-count 2 [0, 3, -5] [0, 0, 1] 0)
+    (test-intersections-count 3 [0, 0, -5] [0, 0, 1] 0)
+    (test-intersections-count 4 [0, 2, -5] [0, 0, 1] 0)
+    (test-intersections-count 5 [0, 1, -5] [0, 0, 1] 0)
+    (test-intersections-count 6 [0, 1.5, -2] [0, 0, 1] 2)))
 
 (deftest test-compute-normal
   (testing "Normal vector on a cylinder"
@@ -53,11 +67,28 @@
 
 ;;; TODO/FIXME fix this test by replacing arrays with ArrayList
 (comment (deftest test-equality
-   (testing "Two cylinders are equals if the share the same characteristics"
-     (is (= (cylinder/cylinder)
-            (cylinder/cylinder)))
-     (let [transform (transform/translate 1 2 3 )]
-       (is (= (cylinder/cylinder transform) (cylinder/cylinder transform)))
-       (is (not= (cylinder/cylinder transform) (cylinder/cylinder)))))))
+           (testing "Two cylinders are equals if the share the same characteristics"
+             (is (= (cylinder/cylinder)
+                    (cylinder/cylinder)))
+             (let [transform (transform/translate 1 2 3 )]
+               (is (= (cylinder/cylinder transform) (cylinder/cylinder transform)))
+               (is (not= (cylinder/cylinder transform) (cylinder/cylinder)))))))
+
+(deftest test-constructor
+  (testing "The default minimum and maximum for a cylinder"
+    (is (= Double/POSITIVE_INFINITY (:maximum a-cylinder)))
+    (is (= Double/NEGATIVE_INFINITY (:minimum a-cylinder))))
+  (testing "A cylinder can be created with a set minimum"
+    (let [cylinder (cylinder/cylinder :minimum 12)]
+      (is (= Double/POSITIVE_INFINITY (:maximum cylinder)))
+      (is (= 12 (:minimum cylinder)))))
+  (testing "A cylinder can be created with a set maximum"
+    (let [cylinder (cylinder/cylinder :maximum 100)]
+      (is (= 100 (:maximum cylinder)))
+      (is (= Double/NEGATIVE_INFINITY (:minimum a-cylinder)))))
+  (testing "A cylinder can be created with a set minimum and maximum"
+    (let [cylinder (cylinder/cylinder :maximum 100 :minimum 12)]
+      (is (= 12 (:minimum cylinder)))
+      (is (= 100 (:maximum cylinder))))))
 
 
