@@ -10,9 +10,11 @@
             [raytracer.intersection :as intersection]))
 
 (defn- check-cap [ray t]
-  (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))]
-    (<= (+ (* (:x point) (:x point))
-           (* (:y point) (:y point)))
+  (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))
+        x (:x point)
+        z (:z point)]
+    (<= (+ (* x x)
+           (* z z))
         1)))
 
 (defn- intersect-cap [cylinder ray]
@@ -21,12 +23,11 @@
             (< (-> y-direction float Math/abs) const/EPSILON))
       []
 ;;; slow, probably
-      (vec
-       (map #(intersection/intersection % cylinder)
-            (filter #(check-cap ray %)
-                    (map #(/ (- (get cylinder %)
-                                (-> ray :origin :y))
-                             y-direction)  [:minimum :maximum])))))))
+      (map #(intersection/intersection % cylinder)
+           (filter #(check-cap ray %)
+                   (map #(/ (- (get cylinder %)
+                               (-> ray :origin :y))
+                            y-direction)  [:minimum :maximum]))))))
 
 (defn is-within-bounds? [cylinder ray t]
   (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
@@ -41,31 +42,39 @@
       (conj partial (intersection/intersection t2 cylinder))
       partial)))
 
-(defn- local-intersect [cylinder ray-object-space]
+(defmacro map-to-vector [f & args]
+  `(vector ~@(map #(list f %) args)))
+
+(defn- intersect-sides [cylinder ray-object-space]
   (let [direction (:direction ray-object-space)
-        a (+ (* (:x direction) (:x direction))
-             (* (:z direction) (:z direction)))]
+        x-direction (:x direction)
+        z-direction (:z direction)
+        a (+ (* x-direction x-direction)
+             (* z-direction z-direction))]
     (if (< a const/EPSILON)
       []
       (let [origin (:origin ray-object-space)
-            b (+ (* 2 (:x origin) (:x direction))
-                 (* 2 (:z origin) (:z direction)))
-            c (+ (* (:x origin) (:x origin))
-                 (* (:z origin) (:z origin))
+            x-origin (:x origin)
+            z-origin (:z origin)
+            b (+ (* 2 x-origin x-direction)
+                 (* 2 z-origin z-direction))
+            c (+ (* x-origin x-origin)
+                 (* z-origin z-origin)
                  -1)
             discriminant (- (* b b) (* 4 a c))]
-        (concat (if (< discriminant 0)
-                  []
-                  (let [√discriminant (Math/sqrt discriminant)]
-                    (create-intersections cylinder
-                                          ray-object-space
-                                          (- (/ (+ √discriminant b)
-                                                (* 2 a)))
-                                          (/ (- √discriminant  b)
-                                             (* 2 a)))))
-                (intersect-cap cylinder
-                               ray-object-space
-                               ))))))
+        (if (< discriminant 0)
+          []
+          (let [√discriminant (Math/sqrt discriminant)]
+            (create-intersections cylinder
+                                  ray-object-space
+                                  (- (/ (+ √discriminant b)
+                                        (* 2 a)))
+                                  (/ (- √discriminant  b)
+                                     (* 2 a)))))))))
+
+(defn- local-intersect [cylinder ray-object-space]
+  (concat (intersect-sides cylinder ray-object-space)
+          (intersect-cap cylinder ray-object-space)))
 
 (defn- compute-cylinder-normal [point-object-space]
   (svector/svector (:x point-object-space) 0 (:z point-object-space)))
