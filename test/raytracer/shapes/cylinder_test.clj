@@ -24,10 +24,10 @@
 
 (defmacro test-intersections-count [index point direction n-intersections-expected]
   `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2)
-        ray# (ray/ray (apply point/point ~point)
-                     (tuple/normalize (apply svector/svector ~direction)))]
-    (is (= ~n-intersections-expected (count (shared/local-intersect cylinder# ray#)))
-        (format "capped cylinder intersection test #%d" ~index))))
+         ray# (ray/ray (apply point/point ~point)
+                       (tuple/normalize (apply svector/svector ~direction)))]
+     (is (= ~n-intersections-expected (count (shared/local-intersect cylinder# ray#)))
+         (format "capped cylinder intersection test #%d" ~index))))
 
 (defn assert-intersection-hits [t1 t2 origin direction]
   (is (v= [t1 t2]
