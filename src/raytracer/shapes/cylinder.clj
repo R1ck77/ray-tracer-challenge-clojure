@@ -48,7 +48,7 @@
 (defn- compute-cylinder-normal [point-object-space]
   (svector/svector (:x point-object-space) 0 (:z point-object-space)))
 
-(defrecord Cylinder [minimum maximum inverse-transform])
+(defrecord Cylinder [minimum maximum closed inverse-transform])
 
 (extend-type Cylinder
   shared/Intersectable
@@ -69,4 +69,5 @@
                     args-map)]
     (->Cylinder (:minimum args)
                 (:maximum args)
+                (:closed args)
                 (matrix/invert (:transform args) 4))))

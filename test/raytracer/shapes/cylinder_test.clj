@@ -89,6 +89,10 @@
   (testing "A cylinder can be created with a set minimum and maximum"
     (let [cylinder (cylinder/cylinder :maximum 100 :minimum 12)]
       (is (= 12 (:minimum cylinder)))
-      (is (= 100 (:maximum cylinder))))))
+      (is (= 100 (:maximum cylinder)))))
+  (testing "The default closed value for a cylinder"
+    (is (not (:closed a-cylinder))))
+  (testing "Filled cylinders can be created"
+    (is (:closed (cylinder/cylinder :closed true)))))
 
 
