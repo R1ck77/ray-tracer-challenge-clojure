@@ -47,7 +47,7 @@
 
 (defmacro test-compute-cone-normal [point expected-normal]
   `(is
-    (t= (tuple/normalize ~expected-normal)
+    (t= (tuple/normalize (apply svector/svector ~expected-normal))
         (shared/compute-normal a-cone (apply point/point ~point)))))
 
 (defmacro test-intersecting-cone-with-end-caps [origin direction expected-count]
@@ -63,7 +63,7 @@
   `(let [cone# (cone/cone)
          ray# (ray/ray (apply point/point ~origin)
                        (apply svector/svector ~direction))]
-     (is (t= ~expected-result
+     (is (v= ~expected-result
              (map :t (shared/local-intersect cone# ray#))))))
 
 (deftest test-local-intersect
@@ -73,13 +73,15 @@
     (test-intersecting-cone-with-ray [1 1 -5] [-0.5 -1 1] [4.55006 49.44994]) )
   (testing "Intersecting a cone with a ray parallel to one of its halves"
     (is [0.35355]
-        (shared/local-intersect a-cone
-                                (ray/ray (point/point 0 0 -1)
-                                         (tuple/normalize (svector/svector 0 1 1))))))
+        ((map :t (shared/local-intersect a-cone
+                                         (ray/ray (point/point 0 0 -1)
+                                                  (tuple/normalize (svector/svector 0 1 1))))))))
   (testing "Intersecting a cone's end caps"
     (test-intersecting-cone-with-end-caps [0, 0, -5]    [0, 1, 0] 0)
     (test-intersecting-cone-with-end-caps [0, 0, -0.25] [0, 1, 1] 2)
-    (test-intersecting-cone-with-end-caps [0, 0, -0.25] [0, 1, 0] 4))
+    (test-intersecting-cone-with-end-caps [0, 0, -0.25] [0, 1, 0] 4)))
+
+(deftest test-compute-normal
   (testing "Computing the normal vector on a cone"
     (test-compute-cone-normal [0 0 0] [0 0 0])
     (test-compute-cone-normal [1 1 1] [1 (- (Math/sqrt 2)) 1])

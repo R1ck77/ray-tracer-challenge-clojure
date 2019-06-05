@@ -49,26 +49,32 @@
 (defn- t-for-side-intersections [ray-object-space]
   (let [direction (:direction ray-object-space)
         x-direction (:x direction)
+        y-direction (:y direction)
         z-direction (:z direction)
         a (+ (* x-direction x-direction)
-             (* z-direction z-direction))]
+             (- (* y-direction y-direction))
+             (* z-direction z-direction))
+        origin (:origin ray-object-space)
+        x-origin (:x origin)
+        y-origin (:y origin)
+        z-origin (:z origin)
+        b (+ (* 2 x-origin x-direction)
+             (- (* 2 y-origin y-direction))
+             (* 2 z-origin z-direction))
+        c (+ (* x-origin x-origin)
+             (- (* y-origin y-origin))                 
+             (* z-origin z-origin))        ]
     (if (>= a const/EPSILON)
-      (let [origin (:origin ray-object-space)
-            x-origin (:x origin)
-            z-origin (:z origin)
-            b (+ (* 2 x-origin x-direction)
-                 (* 2 z-origin z-direction))
-            c (+ (* x-origin x-origin)
-                 (* z-origin z-origin)
-                 -1)
-            discriminant (- (* b b)
+      (let [discriminant (- (* b b)
                             (* 4 a c))]
         (if (>= discriminant 0)
           (let [√discriminant (Math/sqrt discriminant)]
             (list (- (/ (+ √discriminant b)
                         (* 2 a)))
                   (/ (- √discriminant  b)
-                     (* 2 a)))))))))
+                     (* 2 a))))))
+      (if (> (Math/abs (float b)) const/EPSILON)
+        [(- (/ c (* 2 b)))]))))
 
 (defn- intersect-sides [cone ray-object-space]
   (create-intersections cone
@@ -80,7 +86,16 @@
           (intersect-cap cone ray-object-space)))
 
 (defn- compute-cone-side-normal [point-object-space]
-    (svector/svector (:x point-object-space) 0 (:z point-object-space)))
+  (let [px (:x point-object-space)
+        py (:y point-object-space)
+        pz (:z point-object-space)
+        y (Math/sqrt (+ (* px px)
+                        (* pz pz)))]
+    (tuple/normalize
+     (svector/svector px (if (> py 0)
+                           (- y)
+                           y)
+                      pz))))
 
 (defn- compute-cone-normal [this point-object-space]
   (let [x (:x point-object-space)
@@ -104,7 +119,7 @@
      (shared/as-vector
       (matrix/transform (matrix/transpose (:inverse-transform this))
                         (compute-cone-normal this
-                                                 (matrix/transform (:inverse-transform this) point)))))))
+                                             (matrix/transform (:inverse-transform this) point)))))))
 
 (defn cone 
   [& {:as args-map}]
@@ -113,6 +128,6 @@
                      :maximum Double/POSITIVE_INFINITY}
                     args-map)]
     (->Cone (:minimum args)
-                (:maximum args)
-                (:closed args)
-                (matrix/invert (:transform args) 4))))
+            (:maximum args)
+            (:closed args)
+            (matrix/invert (:transform args) 4))))
