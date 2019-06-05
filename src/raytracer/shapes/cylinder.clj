@@ -1,4 +1,3 @@
-;;; TODO/FIXME refactor this eldritch horror
 (ns raytracer.shapes.cylinder
   (:require [raytracer.const :as const]
             [raytracer.tuple :as tuple]
@@ -22,7 +21,7 @@
     (if (or (not (:closed cylinder))
             (< (-> y-direction float Math/abs) const/EPSILON))
       []
-;;; slow, probably
+      ;;; TODO/FIXME? slow, probably
       (map #(intersection/intersection % cylinder)
            (filter #(check-cap ray %)
                    (map #(/ (- (get cylinder %)
@@ -34,25 +33,26 @@
     (and (> y-intersection (:minimum cylinder))
          (< y-intersection (:maximum cylinder)))))
 
-(defn- create-intersections [cylinder ray t1 t2]
-  (let [partial (if (is-within-bounds? cylinder ray t1)
-                  [(intersection/intersection t1 cylinder)]
-                  [])]
-    (if (is-within-bounds? cylinder ray t2)
-      (conj partial (intersection/intersection t2 cylinder))
-      partial)))
+(defn- create-intersections [cylinder ray [t1 t2 :as xt]]
+  (if xt
+    (let [partial (if (is-within-bounds? cylinder ray t1)
+                    [(intersection/intersection t1 cylinder)]
+                    [])]
+      (if (is-within-bounds? cylinder ray t2)
+        (conj partial (intersection/intersection t2 cylinder))
+        partial))
+    []))
 
 (defmacro map-to-vector [f & args]
   `(vector ~@(map #(list f %) args)))
 
-(defn- intersect-sides [cylinder ray-object-space]
+(defn- t-for-side-intersections [ray-object-space]
   (let [direction (:direction ray-object-space)
         x-direction (:x direction)
         z-direction (:z direction)
         a (+ (* x-direction x-direction)
              (* z-direction z-direction))]
-    (if (< a const/EPSILON)
-      []
+    (if (>= a const/EPSILON)
       (let [origin (:origin ray-object-space)
             x-origin (:x origin)
             z-origin (:z origin)
@@ -61,23 +61,36 @@
             c (+ (* x-origin x-origin)
                  (* z-origin z-origin)
                  -1)
-            discriminant (- (* b b) (* 4 a c))]
-        (if (< discriminant 0)
-          []
+            discriminant (- (* b b)
+                            (* 4 a c))]
+        (if (>= discriminant 0)
           (let [√discriminant (Math/sqrt discriminant)]
-            (create-intersections cylinder
-                                  ray-object-space
-                                  (- (/ (+ √discriminant b)
-                                        (* 2 a)))
-                                  (/ (- √discriminant  b)
-                                     (* 2 a)))))))))
+            (list (- (/ (+ √discriminant b)
+                        (* 2 a)))
+                  (/ (- √discriminant  b)
+                     (* 2 a)))))))))
+
+(defn- intersect-sides [cylinder ray-object-space]
+  (create-intersections cylinder
+                        ray-object-space
+                        (t-for-side-intersections ray-object-space)))
 
 (defn- local-intersect [cylinder ray-object-space]
   (concat (intersect-sides cylinder ray-object-space)
           (intersect-cap cylinder ray-object-space)))
 
-(defn- compute-cylinder-normal [point-object-space]
-  (svector/svector (:x point-object-space) 0 (:z point-object-space)))
+(defn- compute-cylinder-side-normal [point-object-space]
+    (svector/svector (:x point-object-space) 0 (:z point-object-space)))
+
+(defn- compute-cylinder-normal [this point-object-space]
+  (let [x (:x point-object-space)
+        y (:y point-object-space)
+        z (:z point-object-space)
+        dist (+ (* x x) (* z z))]
+    (cond 
+      (and (< dist 1) (>= y (- (:maximum this) const/EPSILON))) (svector/svector 0 1 0)
+      (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
+      :default (compute-cylinder-side-normal point-object-space))))
 
 (defrecord Cylinder [minimum maximum closed inverse-transform])
 
@@ -90,7 +103,8 @@
     (tuple/normalize
      (shared/as-vector
       (matrix/transform (matrix/transpose (:inverse-transform this))
-                        (compute-cylinder-normal (matrix/transform (:inverse-transform this) point)))))))
+                        (compute-cylinder-normal this
+                                                 (matrix/transform (:inverse-transform this) point)))))))
 
 (defn cylinder 
   [& {:as args-map}]

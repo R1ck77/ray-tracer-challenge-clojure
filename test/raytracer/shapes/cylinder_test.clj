@@ -15,7 +15,9 @@
 (def half√2 (/ √2 2))
 
 (defmacro test-capped-intersections-count [name point direction n-intersections-expected]
-  `(let [cylinder# (cylinder/cylinder :minimum 1, :maximum 2, :closed true)
+  `(let [cylinder# (cylinder/cylinder :minimum 1,
+                                      :maximum 2,
+                                      :closed true)
          point# (apply point/point ~point)
          direction# (tuple/normalize (apply svector/svector ~direction))]
      (is (= ~n-intersections-expected
@@ -77,7 +79,17 @@
     (is (t= (svector/svector 0 0 -1)
             (shared/compute-normal a-cylinder (point/point 0 5 -1.1))))
     (is (t= (svector/svector half√2 0 (- half√2))
-            (shared/compute-normal a-cylinder (point/point half√2 100 (- half√2)))))))
+            (shared/compute-normal a-cylinder (point/point half√2 100 (- half√2))))))
+  (testing "The normal vector on a cylinder's end caps"
+    (let [cylinder (cylinder/cylinder :minimum 1
+                                      :maximum 2
+                                      :closed true)]
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0 1 0))))
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0.5 1 0))))
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0 1 0.5))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0 2 0))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0.5 2 0))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0 2 0.5)))))))
 
 ;;; TODO/FIXME fix this test by replacing arrays with ArrayList
 (comment (deftest test-equality
