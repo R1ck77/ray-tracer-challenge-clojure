@@ -5,6 +5,8 @@
             [raytracer.svector :as svector]
             [raytracer.point :as point]))
 
+(def √2 (/ (Math/sqrt 2) 2))
+
 (deftest test-add
   (testing "adding two tuple"
     (is (t= (tuple/tuple 1 1 6 1)
@@ -53,3 +55,15 @@
     (is (t= (tuple/tuple 0.5 -1 1.5 -2)
             (tuple/div (tuple/tuple 1 -2 3 -4) 2)))))
 
+(deftest test-normalize
+  (testing "normalizing a tuple with non zero length"
+    (is (t= (tuple/tuple 1 0 0 0)
+            (tuple/normalize (tuple/tuple 25 0 0 0))))
+    (is (t= (tuple/tuple √2 0 √2 0)
+            (tuple/normalize (tuple/tuple 1 0 1 0)))))
+  (testing "normalizing a zero length vector"
+    (is (t= (tuple/tuple 0 0 0 0)
+            (tuple/normalize (tuple/tuple 0 0 0 0)))))
+  (testing "normalizing a very small vector"
+    (is (t= (tuple/tuple 0 0 0 0)
+            (tuple/normalize (tuple/tuple 1e-8 0 3e-7 0))))))

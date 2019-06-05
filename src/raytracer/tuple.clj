@@ -1,4 +1,5 @@
-(ns raytracer.tuple)
+(ns raytracer.tuple
+  (:require [raytracer.const :as const]))
 
 (defprotocol AboutComparable
   (aboutEqual [this tuple]))
@@ -60,7 +61,9 @@
                            (:z squares))))))
   (normalize [this]
     (let [length (.mag this)]
-      (.div this length)))
+      (if (< length const/EPSILON)
+        (->Tuple 0 0 0 0)
+       (.div this length))))
   (cross [this that]
     (->Tuple (- (* (:y this) (:z that)) (* (:z this) (:y that)))
              (- (* (:z this) (:x that)) (* (:x this) (:z that)))
