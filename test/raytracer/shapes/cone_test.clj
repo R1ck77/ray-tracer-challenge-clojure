@@ -71,15 +71,18 @@
     (test-intersecting-cone-with-ray [0 0 -5] [0 0 1] [5 5])
     (test-intersecting-cone-with-ray [0 0 -5] [1 1 1] [8.66025 8.66025])
     (test-intersecting-cone-with-ray [1 1 -5] [-0.5 -1 1] [4.55006 49.44994]) )
-  (testing "Intersecting a cone with a ray parallel to one of its halves"
-    (is [0.35355]
-        ((map :t (shared/local-intersect a-cone
-                                         (ray/ray (point/point 0 0 -1)
-                                                  (tuple/normalize (svector/svector 0 1 1))))))))
+
   (testing "Intersecting a cone's end caps"
     (test-intersecting-cone-with-end-caps [0, 0, -5]    [0, 1, 0] 0)
     (test-intersecting-cone-with-end-caps [0, 0, -0.25] [0, 1, 1] 2)
     (test-intersecting-cone-with-end-caps [0, 0, -0.25] [0, 1, 0] 4)))
+
+(deftest test-local-intersect
+    (testing "Intersecting a cone with a ray parallel to one of its halves"
+    (is [0.35355]
+        (vec (map :t (shared/local-intersect a-cone
+                                             (ray/ray (point/point 0 0 -1)
+                                                      (tuple/normalize (svector/svector 0 1 1)))))))))
 
 (deftest test-compute-normal
   (testing "Computing the normal vector on a cone"

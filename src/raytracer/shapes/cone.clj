@@ -29,9 +29,10 @@
                             y-direction)  [:minimum :maximum]))))))
 
 (defn is-within-bounds? [cone ray t]
-  (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
-    (and (> y-intersection (:minimum cone))
-         (< y-intersection (:maximum cone)))))
+  (and t
+      (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
+        (and (> y-intersection (:minimum cone))
+             (< y-intersection (:maximum cone))))))
 
 (defn- create-intersections [cone ray [t1 t2 :as xt]]
   (if xt
@@ -63,7 +64,7 @@
              (* 2 z-origin z-direction))
         c (+ (* x-origin x-origin)
              (- (* y-origin y-origin))                 
-             (* z-origin z-origin))        ]
+             (* z-origin z-origin))]
     (if (>= a const/EPSILON)
       (let [discriminant (- (* b b)
                             (* 4 a c))]
