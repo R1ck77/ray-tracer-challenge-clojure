@@ -13,11 +13,11 @@
                               0 0 0 1]))
 
 
-(defn get [^java.util.List m i]
+(defn get-cell [^java.util.List m i]
   (.get m i))
 
 (defn get-n [matrix n i j]
-  (get matrix (+ j (* n i))))
+  (get-cell matrix (+ j (* n i))))
 
 (defn get4 [matrix i j]
   (get-n matrix 4 i j))
@@ -29,7 +29,7 @@
   (get-n matrix 2 i j))
 
 (defmacro cell4 [a row column columns]
-  `(get ~a ~(+ column (* columns row))))
+  `(get-cell ~a ~(+ column (* columns row))))
 
 (defmacro mul4-cell [a b row column b-columns index]
   `(* (cell4 ~a ~row ~index 4)
@@ -72,7 +72,7 @@
 
 (defn transpose [m]
   (create
-   (reduce #(conj % (get m %2)) [] [0 4 8 12
+   (reduce #(conj % (get-cell m %2)) [] [0 4 8 12
                                     1 5 9 13
                                     2 6 10 14
                                     3 7 11 15])))
@@ -104,8 +104,8 @@
      (minor m n row column)))
 
 (defn det2 [m]
-  (- (* (get m 0) (get m 3))
-     (* (get m 1) (get m 2))))
+  (- (* (get-cell m 0) (get-cell m 3))
+     (* (get-cell m 1) (get-cell m 2))))
 
 (defn- det-n [m n]
   (apply + (map #(* (get-n m n 0 %)
