@@ -7,7 +7,8 @@
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
             [raytracer.shapes.cylinder :as cylinder]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes :as shapes]))
 
 (def a-cylinder (cylinder/cylinder))
 
@@ -91,14 +92,16 @@
       (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0.5 2 0))))
       (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0 2 0.5)))))))
 
-;;; TODO/FIXME fix this test by replacing arrays with ArrayList
-(comment (deftest test-equality
-           (testing "Two cylinders are equals if the share the same characteristics"
-             (is (= (cylinder/cylinder)
-                    (cylinder/cylinder)))
-             (let [transform (transform/translate 1 2 3 )]
-               (is (= (cylinder/cylinder transform) (cylinder/cylinder transform)))
-               (is (not= (cylinder/cylinder transform) (cylinder/cylinder)))))))
+
+(deftest test-equality
+  (testing "Two cylinders are equals if the share the same characteristics"
+    (is (= (cylinder/cylinder)
+           (cylinder/cylinder)))
+    (let [transform (transform/translate 1 2 3 )
+          transformed-cylinder (shapes/change-transform (cylinder/cylinder)
+                                                        transform)]
+      (is (= transformed-cylinder transformed-cylinder))
+      (is (not= transformed-cylinder (cylinder/cylinder))))))
 
 (deftest test-constructor
   (testing "The default minimum and maximum for a cylinder"
