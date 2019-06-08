@@ -5,9 +5,6 @@
             [raytracer.point :as point]
             [raytracer.test-utils :refer [eps= v= t=]]))
 
-;;; TODO/FIXME all tests comparing with [] are implementation dependent!!!!
-;;; TODO/FIXME some tests are not on real vectors!!!
-
 (def inv-sqrt-3 (/ (Math/sqrt 3)))
 
 (deftest test-vector

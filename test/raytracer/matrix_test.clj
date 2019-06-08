@@ -4,7 +4,6 @@
             [raytracer.point :as point]
             [raytracer.matrix :as matrix]))
 
-;;; TODO/FIXME trying hard not to use types
 (deftest test-construction
   (testing "constructing and inspecting a 4x4 matrix"
     (let [matrix (matrix/create [1 2 3 4 
