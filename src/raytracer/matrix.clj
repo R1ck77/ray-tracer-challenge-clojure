@@ -1,15 +1,23 @@
 (ns raytracer.matrix
-  (:require [raytracer.tuple :as tuple]))
+  (:require [raytracer.tuple :as tuple])
+  (:import [java.util ArrayList List]))
 
 (def ^:private max-error 0.0001)
 
-(def identity-matrix (double-array [1 0 0 0
-                                    0 1 0 0
-                                    0 0 1 0
-                                    0 0 0 1]))
+(defn create [^java.util.List coll]
+  (ArrayList. coll))
 
-(defn get-n [^doubles matrix n i j]
-  (aget matrix (+ j (* n i))))
+(def identity-matrix (create [1 0 0 0
+                              0 1 0 0
+                              0 0 1 0
+                              0 0 0 1]))
+
+
+(defn get [^java.util.List m i]
+  (.get m i))
+
+(defn get-n [^List matrix n i j]
+  (get matrix (+ j (* n i))))
 
 (defn get4 [matrix i j]
   (get-n matrix 4 i j))
@@ -21,11 +29,11 @@
   (get-n matrix 2 i j))
 
 (defmacro cell4 [a row column columns]
-  `(aget ~a ~(+ column (* columns row))))
+  `(get ~a ~(+ column (* columns row))))
 
 (defmacro mul4-cell [a b row column b-columns index]
   `(* (cell4 ~a ~row ~index 4)
-     (cell4 ~b ~index ~column ~b-columns)))
+      (cell4 ~b ~index ~column ~b-columns)))
 
 (defmacro rowp4 [a b row column b-columns]
   `(+ (mul4-cell ~a ~b ~row ~column ~b-columns 0)
@@ -36,13 +44,13 @@
 (defmacro mul4-macro [a b]
   `(let [a# ~a
          b# ~b]
-     (double-array
+     (create
       (vector (rowp4 a# b# 0 0 4) (rowp4 a# b# 0 1 4) (rowp4 a# b# 0 2 4) (rowp4 a# b# 0 3 4)
               (rowp4 a# b# 1 0 4) (rowp4 a# b# 1 1 4) (rowp4 a# b# 1 2 4) (rowp4 a# b# 1 3 4)
               (rowp4 a# b# 2 0 4) (rowp4 a# b# 2 1 4) (rowp4 a# b# 2 2 4) (rowp4 a# b# 2 3 4)
               (rowp4 a# b# 3 0 4) (rowp4 a# b# 3 1 4) (rowp4 a# b# 3 2 4) (rowp4 a# b# 3 3 4)))))
 
-(defn mul4 [^doubles a ^doubles b]
+(defn mul4 [^java.util.List a ^java.util.List b]
   (mul4-macro a b))
 
 (defmacro line-vector-prod [m v row]
@@ -59,15 +67,15 @@
                   (line-vector-prod m# v# 2)
                   (line-vector-prod m# v# 3))))
 
-(defn transform [^doubles m v]
+(defn transform [^java.util.List m v]
   (transform-macro m v))
 
-(defn transpose [^doubles m]
-  (double-array
-   (reduce #(conj % (aget m %2)) [] [0 4 8 12
-                                     1 5 9 13
-                                     2 6 10 14
-                                     3 7 11 15])))
+(defn transpose [^java.util.List m]
+  (create
+   (reduce #(conj % (get m %2)) [] [0 4 8 12
+                                    1 5 9 13
+                                    2 6 10 14
+                                    3 7 11 15])))
 
 (defn cells-indices-seq [n]
   (for [i (range n) j (range n)]
@@ -78,7 +86,7 @@
 
   Probably on the slow side, but it's irrelevant given the number of inversions the ray tracer does"
   [m n row column]
-  (double-array
+  (create
    (let [get-f #(get-n m n % %2)]
      (map (fn [[i j]]
             (get-f i j))
@@ -95,9 +103,9 @@
   (* (if (odd? (+ row column)) -1 1)
      (minor m n row column)))
 
-(defn det2 [^doubles m]
-  (- (* (aget m 0) (aget m 3))
-     (* (aget m 1) (aget m 2))))
+(defn det2 [^java.util.List m]
+  (- (* (get m 0) (get m 3))
+     (* (get m 1) (get m 2))))
 
 (defn- det-n [m n]
   (apply + (map #(* (get-n m n 0 %)
@@ -114,11 +122,11 @@
 
 (defn- cofactor-matrix [m n]
   (let [cofactor-f (partial cofactor m n)]
-    (double-array
+    (create
      (map (fn [[i j]]
             (cofactor-f i j))
           (cells-indices-seq n)))))
 
 (defn invert [m n]
-  (double-array
+  (create
    (map float (map #(/ % (det m n)) (transpose (cofactor-matrix m n ))))))

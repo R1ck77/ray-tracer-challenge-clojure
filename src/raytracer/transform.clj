@@ -2,10 +2,10 @@
   (:require [raytracer.matrix :as matrix]))
 
 (defn- translation [tx ty tz]
-  (double-array [1 0 0 tx
-                 0 1 0 ty
-                 0 0 1 tz
-                 0 0 0 1]))
+  (matrix/create [1 0 0 tx
+                  0 1 0 ty
+                  0 0 1 tz
+                  0 0 0 1]))
 
 (defn translate
   ([tx ty tz]
@@ -14,10 +14,10 @@
    (matrix/mul4 (translation tx ty tz) m)))
 
 (defn- scaling [sx sy sz]
-  (double-array [sx 0 0 0
-                 0 sy 0 0
-                 0 0 sz 0
-                 0 0 0 1]))
+  (matrix/create [sx 0 0 0
+                  0 sy 0 0
+                  0 0 sz 0
+                  0 0 0 1]))
 
 (defn scale
   ([sx sy sz]
@@ -28,10 +28,10 @@
 (defn- rotation-x [angle-rad]
   (let [cos (Math/cos angle-rad)
         sin (Math/sin angle-rad)]
-    (double-array [1   0       0 0
-                   0 cos (- sin) 0
-                   0 sin     cos 0
-                   0   0       0 1])))
+    (matrix/create [1   0       0 0
+                    0 cos (- sin) 0
+                    0 sin     cos 0
+                    0   0       0 1])))
 
 (defn rotate-x
   ([angle-rad]
@@ -42,10 +42,10 @@
 (defn- rotation-y [angle-rad]
   (let [cos (Math/cos angle-rad)
         sin (Math/sin angle-rad)]
-    (double-array [cos  0 sin 0
-                   0  1   0 0
-                   (- sin)  0 cos 0
-                   0  0   0 1])))
+    (matrix/create [cos  0 sin 0
+                    0  1   0 0
+                    (- sin)  0 cos 0
+                    0  0   0 1])))
 
 (defn rotate-y
   ([angle-rad]
@@ -56,10 +56,10 @@
 (defn- rotation-z [angle-rad]
   (let [cos (Math/cos angle-rad)
         sin (Math/sin angle-rad)]
-    (double-array [cos (- sin) 0 0
-                   sin     cos 0 0
-                   0       0 1 0
-                   0       0 0 1])))
+    (matrix/create [cos (- sin) 0 0
+                    sin     cos 0 0
+                    0       0 1 0
+                    0       0 0 1])))
 
 (defn rotate-z
   ([angle-rad]
@@ -69,10 +69,10 @@
 
 (defn- shearing
   [x-y x-z y-x y-z z-x z-y]
-  (double-array [1 x-y x-z 0
-                 y-x 1 y-z 0
-                 z-x z-y 1 0
-                 0     0 0 1]))
+  (matrix/create [1 x-y x-z 0
+                  y-x 1 y-z 0
+                  z-x z-y 1 0
+                  0     0 0 1]))
 
 (defn shear
   ([x-y x-z y-x y-z z-x z-y]

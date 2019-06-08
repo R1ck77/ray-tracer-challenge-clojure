@@ -279,7 +279,7 @@
   (let [forward (tuple/normalize (tuple/sub to from))
         left (tuple/cross forward (tuple/normalize up))
         true-up (tuple/cross left forward)]
-    (matrix/mul4 (double-array
+    (matrix/mul4 (matrix/create
                   (vector (:x left)      (:y left)      (:z left)      0
                           (:x true-up)   (:y true-up)   (:z true-up)   0
                           (- (:x forward))   (- (:y forward))   (- (:z forward))   0
