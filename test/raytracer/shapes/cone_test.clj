@@ -6,6 +6,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
+            [raytracer.shapes :as shapes]
             [raytracer.shapes.cone :as cone]
             [raytracer.shapes.shared :as shared]))
 
@@ -14,15 +15,13 @@
 (def √2 (Math/sqrt 2))
 (def half√2 (/ √2 2))
 
-;;; TODO/FIXME fix this test by replacing arrays with ArrayList
-(comment
-  (deftest test-equality
-    (testing "Two cones are equals if the share the same characteristics"
-      (is (= (cone/cone)
-             (cone/cone)))
-      (let [transform (transform/translate 1 2 3 )]
-        (is (= (cone/cone transform) (cone/cone transform)))
-        (is (not= (cone/cone transform) (cone/cone)))))))
+(deftest test-equality
+  (testing "Two cones are equals if the share the same characteristics"
+    (is (= (cone/cone)
+           (cone/cone)))
+    (let [transformed-cone (shapes/change-transform a-cone (transform/translate 1 2 3 ))]
+      (is (= transformed-cone transformed-cone))
+      (is (not= transformed-cone (cone/cone))))))
 
 (deftest test-constructor
   (testing "The default minimum and maximum for a cone"

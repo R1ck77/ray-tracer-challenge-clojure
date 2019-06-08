@@ -97,9 +97,8 @@
   (testing "Two cylinders are equals if the share the same characteristics"
     (is (= (cylinder/cylinder)
            (cylinder/cylinder)))
-    (let [transform (transform/translate 1 2 3 )
-          transformed-cylinder (shapes/change-transform (cylinder/cylinder)
-                                                        transform)]
+    (let [transformed-cylinder (shapes/change-transform a-cylinder
+                                                        (transform/translate 1 2 3 ))]
       (is (= transformed-cylinder transformed-cylinder))
       (is (not= transformed-cylinder (cylinder/cylinder))))))
 
