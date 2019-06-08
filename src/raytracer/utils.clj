@@ -4,7 +4,7 @@
 (defn zero? [v]
   (< (Math/abs (double v)) const/EPSILON))
 
-(defmacro quick-mmap
+(defmacro quick-map
   "Non composable macro-version of map.
 
   Useful for performance critical code, if the size of the collection is small."
