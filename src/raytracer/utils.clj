@@ -4,25 +4,31 @@
 (defn zero? [v]
   (< (Math/abs (double v)) const/EPSILON))
 
-(defmacro mmap [f v]
+(defmacro quick-mmap
+  "Non composable macro-version of map.
+
+  Useful for performance critical code, if the size of the collection is small."
+  [f v]
   `(vector
     ~@(map #(list f %) v)))
 
-(defn- expand-comparison
-  ([f values carried]
+(defn- map-filter-f
+  ([map-f pred-f values carried]
    (if (empty? values)
      carried
      (let [next (first values)
            remaining (rest values)]
        (if (empty? remaining)
-         (list 'if (list f next)
-               (reverse (conj carried next))
+         (list 'if (list pred-f next)
+               (reverse (conj carried (list map-f next)))
                (reverse carried))
-         (list 'if (list f next)
-               (expand-comparison f remaining (conj carried next))
-               (expand-comparison f remaining carried)))))))
+         (list 'if (list pred-f next)
+               (map-filter-f map-f pred-f remaining (conj carried (list map-f next)))
+               (map-filter-f map-f pred-f remaining carried)))))))
 
-(defmacro mfilter                                                                                                                                                                                                  
-  "Unroll the filtering on a sequence of known elements to reproduce the filter behavior"                                                                                                                          
-  [f values]                                                                                                                                                                                                       
-  (expand-comparison f values '(list)))
+(defmacro map-filter
+  "Loose macro equivalent of (map mapf (filter pred-f values))
+
+  Some performance gain for repeated application on short collections (size < 8)"
+  [map-f pred-f values]                                                                                                                                                                                                       
+  (map-filter-f map-f pred-f values '(list)))
