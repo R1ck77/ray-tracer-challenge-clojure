@@ -1,5 +1,6 @@
 (ns raytracer.shapes.cone
-  (:require [raytracer.const :as const]
+  (:require [raytracer.utils :as utils]
+            [raytracer.const :as const]
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
@@ -36,13 +37,9 @@
 
 (defn- create-intersections [cone ray [t1 t2 :as xt]]
   (if xt
-    (let [partial (if (is-within-bounds? cone ray t1)
-                    [(intersection/intersection t1 cone)]
-                    [])]
-      (if (is-within-bounds? cone ray t2)
-        (conj partial (intersection/intersection t2 cone))
-        partial))
-    []))
+    (utils/map-filter #(intersection/intersection % cone)
+                      #(is-within-bounds? cone ray %)
+                      [t1 t2])))
 
 (defmacro map-to-vector [f & args]
   `(vector ~@(map #(list f %) args)))

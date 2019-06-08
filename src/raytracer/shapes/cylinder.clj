@@ -1,5 +1,6 @@
 (ns raytracer.shapes.cylinder
-  (:require [raytracer.const :as const]
+  (:require [raytracer.utils :as utils]
+            [raytracer.const :as const]
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
@@ -35,13 +36,9 @@
 
 (defn- create-intersections [cylinder ray [t1 t2 :as xt]]
   (if xt
-    (let [partial (if (is-within-bounds? cylinder ray t1)
-                    [(intersection/intersection t1 cylinder)]
-                    [])]
-      (if (is-within-bounds? cylinder ray t2)
-        (conj partial (intersection/intersection t2 cylinder))
-        partial))
-    []))
+    (utils/map-filter #(intersection/intersection % cylinder)
+                      #(is-within-bounds? cylinder ray %)
+                      [t1 t2])))
 
 (defmacro map-to-vector [f & args]
   `(vector ~@(map #(list f %) args)))
