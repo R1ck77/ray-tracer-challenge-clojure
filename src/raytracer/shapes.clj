@@ -5,7 +5,9 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.sphere :as sphere-ns]
             [raytracer.shapes.plane :as plane-ns]
-            [raytracer.shapes.cube :as cube-ns]))
+            [raytracer.shapes.cube :as cube-ns]
+            [raytracer.shapes.cylinder :as cylinder-ns]
+            [raytracer.shapes.cone :as cone-ns]))
 
 (defn change-transform [shape new-transform]
   (merge shape {:transform new-transform
@@ -25,3 +27,9 @@
 
 (defn cube []
   (cube-ns/cube))
+
+(defn cylinder []
+  (cylinder-ns/cylinder))
+
+(defn cone []
+  (cone-ns/cone))

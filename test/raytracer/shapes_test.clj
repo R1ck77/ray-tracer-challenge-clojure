@@ -4,7 +4,9 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.sphere :as sphere-ns]
             [raytracer.shapes.plane :as plane-ns]
-            [raytracer.shapes.cube :as cube-ns]))
+            [raytracer.shapes.cube :as cube-ns]
+            [raytracer.shapes.cylinder :as cylinder-ns]
+            [raytracer.shapes.cone :as cone-ns]))
 
 (defn- glass-object [shape]
   (shapes/change-material shape
@@ -32,4 +34,8 @@
   (testing "plane creates a plane"
     (is (= (plane-ns/plane) (shapes/plane))))
   (testing "cube creates a cube"
-    (is (= (cube-ns/cube) (shapes/cube)))))
+    (is (= (cube-ns/cube) (shapes/cube))))
+  (testing "cylinder creates a cylinder"
+    (is (= (cylinder-ns/cylinder) (shapes/cylinder))))
+  (testing "cone creates a cone"
+    (is (= (cone-ns/cone) (shapes/cone)))))
