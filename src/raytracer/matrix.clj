@@ -16,7 +16,7 @@
 (defn get [^java.util.List m i]
   (.get m i))
 
-(defn get-n [^List matrix n i j]
+(defn get-n [matrix n i j]
   (get matrix (+ j (* n i))))
 
 (defn get4 [matrix i j]
@@ -50,7 +50,7 @@
               (rowp4 a# b# 2 0 4) (rowp4 a# b# 2 1 4) (rowp4 a# b# 2 2 4) (rowp4 a# b# 2 3 4)
               (rowp4 a# b# 3 0 4) (rowp4 a# b# 3 1 4) (rowp4 a# b# 3 2 4) (rowp4 a# b# 3 3 4)))))
 
-(defn mul4 [^java.util.List a ^java.util.List b]
+(defn mul4 [a b]
   (mul4-macro a b))
 
 (defmacro line-vector-prod [m v row]
@@ -67,10 +67,10 @@
                   (line-vector-prod m# v# 2)
                   (line-vector-prod m# v# 3))))
 
-(defn transform [^java.util.List m v]
+(defn transform [m v]
   (transform-macro m v))
 
-(defn transpose [^java.util.List m]
+(defn transpose [m]
   (create
    (reduce #(conj % (get m %2)) [] [0 4 8 12
                                     1 5 9 13
@@ -103,7 +103,7 @@
   (* (if (odd? (+ row column)) -1 1)
      (minor m n row column)))
 
-(defn det2 [^java.util.List m]
+(defn det2 [m]
   (- (* (get m 0) (get m 3))
      (* (get m 1) (get m 2))))
 
