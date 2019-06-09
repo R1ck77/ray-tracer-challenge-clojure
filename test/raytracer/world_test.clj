@@ -10,11 +10,11 @@
             [raytracer.ray :as ray]
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
-            [raytracer.shapes-test :as shapes-test]
             [raytracer.material :as material]
             [raytracer.transform :as transform]
             [raytracer.pattern :as pattern]
-            [raytracer.light-sources :as light-sources]))
+            [raytracer.light-sources :as light-sources]
+            [raytracer.refraction :as refraction]))
 
 (def √2 (Math/sqrt 2))
 (def half√2 (/ √2 2))
@@ -118,44 +118,6 @@
       (is (<= (* 0.5 const/EPSILON) z-under-point))
       (is (< z-point z-under-point)))))
 
-(deftest test-compute-refractive-indices
-    (testing "Finding n1 and n2 at various intersections"
-    (let [sphere-a (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/scale 2 2 2))
-                       (shapes/update-material #(material/update-material % :refractive-index 1.5)))
-          sphere-b (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/translate 0 0 -0.25))
-                       (shapes/update-material #(material/update-material % :refractive-index 2.0)))
-          sphere-c (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/translate 0 0 0.25))
-                       (shapes/update-material #(material/update-material % :refractive-index 2.5)))
-          ray (ray/ray (point/point 0 0 -4)
-                       (svector/svector 0 0 1))
-          intersections (vec (map #(apply intersection/intersection %) [[2 sphere-a]
-                                                                        [2.75 sphere-b]
-                                                                        [3.25 sphere-c]
-                                                                        [4.75 sphere-b]
-                                                                        [5.25 sphere-c]
-                                                                        [6 sphere-a]]))]
-      (let  [indices (world/compute-refractive-indices (nth intersections 0) intersections 1)]
-        (is (eps= 1 (:n1 indices)))
-        (is (eps= 1.5 (:n2 indices))))
-      (let  [indices (world/compute-refractive-indices (nth intersections 1) intersections 1)]
-        (is (eps= 1.5 (:n1 indices)))
-        (is (eps= 2.0 (:n2 indices))))
-      (let  [indices (world/compute-refractive-indices (nth intersections 2) intersections 1)]
-        (is (eps= 2 (:n1 indices)))
-        (is (eps= 2.5 (:n2 indices))))
-      (let  [indices (world/compute-refractive-indices (nth intersections 3) intersections 1)]
-        (is (eps= 2.5 (:n1 indices)))
-        (is (eps= 2.5 (:n2 indices))))
-      (let  [indices (world/compute-refractive-indices (nth intersections 4) intersections 1)]
-        (is (eps= 2.5 (:n1 indices)))
-        (is (eps= 1.5 (:n2 indices))))
-      (let  [indices (world/compute-refractive-indices  (nth intersections 5) intersections 1)]
-        (is (eps= 1.5 (:n1 indices)))
-        (is (eps= 1.0 (:n2 indices)))))))
-
 (deftest test-shade-hit
   (testing "Shading an intersection"
     (let [world (world/default-world)
@@ -218,7 +180,7 @@
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- half√2) half√2))
           intersections [(intersection/intersection √2 floor)]
-          refractive-indices (world/compute-refractive-indices (first intersections) intersections 1)
+          refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
           intermediate-results (world/prepare-computations ray
                                                            (first intersections)
                                                            refractive-indices)]
@@ -244,7 +206,7 @@
                     (world/add-object floor)
                     (world/add-object ball))
           intersections [(intersection/intersection √2 floor)]
-          refractive-indices (world/compute-refractive-indices (first intersections) intersections 1)
+          refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
           intermediate-results (world/prepare-computations ray (first intersections) refractive-indices)]
       (with-redefs [world/*basic-shade-detection* true]
         (is (c= (color/color 0.9339151479206158 0.6964342355067606 0.6924306968966569)
@@ -475,33 +437,3 @@
       (is (c= (color/color 0 0.99888 0.04725)
               (world/refracted-color world intermediate-results 5))))))
 
-(deftest test-schlick
-  (testing "The Schlick approximation under total internal reflection"
-    (let [shape (shapes-test/glass-sphere)
-          ray (ray/ray (point/point 0 0 half√2)
-                       (svector/svector 0 1 0))
-          intersections [(intersection/intersection (- half√2) shape)
-                         (intersection/intersection half√2 shape)]
-          intermediate-results (world/prepare-computations ray
-                                                           (second intersections)
-                                                           {:n1 1.5, :n2 1})]
-      (is (eps= 1 (world/schlick intermediate-results)))))
-  (testing "The Schlick approximation with a perpendicular viewing angle"
-    (let [shape (shapes-test/glass-sphere)
-          ray (ray/ray (point/point 0 0 0)
-                       (svector/svector 0 1 0))
-          intersections [(intersection/intersection -1 shape)
-                         (intersection/intersection 1 shape)]
-          intermediate-results (world/prepare-computations ray
-                                                           (second intersections)
-                                                           {:n1 1.5, :n2 1})]
-      (is (eps= 0.04 (world/schlick intermediate-results)))))
-  (testing "The Schlick approximation with small angle and n2 > n1"
-    (let [shape (shapes-test/glass-sphere)
-          ray (ray/ray (point/point 0 0.99 -2)
-                       (svector/svector 0 0 1))
-          intersections [(intersection/intersection 1.8589 shape)]
-          intermediate-results (world/prepare-computations ray
-                                                           (first intersections)
-                                                           {:n1 1, :n2 1.5})]
-      (is (eps= 0.48873 (world/schlick intermediate-results))))))
