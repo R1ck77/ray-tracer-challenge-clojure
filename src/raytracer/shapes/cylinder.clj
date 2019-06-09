@@ -17,17 +17,19 @@
            (* z z))
         1)))
 
+(defn- intermediate-value [y-direction ray cap-y]
+  (/ (- cap-y
+        (-> ray :origin :y))
+     y-direction))
+
 (defn- intersect-cap [cylinder ray]
   (let [y-direction (-> ray :direction :y)]
     (if (or (not (:closed cylinder))
             (< (-> y-direction float Math/abs) const/EPSILON))
-      []
-      ;;; TODO/FIXME? slow, probably
-      (map #(intersection/intersection % cylinder)
-           (filter #(check-cap ray %)
-                   (map #(/ (- (get cylinder %)
-                               (-> ray :origin :y))
-                            y-direction)  [:minimum :maximum]))))))
+      (utils/map-filter #(intersection/intersection % cylinder)
+                        #(check-cap ray %)
+                        [(intermediate-value y-direction ray (get cylinder :minimum))
+                         (intermediate-value y-direction ray (get cylinder :maximum))]))))
 
 (defn is-within-bounds? [cylinder ray t]
   (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]

@@ -100,12 +100,24 @@
                       (> t 0)))
                intersections)))
 
-;;; TODO/FIXME this function is oversimplifying the model, even after the update to account transparency
-;;; There is no way to filter a light through a colored glass (or multiple ones!)
-;;; While simulating transparency for arbitrary objects with some realism would be complicated, you can at least:
-;;; a) get the list of intersections with their transparencies
-;;; b) remove the concept of shadow and just filter the light through all objects the light passes through
+;;; TODO/FIXME consider a more physics based shadowing model based on the distance traveled inside the material
 (defn- compute-shadow-attenuation
+  "Slightly more complex shadow computation
+  
+  This function is an improvement over the basic shadowed/lit model in
+  the book, altough still very crude.
+
+  It computes the transparency of each object the light goes through
+  when moving from the point to the light, and picks the one with the
+  lowest transparency as the attenuation to use.
+
+  A better model could compute the attenuation through each object to
+  account for multiple semi-transparent objects.
+
+  Also keep in mind that this transparency model is not physics based,
+  as the light attenuation doesn't account the length the light goes
+  through the material. Using intersection points to compute how deep
+  an object goes into a material could make an interesting upgrade."
   [world point]
   (let [light-source (first (:light-sources world)) ;;; first light source only
         pos->light (tuple/sub (:position light-source) point)
@@ -125,7 +137,9 @@
 (defn select-shadow-attenuation
   [world point]
   (if *basic-shade-detection*
-    (if (basic-is-shadowed? world point) 0.0 1.0)
+    (if (basic-is-shadowed? world point)
+      0.0
+      1.0)
     (compute-shadow-attenuation world point)))
 
 (def reflected-color)
