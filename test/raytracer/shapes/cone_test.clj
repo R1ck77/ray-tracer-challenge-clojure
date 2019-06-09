@@ -1,6 +1,7 @@
 (ns raytracer.shapes.cone-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.ray :as ray]
             [raytracer.tuple :as tuple]
             [raytracer.point :as point]
@@ -13,7 +14,6 @@
 (def a-cone (cone/cone))
 
 (def √2 (Math/sqrt 2))
-(def half√2 (/ √2 2))
 
 (deftest test-equality
   (testing "Two cones are equals if the share the same characteristics"

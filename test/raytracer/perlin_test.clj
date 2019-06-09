@@ -1,6 +1,7 @@
 (ns raytracer.perlin-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.svector :as svector]
             [raytracer.perlin :as perlin]))
 
@@ -159,12 +160,11 @@
                         (set-1D-grid-values! [-1 1]))]
       (is (eps= 1 (perlin/noise perlin-data [0.25])))))
   (testing "noise extremes for the 2D noise"
-    (let [half√2 (/ (Math/sqrt 2) 2)
-          perlin-data (doto (perlin/create-perlin-data [2 2])
-                        (set-2D-grid-values! {[0 0] [(- half√2) (- half√2)]
-                                              [1 0] [(+ half√2) (- half√2)]
-                                              [0 1] [(- half√2) (+ half√2)]
-                                              [1 1] [(+ half√2) (+ half√2)]}))]
+    (let [perlin-data (doto (perlin/create-perlin-data [2 2])
+                        (set-2D-grid-values! {[0 0] [(- const/half√2) (- const/half√2)]
+                                              [1 0] [(+ const/half√2) (- const/half√2)]
+                                              [0 1] [(- const/half√2) (+ const/half√2)]
+                                              [1 1] [(+ const/half√2) (+ const/half√2)]}))]
       (is (eps= 1 (perlin/noise perlin-data [0.25 0.25])))))
   (testing "noise extremes for the 3D noise"
     (let [inv√3 (/ (Math/sqrt 3))

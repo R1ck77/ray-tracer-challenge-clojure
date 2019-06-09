@@ -1,6 +1,7 @@
 (ns raytracer.camera-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.camera :as camera]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
@@ -12,7 +13,6 @@
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
-(def half√2 (/ (Math/sqrt 2) 2))
 
 (deftest test-camera
   (testing "Constructing a camera"
@@ -71,7 +71,7 @@
           ray (camera/ray-for-pixel transformed-camera 100 50)]
       (is (t= (point/point 0 2 -5)
               (:origin ray)))
-      (is (t= (svector/svector half√2 0 (- half√2))
+      (is (t= (svector/svector const/half√2 0 (- const/half√2))
               (:direction ray))))))
 
 (deftest test-render

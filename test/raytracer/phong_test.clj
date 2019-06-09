@@ -1,6 +1,7 @@
 (ns raytracer.phong-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.phong :as phong]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
@@ -10,7 +11,6 @@
             [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]))
 
-(def half√2 (/ (Math/sqrt 2) 2))
 (def material (material/material))
 (def position (point/point 0 0 0))
 
@@ -33,7 +33,7 @@
       (is (c= (color/color 0.1 0.1 0.1)
               (phong/lighting (test-object material) light position eye normal 0.0)))))
   (testing "Lighting with the eye between light and surface eye offset 45°"
-    (let [eye (svector/svector 0 half√2 (- half√2))
+    (let [eye (svector/svector 0 const/half√2 (- const/half√2))
           normal (svector/svector 0 0 -1)
           light (light-sources/create-point-light (point/point 0 0 -10) (color/color 1 1 1))]
       (is (c= (color/color 1.0 1.0 1.0)
@@ -45,13 +45,13 @@
       (is (c= (color/color 0.7364 0.7364 0.7364)
               (phong/lighting (test-object material) light position eye normal)))))
   (testing "Lighting with eye in the path of the reflection vector"
-    (let [eye (svector/svector 0 (- half√2) (- half√2))
+    (let [eye (svector/svector 0 (- const/half√2) (- const/half√2))
           normal (svector/svector 0 0 -1)
           light (light-sources/create-point-light (point/point 0 10 -10) (color/color 1 1 1))]
       (is (c= (color/color 1.6364 1.6364 1.6364)
               (phong/lighting (test-object material) light position eye normal)))))
   (testing "Lighting with eye in the path of the reflection vector and partial shadowing (golden master)"
-    (let [eye (svector/svector 0 (- half√2) (- half√2))
+    (let [eye (svector/svector 0 (- const/half√2) (- const/half√2))
           normal (svector/svector 0 0 -1)
           light (light-sources/create-point-light (point/point 0 10 -10) (color/color 1 1 1))]
       (is (c= (color/color 1.06793 1.06793 1.06793)

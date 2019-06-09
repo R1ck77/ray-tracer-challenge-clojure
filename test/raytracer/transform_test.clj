@@ -1,12 +1,11 @@
 (ns raytracer.transform-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.transform :as transform]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]))
-
-(def half-√2 (/ (Math/sqrt 2) 2))
 
 (deftest test-translate
   (testing "translation"
@@ -42,7 +41,7 @@
 
 (deftest test-rotation-x
   (testing "various x axis rotation"
-    (is (t= (point/point 0 half-√2 half-√2)
+    (is (t= (point/point 0 const/half√2 const/half√2)
             (matrix/transform (transform/rotate-x (/ Math/PI 4))
                               (point/point 0 1 0))))
     (is (t= (point/point 0 0 1)
@@ -51,14 +50,14 @@
   (testing "inverse of various x axis rotation"
     (is (t= (point/point 0 1 0)
             (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 4)) 4)
-                              (point/point 0 half-√2 half-√2))))
+                              (point/point 0 const/half√2 const/half√2))))
     (is (t= (point/point 0 1 0)
             (matrix/transform (matrix/invert (transform/rotate-x (/ Math/PI 2)) 4)
                               (point/point 0 0 1))))))
 
 (deftest test-rotation-y
   (testing "various y axis rotation"
-    (is (t= (point/point half-√2 0 half-√2)
+    (is (t= (point/point const/half√2 0 const/half√2)
             (matrix/transform (transform/rotate-y (/ Math/PI 4))
                               (point/point 0 0 1))))
     (is (t= (point/point 1 0 0)
@@ -67,14 +66,14 @@
   (testing "inverse of various y axis rotation"
     (is (t= (point/point 0 0 1)
             (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 4)) 4)
-                              (point/point half-√2 0 half-√2))))
+                              (point/point const/half√2 0 const/half√2))))
     (is (t= (point/point 0 0 1)
             (matrix/transform (matrix/invert (transform/rotate-y (/ Math/PI 2)) 4)
                               (point/point 1 0 0))))))
 
 (deftest test-rotation-z
   (testing "various z axis rotation"
-    (is (t= (point/point (- half-√2) half-√2 0)
+    (is (t= (point/point (- const/half√2) const/half√2 0)
             (matrix/transform (transform/rotate-z (/ Math/PI 4))
                               (point/point 0 1 0))))
     (is (t= (point/point -1 0 0)
@@ -83,7 +82,7 @@
   (testing "inverse of various z axis rotation"
     (is (t= (point/point 0 1 0)
             (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 4)) 4)
-                              (point/point (- half-√2) half-√2 0))))
+                              (point/point (- const/half√2) const/half√2 0))))
     (is (t= (point/point 0 1 0)
             (matrix/transform (matrix/invert (transform/rotate-z (/ Math/PI 2)) 4)
                               (point/point -1 0 0))))))

@@ -1,6 +1,7 @@
 (ns raytracer.shapes.cylinder-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.ray :as ray]
             [raytracer.tuple :as tuple]
             [raytracer.point :as point]
@@ -13,7 +14,6 @@
 (def a-cylinder (cylinder/cylinder))
 
 (def √2 (Math/sqrt 2))
-(def half√2 (/ √2 2))
 
 (defmacro test-capped-intersections-count [name point direction n-intersections-expected]
   `(let [cylinder# (cylinder/cylinder :minimum 1,
@@ -79,8 +79,8 @@
   (testing "Extra normal tests not in the book"
     (is (t= (svector/svector 0 0 -1)
             (shared/compute-normal a-cylinder (point/point 0 5 -1.1))))
-    (is (t= (svector/svector half√2 0 (- half√2))
-            (shared/compute-normal a-cylinder (point/point half√2 100 (- half√2))))))
+    (is (t= (svector/svector const/half√2 0 (- const/half√2))
+            (shared/compute-normal a-cylinder (point/point const/half√2 100 (- const/half√2))))))
   (testing "The normal vector on a cylinder's end caps"
     (let [cylinder (cylinder/cylinder :minimum 1
                                       :maximum 2
