@@ -17,18 +17,17 @@
    (if (empty? values)
      carried
      (let [next (first values)
-           remaining (rest values)]
+           remaining (rest values)
+           x (gensym)]
        (if (empty? remaining)
-         (let [x (gensym)]
-           `(let [~x ~next]
-              (if (~pred-f ~x)
-                ~(reverse (conj carried `(~map-f ~x)))
-                ~(reverse carried))))
-         (let [x (gensym)]
-           `(let [~x ~next]
-              (if (~pred-f ~x)
-                ~(map-filter-f map-f pred-f remaining (conj carried `(~map-f ~x)))
-                ~(map-filter-f map-f pred-f remaining carried)))))))))
+         `(let [~x ~next]
+            (if (~pred-f ~x)
+              ~(reverse (conj carried `(~map-f ~x)))
+              ~(reverse carried)))
+         `(let [~x ~next]
+            (if (~pred-f ~x)
+              ~(map-filter-f map-f pred-f remaining (conj carried `(~map-f ~x)))
+              ~(map-filter-f map-f pred-f remaining carried))))))))
 
 (defmacro map-filter
   "Loose macro equivalent of (map mapf (filter pred-f values))
