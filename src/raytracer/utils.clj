@@ -19,12 +19,16 @@
      (let [next (first values)
            remaining (rest values)]
        (if (empty? remaining)
-         (list 'if (list pred-f next)
-               (reverse (conj carried (list map-f next)))
-               (reverse carried))
-         (list 'if (list pred-f next)
-               (map-filter-f map-f pred-f remaining (conj carried (list map-f next)))
-               (map-filter-f map-f pred-f remaining carried)))))))
+         (let [x (gensym)]
+           `(let [~x ~next]
+              (if (~pred-f ~x)
+                ~(reverse (conj carried `(~map-f ~x)))
+                ~(reverse carried))))
+         (let [x (gensym)]
+           `(let [~x ~next]
+              (if (~pred-f ~x)
+                ~(map-filter-f map-f pred-f remaining (conj carried `(~map-f ~x)))
+                ~(map-filter-f map-f pred-f remaining carried)))))))))
 
 (defmacro map-filter
   "Loose macro equivalent of (map mapf (filter pred-f values))
