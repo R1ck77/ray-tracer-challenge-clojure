@@ -17,19 +17,25 @@
            (* z z))
         1)))
 
-(defn- intermediate-value [y-direction ray cap-y]
-  (/ (- cap-y
-        (-> ray :origin :y))
+(defn- parallel? [y-direction]
+  (< (-> y-direction float Math/abs)
+     const/EPSILON))
+
+(defn- intermediate-value [y-direction y-origin cap-y]
+  (/ (- cap-y y-origin)
      y-direction))
 
 (defn- intersect-cap [cylinder ray]
-  (let [y-direction (-> ray :direction :y)]
+  (let [y-direction (-> ray :direction :y)
+        y-origin (-> ray :origin :y)
+        intermediate-value (partial intermediate-value y-direction y-origin)]
     (if (or (not (:closed cylinder))
-            (< (-> y-direction float Math/abs) const/EPSILON))
+            (parallel? y-direction))
+      []
       (utils/map-filter #(intersection/intersection % cylinder)
                         #(check-cap ray %)
-                        [(intermediate-value y-direction ray (get cylinder :minimum))
-                         (intermediate-value y-direction ray (get cylinder :maximum))]))))
+                        [(intermediate-value (get cylinder :minimum))
+                         (intermediate-value (get cylinder :maximum))]))))
 
 (defn is-within-bounds? [cylinder ray t]
   (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
