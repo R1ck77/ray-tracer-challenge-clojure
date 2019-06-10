@@ -7,7 +7,7 @@
 (deftest test-material
   (let [default-material (material/material)]
     (testing "the default material"
-      (is (c= (color/color 1 1 1) (:color default-material)))
+      (is (c= (color/color 1 1 1) (material/get-color default-material)))
       (is (= 0.1 (:ambient default-material)))
       (is (= 0.9 (:diffuse default-material)))
       (is (= 0.9 (:specular default-material)))
@@ -16,7 +16,7 @@
       (is (= 0.0 (:transparency default-material)))
       (is (= 1.0 (:refractive-index default-material))))
     (testing "material with custom color"
-      (let [material (material/material :color (color/color 1 2 3))]
+      (let [material (material/material (color/color 1 2 3))]
         (is (c= (color/color 1 2 3) (:color material)))
         (is (= 0.1 (:ambient material)))
         (is (= 0.9 (:diffuse material)))
