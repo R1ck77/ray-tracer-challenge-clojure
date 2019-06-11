@@ -46,9 +46,9 @@
   []
   (-> (world)
       (add-object (shapes/change-material (shapes/sphere)
-                                          (material/material :color (color/color 0.8 1.0 0.6)
-                                                              :diffuse 0.7
-                                                              :specular 0.2)))
+                                          (material/with-color (color/color 0.8 1.0 0.6)
+                                                               :diffuse 0.7
+                                                               :specular 0.2)))
       (add-object (shapes/change-transform (shapes/sphere)
                                            (transform/scale 0.5 0.5 0.5)))    
       (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
@@ -184,7 +184,7 @@
                                                                                      intersections
                                                                                      (-> world :material :refractive-index)))
                   remaining)
-       (-> world :material :color)))))
+       (-> world :material material/get-color)))))
 
 (defn- get-reflectivity [intermediate-result]
   (:reflectivity (:material (:object intermediate-result))))
@@ -197,7 +197,7 @@
         (let [reflection (ray/ray (:over-point intermediate-result)
                                   (:reflection intermediate-result))]
           (color/scale (color-at world reflection (dec remaining)) reflectivity))))
-    (-> world :material :color)))
+    (-> world :material material/get-color)))
 
 (defn- compute-refracted-ray [intermediate-result n-ratio sin-t-squared cos-i]
   (let [cos-t (Math/sqrt (- 1 sin-t-squared))]

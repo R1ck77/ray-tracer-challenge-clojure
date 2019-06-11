@@ -9,8 +9,7 @@
      transparency])
 
 (defn material
-  ([] (material (color/color 1 1 1)))
-  ([color]
+  ([]
    (map->Material {:ambient 0.1
                    :diffuse 0.9
                    :specular 0.9
@@ -18,13 +17,16 @@
                    :reflectivity 0.0
                    :transparency 0.0
                    :refractive-index 1.0
-                   :pattern (pattern/solid color)}))
-  ([color & {:as args}]
-   (merge (material color) args)))
+                   :pattern (pattern/solid (color/color 1 1 1))}))
+  ([& {:as args}]
+   (merge (material) args)))
 
-(def void-material (material :transparency 1.0
-                             :refractive-index 1.0
-                             :pattern (pattern/solid (color/color 0 0 0))))
+(defn with-color [color & {:as args}]
+  (apply material (mapcat seq (merge args {:pattern (pattern/solid color)}))))
+
+(def void-material (with-color (color/color 0 0 0)
+                               :transparency 1.0
+                               :refractive-index 1.0))
 
 (def some-point (point/point 0 0 0))
 (def some-object ())

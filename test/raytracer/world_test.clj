@@ -36,9 +36,9 @@
   (testing "The default world"
     (let [world (world/default-world)
           expected-sphere1 (shapes/change-material (shapes/sphere)
-                                                   (material/material :color (color/color 0.8 1.0 0.6)
-                                                                       :diffuse 0.7
-                                                                       :specular 0.2))
+                                                   (material/with-color (color/color 0.8 1.0 0.6)
+                                                                        :diffuse 0.7
+                                                                        :specular 0.2))
           expected-sphere2 (shapes/change-transform (shapes/sphere)
                                                     (transform/scale 0.5 0.5 0.5))]
       (is (contains? (:light-sources world)
@@ -170,8 +170,8 @@
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (material/material :color (color/color 1 0 0)
-                                                               :ambient 0.5)))
+                   (shapes/change-material (material/with-color (color/color 1 0 0)
+                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
                     (world/add-object ball))
@@ -198,8 +198,8 @@
                                                                 :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (shapes/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (material/material :color (color/color 1 0 0)
-                                                               :ambient 0.5)))
+                   (shapes/change-material (material/with-color (color/color 1 0 0)
+                                                                :ambient 0.5)))
           world (-> (world/default-world)
                     (world/add-object floor)
                     (world/add-object ball))
@@ -232,7 +232,7 @@
     (let [world (world/set-objects (world/default-world)
                                    (map reset-ambient-color (:objects (world/default-world))))
           ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
-      (is (c= (:color (:material (second (:objects world))))
+      (is (c= (material/get-color (:material (second (:objects world))))
               (world/color-at world ray)))))
   (testing "color_at() with mutually reflective surfaces"
     (let [light (light-sources/create-point-light (point/point 0 0 0)
