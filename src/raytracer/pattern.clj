@@ -25,8 +25,15 @@
      (->Pattern (matrix/invert transform 4)
                 function)))
 
+(defrecord SolidPattern [color]
+  ColorFunction
+  (color-at [this point]
+            color)
+  (color-at [this object point]
+            color))
+
 (defn solid [color]
-  (create-pattern (fn [_ _] color)))
+  (->SolidPattern color))
 
 (defn stripe [color1 color2]
   (create-pattern (fn [_ point]
