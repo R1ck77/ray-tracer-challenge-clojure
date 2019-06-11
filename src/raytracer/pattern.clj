@@ -5,6 +5,9 @@
 (defprotocol ColorFunction
   (color-at [this point] [this object point]))
 
+(defprotocol ObjectSpace
+  (change-transform [this new-transform]))
+
 (defn- point-in-pattern-space [pattern object point]
   (->> point
        (matrix/transform (:inverse-transform object))
@@ -28,18 +31,32 @@
 (defrecord SolidPattern [color]
   ColorFunction
   (color-at [this point]
-            color)
+    color)
   (color-at [this object point]
-            color))
+    color)
+  ObjectSpace
+  (chnage-transform [this new-transform]))
 
 (defn solid [color]
   (->SolidPattern color))
 
+(defn- stripe-function [stripe-pattern point]
+  (if (zero? (mod (int (Math/floor (:x point))) 2))
+    (:color1 stripe-pattern)
+    (:color2 stripe-pattern)))
+
+(defrecord StripePattern [color1 color2 inverse-transform]
+  ColorFunction
+  (color-at [this point]
+    (stripe-function this point))
+  (color-at [this object point]
+    (stripe-function this (point-in-pattern-space this object point)))
+  ObjectSpace
+  (change-transform [this new-transform]
+    ))
+
 (defn stripe [color1 color2]
-  (create-pattern (fn [_ point]
-                    (if (zero? (mod (int (Math/floor (:x point))) 2))
-                      color1
-                      color2))))
+  (->StripePattern color1 color2))
 
 (defn gradient [color1 color2]
   (create-pattern (fn [_ point]
