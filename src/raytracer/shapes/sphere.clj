@@ -5,12 +5,11 @@
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
-            [raytracer.intersection :as intersection]
-            [raytracer.spatial-object :as spatial-object]))
+            [raytracer.intersection :as intersection]))
 
 (def center (point/point 0 0 0))
 
-(defrecord Sphere [material inverse-transform])
+(defrecord Sphere [material transform inverse-transform])
 
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
@@ -38,7 +37,7 @@
   (tuple/normalize
    (shared/as-vector
     (matrix/transform (matrix/transpose (:inverse-transform shape))
-                      (tuple/sub (spatial-object/inverse-transform shape point)
+                      (tuple/sub (matrix/transform (:inverse-transform shape) point)
                                  (point/point 0 0 0))))))
 
 (extend-type Sphere
@@ -47,14 +46,10 @@
     (intersect-sphere-space this ray-in-plane-space))
   shared/Surface
   (compute-normal [this point]
-    (compute-normal this point))
-  spatial-object/SpatialObject
-  (change-transform [this new-matrix]
-    (shared/change-transform this new-matrix))
-  (inverse-transform [this point]
-    (matrix/transform (:inverse-transform this) point)))
+    (compute-normal this point)))
 
 (defn sphere []
   (map->Sphere 
    {:material (material/material)
+    :transform matrix/identity-matrix
     :inverse-transform matrix/identity-matrix}))
