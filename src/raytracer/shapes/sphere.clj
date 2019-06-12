@@ -9,7 +9,7 @@
 
 (def center (point/point 0 0 0))
 
-(defrecord Sphere [material transform inverse-transform])
+(defrecord Sphere [material transform inverse-transform inverse-transposed-transform])
 
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
@@ -36,7 +36,7 @@
 (defn compute-normal [shape point]
   (tuple/normalize
    (shared/as-vector
-    (matrix/transform (matrix/transpose (:inverse-transform shape))
+    (matrix/transform (:inverse-transposed-transform shape)
                       (tuple/sub (matrix/transform (:inverse-transform shape) point)
                                  (point/point 0 0 0))))))
 
@@ -52,4 +52,5 @@
   (map->Sphere 
    {:material (material/material)
     :transform matrix/identity-matrix
-    :inverse-transform matrix/identity-matrix}))
+    :inverse-transform matrix/identity-matrix
+    :inverse-transposed-transform matrix/identity-matrix}))

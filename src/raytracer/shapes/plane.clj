@@ -7,7 +7,7 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
-(defrecord Plane [material transform inverse-transform])
+(defrecord Plane [material inverse-transform inverse-transposed-transform])
 
 (defn- xz-plane-intersection [ray]
   (- (/ (:y (:origin ray))
@@ -26,10 +26,10 @@
   shared/Surface
   (compute-normal [this _]
     (shared/as-vector
-     (matrix/transform (matrix/transpose (:inverse-transform this))
+     (matrix/transform (:inverse-transposed-transform this)
                        (svector/svector 0 1 0)))))
 
 (defn plane []
   (map->Plane {:material (material/material)
-               :transform matrix/identity-matrix
-               :inverse-transform matrix/identity-matrix}))
+               :inverse-transform matrix/identity-matrix
+               :inverse-transposed-transform matrix/identity-matrix}))

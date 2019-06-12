@@ -5,6 +5,7 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.point :as point]
+            [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.shapes.plane :as plane]))
@@ -12,10 +13,10 @@
 (def a-plane (plane/plane))
 
 (deftest test-constructor
-  (testing "The courtesy constructor function fills material, transform and inverse"
+  (testing "The courtesy constructor function fills material, inverse transform and its transpose"
     (is (:material (plane/plane)))
-    (is (:transform (plane/plane)))
-    (is (:inverse-transform (plane/plane)))))
+    (is (= matrix/identity-matrix (:inverse-transform (plane/plane))))
+    (is (v= matrix/identity-matrix (:inverse-transposed-transform (plane/plane))))))
 
 (deftest test-plane-normal
   (let [expected-normal (svector/svector 0 1 0)]

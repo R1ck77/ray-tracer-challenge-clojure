@@ -8,7 +8,7 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]))
 
-(defrecord Cube [material transform inverse-transform])
+(defrecord Cube [material inverse-transform inverse-transposed-transform])
 
 (defn- signed-infinity [numerator _]
   (if (>= numerator 0)
@@ -69,7 +69,7 @@
   (compute-normal [this point]
     (tuple/normalize
      (shared/as-vector
-      (matrix/transform (matrix/transpose (:inverse-transform this))
+      (matrix/transform (:inverse-transposed-transform this)
                         (compute-cube-normal this
                                              (matrix/transform (:inverse-transform this) point)))))))
 

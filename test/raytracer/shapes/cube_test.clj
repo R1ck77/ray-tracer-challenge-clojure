@@ -5,6 +5,7 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.point :as point]
+            [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]            
             [raytracer.shapes.cube :as cube]
@@ -13,11 +14,11 @@
 (def a-cube (cube/cube))
 
 (deftest test-constructor
-  (testing "The courtesy construction function creates a cube with material and transforms set"
+  (testing "The courtesy construction function creates a cube with material, inverse transforms and inverse transposed transform set"
     (let [cube (cube/cube)]
       (is (:material cube))
-      (is (:transform cube))
-      (is (:inverse-transform cube)))))
+      (is (= matrix/identity-matrix (:inverse-transform cube)))
+      (is (v= matrix/identity-matrix (:inverse-transposed-transform cube))))))
 
 (defmacro test-no-intersection [name origin direction]
  `(testing ~(format "A ray misses a cube (%s)" name)

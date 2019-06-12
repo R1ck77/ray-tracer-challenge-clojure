@@ -97,7 +97,7 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cylinder-side-normal point-object-space))))
 
-(defrecord Cylinder [minimum maximum closed inverse-transform])
+(defrecord Cylinder [minimum maximum closed inverse-transform inverse-transposed-transform])
 
 (extend-type Cylinder
   shared/Intersectable
@@ -107,7 +107,7 @@
   (compute-normal [this point]
     (tuple/normalize
      (shared/as-vector
-      (matrix/transform (matrix/transpose (:inverse-transform this))
+      (matrix/transform (:inverse-transposed-transform this)
                         (compute-cylinder-normal this
                                                  (matrix/transform (:inverse-transform this) point)))))))
 
@@ -117,7 +117,9 @@
                      :minimum Double/NEGATIVE_INFINITY
                      :maximum Double/POSITIVE_INFINITY}
                     args-map)]
-    (->Cylinder (:minimum args)
-                (:maximum args)
-                (:closed args)
-                (matrix/invert (:transform args) 4))))
+    (let [inverse (matrix/invert (:transform args) 4)]
+      (->Cylinder (:minimum args)
+                  (:maximum args)
+                  (:closed args)
+                  inverse
+                  (matrix/transpose inverse)))))
