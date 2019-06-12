@@ -56,18 +56,18 @@
         px (range width)]
     (vector px py)))
 
-(defn- simple-color-for-pixel [world camera px py]
+(defn basic-color-for-pixel [world camera px py]
   (world/color-at world (ray-for-pixel camera px py)))
 
 (def diag-displacement (/ (Math/sqrt 2) 6))
 
-(defn- basic-aa-2x-color-for-pixel [world camera px py]
+(defn grid-aa-2x-color-for-pixel [world camera px py]
   (let [a (world/color-at world (ray-for-pixel camera (- px diag-displacement) (+ py diag-displacement)))
         b (world/color-at world (ray-for-pixel camera (+ px diag-displacement) (- py diag-displacement)))]
     (color/scale (color/add a b)
                  0.5)))
 
-(defn- basic-aa-4x-color-for-pixel [world camera px py]
+(defn grid-aa-4x-color-for-pixel [world camera px py]
   (let [a (world/color-at world (ray-for-pixel camera (+ px 0.25) (+ py 0.25)))
         b (world/color-at world (ray-for-pixel camera (+ px 0.75) (+ py 0.25)))
         c (world/color-at world (ray-for-pixel camera (+ px 0.25) (+ py 0.75)))
@@ -76,12 +76,12 @@
                             (color/add c d))
                  (/ 1 4))))
 
-(def color-for-pixel-function basic-aa-2x-color-for-pixel)
+(def ^:dynamic *color-for-pixel-function* basic-color-for-pixel)
 
 (defn- render-pixel [camera world canvas [px py]]
   (canvas/write canvas
                 px py
-                (color-for-pixel-function world camera px py)))
+                (*color-for-pixel-function* world camera px py)))
 
 (defn render-serial [camera world]
   (let [width (:h-size camera)
@@ -91,7 +91,7 @@
             (seq-pixels width height))))
 
 (defn- get-pixel-color [camera world [px py]]
-  (vector px py (color-for-pixel-function world camera px py)))
+  (vector px py (*color-for-pixel-function* world camera px py)))
 
 (defn render
   "very coarse and far from optmized parallel version"
