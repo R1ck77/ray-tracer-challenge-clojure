@@ -1,6 +1,7 @@
 (ns raytracer.pattern
   (:require [raytracer.color :as color]
-            [raytracer.matrix :as matrix]))
+            [raytracer.matrix :as matrix]
+            [raytracer.spatial-object :as spatial-object]))
 
 (defprotocol ColorFunction
   (color-at [this point] [this object point]))
@@ -8,14 +9,21 @@
 (defn- point-in-pattern-space [pattern object point]
   (->> point
        (matrix/transform (:inverse-transform object))
-       (matrix/transform (:inverse-transform pattern))))
+       (spatial-object/inverse-transform pattern)))
+
+(def create-pattern)
 
 (defrecord Pattern [inverse-transform function function-data]
   ColorFunction
   (color-at [this point]
     (function function-data  point))
   (color-at [this object point]
-    (function function-data (point-in-pattern-space this object point))))
+    (function function-data (point-in-pattern-space this object point)))
+  spatial-object/SpatialObject
+  (change-transform [this new-matrix]
+    (create-pattern function-data new-matrix))
+  (inverse-transform [this point]
+    (matrix/transform inverse-transform point)))
 
 (defn- create-pattern
   ([function function-data]
