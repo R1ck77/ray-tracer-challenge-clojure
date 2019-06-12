@@ -71,7 +71,12 @@
      (shared/as-vector
       (matrix/transform (matrix/transpose (:inverse-transform this))
                         (compute-cube-normal this
-                                             (matrix/transform (:inverse-transform this) point)))))))
+                                             (matrix/transform (:inverse-transform this) point))))))
+  spatial-object/SpatialObject
+  (change-transform [this new-matrix]
+    (shared/change-transform this new-matrix))
+  (inverse-transform [this point]
+    (matrix/transform (:inverse-transform this) point)))
 
 (defn cube []
   (->Cube (material/material)
