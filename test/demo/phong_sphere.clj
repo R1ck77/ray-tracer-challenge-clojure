@@ -32,7 +32,6 @@
    :light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                    (color/color 1 1 1))})
 
-;;; TODO/FIXME most stuff can probably be cached
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 
   (point/point (* (first canvas-scale) (- x half-width))
                (* (second canvas-scale) (- half-height y))

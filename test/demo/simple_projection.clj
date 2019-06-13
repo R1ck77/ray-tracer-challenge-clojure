@@ -23,7 +23,6 @@
                                     (transform/scale 5 5 5))
    :screen-z 0})
 
-;;; TODO/FIXME most stuff can probably be cached
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 
   (point/point (* (first canvas-scale) (- x half-width))
                (* (second canvas-scale) (- half-height y))

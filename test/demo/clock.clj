@@ -12,7 +12,6 @@
 (def clock-radius 10)
 
 (defn clock-position [angle-rad]
-;;; TODO/FIXME some multiplications could be cached. Whatever
   (matrix/transform (transform/translate (/ (first canvas-size) 2)
                                          (/ (second canvas-size) 2)
                                          0
