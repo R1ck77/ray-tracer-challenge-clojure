@@ -36,6 +36,8 @@
   (testing "cube creates a cube"
     (is (= (cube-ns/cube) (shapes/cube))))
   (testing "cylinder creates a cylinder"
-    (is (= (cylinder-ns/cylinder) (shapes/cylinder))))
+    (is (= (cylinder-ns/cylinder) (shapes/cylinder)))
+    (is (= true (:closed (shapes/cylinder :closed true)))))
   (testing "cone creates a cone"
-    (is (= (cone-ns/cone) (shapes/cone)))))
+    (is (= (cone-ns/cone) (shapes/cone)))
+    (is (= true (:closed (shapes/cone :closed true))))))

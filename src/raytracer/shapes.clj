@@ -30,8 +30,8 @@
 (defn cube []
   (cube-ns/cube))
 
-(defn cylinder []
-  (cylinder-ns/cylinder))
+(defn cylinder [& args]
+  (apply cylinder-ns/cylinder args))
 
-(defn cone []
-  (cone-ns/cone))
+(defn cone [& args]
+  (apply cone-ns/cone args))
