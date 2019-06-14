@@ -16,7 +16,7 @@
 
 ;;; Note: the result of this demo changes with the evolution of the underlying functions
 
-  (def ^:dynamic *output-file* "cone-demo.ppm")
+(def ^:dynamic *output-file* "cone-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
 
 (def halfπ (/ Math/PI 2))
@@ -45,30 +45,18 @@
                      (shapes/change-transform (->> (transform/scale 0.75 0.75 0.75)
                                                    (transform/translate -1.5 0.75 -1.5)))))
 
-(def middle-cylinder (-> (shapes/cylinder :minimum -1
-                                          :maximum 1
-                                          :closed true)
+(def middle-cylinder (-> (shapes/cylinder :minimum 0
+                                          :maximum 0.6
+                                          :closed false
+)
                        (shapes/change-material (material/material :color (color/color 0 0.05 0.1)
                                                                   :diffuse 0.1
                                                                   :specular 0.3
-                                                                  :reflectivity 0.1
-                                                                  :transparency 0.95
+                                                                  :reflectivity 0.99
+                                                                  :transparency 0.0
                                                                   :refractive-index 2.0))
                        
-                       (shapes/change-transform (transform/translate -0.5 1 0.5))))
-
-(def air-cylinder (-> (shapes/cylinder :minimum -1
-                                       :maximum 1
-                                       :closed true)
-                    (shapes/change-material (material/material :color (color/color 0 0 0)
-                                                               :diffuse 0.0
-                                                               :specular 0.0
-                                                               :reflectivity 1.0
-                                                               :transparency 1.0
-                                                               :refractive-index 1.0))
-                    
-                    (shapes/change-transform (transform/translate -0.5 1 0.5
-                                                                  (transform/scale 0.5 0.5 0.5)))))
+                       (shapes/change-transform (transform/translate -0.5 0 0.5))))
 
 (def back-cylinder (-> (shapes/cylinder :closed true
                                         :maximum 1
@@ -107,7 +95,7 @@
 (def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
-               (world/set-objects [floor left-cone middle-cylinder air-cylinder back-cylinder right-cylinder])
+               (world/set-objects [floor left-cone middle-cylinder back-cylinder right-cylinder])
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
 
 (defn create-camera [width height]
