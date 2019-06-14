@@ -11,7 +11,8 @@
             [demo.perlin-demo :as perlin]
             [demo.pattern-demo :as pattern-demo]
             [demo.reflection-demo :as reflections-demo]
-            [demo.cubes-demo :as cubes-demo]))
+            [demo.cubes-demo :as cubes-demo]
+            [demo.cone-demo :as cone-demo]))
 
 
 (defmacro run-demo [name demo-code]
@@ -40,6 +41,9 @@
   (run-demo "tiny cubes demo"
             (with-redefs [world/*maximum-reflections* 2]
               (cubes-demo/render-demo 10 5)))
+  (run-demo "tiny cylinders and cones demo"
+            (with-redefs [world/*maximum-reflections* 2]
+              (cone-demo/render-demo 10 5)))  
   (run-demo "tiny fresnel demo"
             (fresnel/render-demo 10 5))
   (run-demo "tiny perlin demo"
