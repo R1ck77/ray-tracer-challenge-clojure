@@ -8,6 +8,10 @@
 (defprotocol Surface
   (compute-normal [this point]))
 
+(defprotocol Hierarchy
+  (add [this shape])
+  (get-parent [this]))
+
 (defn as-point [v]
   (point/point (:x v) (:y v) (:z v)))
 
