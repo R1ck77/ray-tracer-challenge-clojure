@@ -11,8 +11,9 @@
 (def group)
 
 (defn- intersect [group ray-object-space]
-  (map #(intersection/intersection 0 %)
-       (filter (complement nil?) (map #(% (:children group)) (list second second first first)))))
+  (sort-by :t (reduce concat
+                      (map #(shared/local-intersect % ray-object-space)
+                           (:children group)))))
 
 (defrecord Group [children inverse-transform inverse-transpose-transform]
   shared/Intersectable
