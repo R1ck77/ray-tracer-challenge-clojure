@@ -8,9 +8,21 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
+(def group)
 
-(defrecord Group [inverse-transform inverse-transpose-transform])
+(defn- intersect [group ray-object-space]
+  [])
+
+(defrecord Group [inverse-transform inverse-transpose-transform]
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    (intersect group ray-object-space))
+  shared/Surface
+  (compute-normal [this point]))
 
 (defn group []
   (->Group matrix/identity-matrix
            matrix/identity-matrix))
+
+
+
