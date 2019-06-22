@@ -11,19 +11,20 @@
 (def group)
 
 (defn- intersect [group ray-object-space]
-  [])
+  (map #(intersection/intersection 0 %)
+       (filter (complement nil?) (map #(% (:children group)) (list second second first first)))))
 
-(defrecord Group [inverse-transform inverse-transpose-transform]
+(defrecord Group [children inverse-transform inverse-transpose-transform]
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    (intersect group ray-object-space))
+    (intersect this ray-object-space))
   shared/Surface
   (compute-normal [this point]))
 
 (defn group [children]
-  (->Group matrix/identity-matrix
+  (->Group children
+           matrix/identity-matrix
            matrix/identity-matrix))
 
 (def empty-group (group []))
-
 

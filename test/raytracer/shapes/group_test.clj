@@ -30,4 +30,5 @@
           group (group/group [sphere1 sphere2 sphere3])
           xs (shared/local-intersect group (ray/ray (point/point 0 0 -5)
                                                     (svector/svector 0 0 1)))]
-      (is (= [sphere2 sphere2 sphere1 sphere1] (map :object xs))))))
+      (is (= [sphere2 sphere2 sphere1 sphere1]
+             (map :object xs))))))
