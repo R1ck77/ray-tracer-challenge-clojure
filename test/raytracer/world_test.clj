@@ -45,8 +45,7 @@
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
       (is (some #(= expected-sphere1 %) (:objects world)))
-      (is (some #(and
-                  (v= (transform/scale 0.5 0.5 0.5) (:transform %))
+      (is (some #(and                  
                   (= (dissoc % :transform :inverse-transform)
                      (dissoc expected-sphere2 :transform :inverse-transform)))
                 (:objects world))))))

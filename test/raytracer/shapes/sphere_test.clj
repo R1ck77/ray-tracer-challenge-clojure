@@ -14,13 +14,12 @@
 (deftest test-sphere
   (let [sphere (shapes/sphere)]
     (testing "create a sphere"
-      (is (= (material/material) (:material sphere)))
-      (is (identical? matrix/identity-matrix (:transform sphere))))
+      (is (= (material/material) (:material sphere))))
     (testing "update a sphere's transformation"
       (let [transform (transform/translate 2 3 4)
             new-sphere (shapes/change-transform sphere transform)]
-        (is (identical? transform
-                        (:transform new-sphere)))))
+        (is (v= (matrix/invert transform 4)
+                (:inverse-transform new-sphere)))))
     (testing "a sphere may be assigned a material"
       (let [new-material (assoc (material/material) :ambient 0.25)]
         (is (= new-material
