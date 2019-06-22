@@ -20,9 +20,10 @@
   shared/Surface
   (compute-normal [this point]))
 
-(defn group []
+(defn group [children]
   (->Group matrix/identity-matrix
            matrix/identity-matrix))
 
+(def empty-group (group []))
 
 
