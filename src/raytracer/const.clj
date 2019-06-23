@@ -6,5 +6,7 @@
 
 (def half√2 (/ √2 2))
 
+(def half𝛑 (/ Math/PI 2))
+
 
 

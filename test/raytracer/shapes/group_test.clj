@@ -1,6 +1,7 @@
 (ns raytracer.shapes.group-test
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :refer :all]
+            [raytracer.const :as const]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
@@ -43,3 +44,12 @@
                                                        (svector/svector 0 0 1)))))))))
 
 
+
+(deftest test-point-conversion
+  (testing "Converting a point from world to object space"
+    (let [sphere (shared/change-transform (shapes/sphere) (transform/translate 5 0 0))
+          group2 (shared/change-transform (group/group [sphere]) (transform/scale 2 2 2))
+          group1 (shared/change-transform (group/group [group2]) (transform/rotate-y const/half𝛑))
+          ])
+    (is (t= (point/point 0 0 -1)
+            (group/world-to-object sphere (point/point -2 0 -10))))))
