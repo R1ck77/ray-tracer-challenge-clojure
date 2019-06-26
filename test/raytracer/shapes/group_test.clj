@@ -43,8 +43,6 @@
                                               (ray/ray (point/point 10 0 -10)
                                                        (svector/svector 0 0 1)))))))))
 
-
-
 (deftest test-point-conversion
   (testing "Converting a point from world to object space"
     (let [sphere (shared/change-transform (shapes/sphere) (transform/translate 5 0 0))
