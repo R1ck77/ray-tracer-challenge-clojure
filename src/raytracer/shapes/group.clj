@@ -18,7 +18,7 @@
                                                                        (:inverse-transform %)))
                              (:children group))))))
 
-(defrecord Group [children inverse-transform inverse-transpose-transform]
+(defrecord Group [children inverse-transform inverse-transposed-transform]
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (intersect this ray-object-space))

@@ -1,13 +1,16 @@
 (ns raytracer.hierarchy
   (:require [clojure.zip :as zip]
+            [raytracer.tuple :as tuple]
             [raytracer.shapes.group :as group]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]            
             [raytracer.matrix :as matrix])
   (:import [raytracer.shapes.group Group]))
 
 
 (defprotocol CoordinatesConverter
-  (to-world-coordinates [this shape point]))
+  (vector-to-world-coordinates [this shape point])
+  (point-to-world-coordinates [this shape point]))
 
 (defn find-node
   ([zipper predicate]
@@ -20,15 +23,23 @@
          (recur next predicate))))))
 
 (defn- get-transforms [zipper object]
-  (map :inverse-transpose-transform
-       (conj (zip/path (find-node zipper #(= object %)))
-             object)))
+  (reverse
+   (map :inverse-transposed-transform
+        (conj (zip/path (find-node zipper #(= object %)))
+              object))))
 
+;;; TODO/FIXME I suspect I'm using the wrong matrix
 (defrecord Hierarchy [zipper]
   CoordinatesConverter
-  (to-world-coordinates [this shape point]  ;;; TODO/FIXME totally bogus
-    (reduce (fn transform [point matrix]  ;;; premultiply all of them
-              (matrix/transform point matrix))
+  (vector-to-world-coordinates [this shape point]  ;;; TODO/FIXME totally bogus
+    (tuple/normalize
+     (reduce (fn transform [point matrix] ;;; premultiply all of them
+               (shared/as-vector (matrix/transform matrix point)))
+             point
+             (get-transforms zipper shape))))
+  (point-to-world-coordinates [this shape point]  ;;; TODO/FIXME totally bogus
+    (reduce (fn transform [point matrix] ;;; premultiply all of them
+              (matrix/transform matrix point))
             point
             (get-transforms zipper shape)))) ;;; memoize
 
