@@ -18,7 +18,7 @@
           group1 (shapes/change-transform (group/group [group2]) (transform/rotate-y const/half𝛑))
           hierarchy (hierarchy/hierarchy group1)]
       (is (t= (point/point 0 0 -1)
-              (hierarchy/point-to-world-coordinates hierarchy sphere (point/point -2 0 -10))))))
+              (hierarchy/world-to-local-coordinates hierarchy sphere (point/point -2 0 -10))))))
   (testing "Converting a normal from object to world space"
     (let [sphere (shapes/change-transform (shapes/sphere) (transform/translate 5 0 0))
           group2 (shapes/change-transform (group/group [sphere]) (transform/scale 1 2 3))
@@ -26,4 +26,4 @@
           hierarchy (hierarchy/hierarchy group1)
           third√3 (/ (Math/sqrt 3) 3)]
       (is (t= (svector/svector 0.2857, 0.4286, -0.8571)
-              (hierarchy/vector-to-world-coordinates hierarchy sphere (svector/svector third√3 third√3 third√3)))))))
+              (hierarchy/local-to-world-coordinates hierarchy sphere (svector/svector third√3 third√3 third√3)))))))

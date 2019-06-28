@@ -9,8 +9,8 @@
 
 
 (defprotocol CoordinatesConverter
-  (vector-to-world-coordinates [this shape point])
-  (point-to-world-coordinates [this shape point]))
+  (local-to-world-coordinates [this shape svector])
+  (world-to-local-coordinates [this shape point]))
 
 (defn find-node
   ([zipper predicate]
@@ -22,26 +22,32 @@
          nil
          (recur next predicate))))))
 
-(defn- get-transforms [zipper object]
+(defn- get-local-to-world-transforms  [zipper object]
   (reverse
    (map :inverse-transposed-transform
         (conj (zip/path (find-node zipper #(= object %)))
               object))))
 
+(defn- get-world-to-local-transforms  [zipper object]
+  (map :inverse-transform
+       (conj (zip/path (find-node zipper #(= object %)))
+             object)))
+
 ;;; TODO/FIXME I suspect I'm using the wrong matrix
+;;; TODO/FIXME totally bogus: premultiply and cache the results
 (defrecord Hierarchy [zipper]
-  CoordinatesConverter
-  (vector-to-world-coordinates [this shape point]  ;;; TODO/FIXME totally bogus
+  CoordinatesConverter  
+  (local-to-world-coordinates [this shape svector]  
     (tuple/normalize
-     (reduce (fn transform [point matrix] ;;; premultiply all of them
-               (shared/as-vector (matrix/transform matrix point)))
-             point
-             (get-transforms zipper shape))))
-  (point-to-world-coordinates [this shape point]  ;;; TODO/FIXME totally bogus
-    (reduce (fn transform [point matrix] ;;; premultiply all of them
+     (reduce (fn transform-vector [svector matrix]
+               (shared/as-vector (matrix/transform matrix svector)))
+             svector
+             (get-local-to-world-transforms zipper shape))))
+  (world-to-local-coordinates [this shape point]
+    (reduce (fn transform-point [point matrix]
               (matrix/transform matrix point))
             point
-            (get-transforms zipper shape)))) ;;; memoize
+            (get-world-to-local-transforms zipper shape))))
 
 (defn- branch? [node]
   (instance? Group node))
