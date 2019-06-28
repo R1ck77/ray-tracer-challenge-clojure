@@ -28,10 +28,11 @@
         (conj (zip/path (find-node zipper #(= object %)))
               object))))
 
-(defn- get-world-to-local-transforms  [zipper object]
-  (map :inverse-transform
-       (conj (zip/path (find-node zipper #(= object %)))
-             object)))
+(defn- get-world-to-local-transform  [zipper object]
+  (reduce #(matrix/mul4 %2 %)
+          (map :inverse-transform
+               (conj (zip/path (find-node zipper #(= object %)))
+                     object))))
 
 ;;; TODO/FIXME I suspect I'm using the wrong matrix
 ;;; TODO/FIXME totally bogus: premultiply and cache the results
@@ -44,10 +45,7 @@
              svector
              (get-local-to-world-transforms zipper shape))))
   (world-to-local-coordinates [this shape point]
-    (reduce (fn transform-point [point matrix]
-              (matrix/transform matrix point))
-            point
-            (get-world-to-local-transforms zipper shape))))
+    (matrix/transform (get-world-to-local-transform zipper shape) point)))
 
 (defn- branch? [node]
   (instance? Group node))
