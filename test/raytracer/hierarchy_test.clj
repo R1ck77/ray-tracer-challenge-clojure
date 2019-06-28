@@ -26,4 +26,14 @@
           hierarchy (hierarchy/hierarchy group1)
           third√3 (/ (Math/sqrt 3) 3)]
       (is (t= (svector/svector 0.2857, 0.4286, -0.8571)
-              (hierarchy/local-to-world-coordinates hierarchy sphere (svector/svector third√3 third√3 third√3)))))))
+              (hierarchy/local-to-world-coordinates hierarchy sphere (svector/svector third√3 third√3 third√3))))))
+  (testing "Converting a normal from object to world space: regression to check optimization"
+    (let [sphere (shapes/change-transform (shapes/sphere) (transform/translate 5 0 0))
+          group4 (shapes/change-transform (group/group [sphere]) (transform/scale 1 2 3))
+          group3 (shapes/change-transform (group/group [group4]) (transform/rotate-x 0.834))
+          group2 (shapes/change-transform (group/group [group3]) (transform/translate 3 2 1.2))
+          group1 (shapes/change-transform (group/group [group2]) (transform/rotate-y 0.23))
+          hierarchy (hierarchy/hierarchy group1)
+          third√3 (/ (Math/sqrt 3) 3)]
+      (is (t= (svector/svector 0.9507001 0.076358 0.300564)
+              (hierarchy/local-to-world-coordinates hierarchy sphere (svector/svector third√3 third√3 third√3))))))  )
