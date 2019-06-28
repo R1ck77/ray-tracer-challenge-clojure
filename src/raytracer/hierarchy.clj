@@ -22,11 +22,12 @@
          nil
          (recur next predicate))))))
 
-(defn- get-local-to-world-transforms  [zipper object]
-  (reverse
-   (map :inverse-transposed-transform
-        (conj (zip/path (find-node zipper #(= object %)))
-              object))))
+(defn- get-local-to-world-transform  [zipper object]
+  (reduce #(matrix/mul4 %2 %)
+          (reverse
+           (map :inverse-transposed-transform
+                (conj (zip/path (find-node zipper #(= object %)))
+                      object)))))
 
 (defn- get-world-to-local-transform  [zipper object]
   (reduce #(matrix/mul4 %2 %)
@@ -40,12 +41,12 @@
   CoordinatesConverter  
   (local-to-world-coordinates [this shape svector]  
     (tuple/normalize
-     (reduce (fn transform-vector [svector matrix]
-               (shared/as-vector (matrix/transform matrix svector)))
-             svector
-             (get-local-to-world-transforms zipper shape))))
+     (shared/as-vector
+      (matrix/transform
+       (get-local-to-world-transform zipper shape) svector))))
   (world-to-local-coordinates [this shape point]
-    (matrix/transform (get-world-to-local-transform zipper shape) point)))
+    (matrix/transform
+     (get-world-to-local-transform zipper shape) point)))
 
 (defn- branch? [node]
   (instance? Group node))
