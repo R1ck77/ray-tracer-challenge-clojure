@@ -11,14 +11,13 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.group :as group]))
 
-
 (deftest test-group
   (testing "You can create an empty group with the identity matrix as transform"
     (let [group (group/group [])]
       (is (empty? (:children group)))
       (is (= group/empty-group group))
       (is (v= matrix/identity-matrix (:inverse-transform group)))
-      (is (v= matrix/identity-matrix (:inverse-transpose-transform group))))))
+      (is (v= matrix/identity-matrix (:inverse-transposed-transform group))))))
 
 (deftest test-local-intersect
   (testing "Intersection with empty group"
