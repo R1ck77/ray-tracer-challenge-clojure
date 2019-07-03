@@ -13,29 +13,25 @@
             [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.refraction :as refraction]
-            [raytracer.phong :as phong]))
+            [raytracer.phong :as phong]
+            [raytracer.hierarchy :as hierarchy]))
 
 (def ^:dynamic *maximum-reflections* 4)
 (def ^:dynamic *basic-shade-detection* true)
 
 (def zero-color (color/color 0 0 0))
 
-(defn world []
-  {:objects []
-   :light-sources #{}
-   :material material/void-material})
+(defn world
+  ([]
+   (world []))
+  ([root-objects]
+   {:hierarchy (hierarchy/hierarchy root-objects) ; TODO/FIXME sloooowwwww
+    :light-sources #{}
+    :material material/void-material}))
 
-(defn add-object [world object]
-  (update world :objects #(conj % object)))
-
-(defn- add-light-source [world light-source]
-  (update world :light-sources #(conj % light-source)))
 
 (defn set-light-sources [world & light-sources]
   (assoc world :light-sources (vec light-sources)))
-
-(defn set-objects [world objects]
-  (assoc world :objects (vec objects)))
 
 (defn default-world
   "A world used for testing.
@@ -44,15 +40,15 @@
   but at least at the moment I'll keep it here because
   \"The Book made me do it.\""
   []
-  (-> (world)
-      (add-object (shapes/change-material (shapes/sphere)
-                                          (material/with-color (color/color 0.8 1.0 0.6)
-                                                               :diffuse 0.7
-                                                               :specular 0.2)))
-      (add-object (shapes/change-transform (shapes/sphere)
-                                           (transform/scale 0.5 0.5 0.5)))    
-      (add-light-source (light-sources/create-point-light (point/point -10 10 -10)
-                                                          (color/color 1 1 1)))))
+  (let [sphere1 (shapes/change-material (shapes/sphere)
+                                                  (material/with-color (color/color 0.8 1.0 0.6)
+                                                    :diffuse 0.7
+                                                    :specular 0.2))
+        sphere2 (shapes/change-transform (shapes/sphere)
+                                                   (transform/scale 0.5 0.5 0.5))]
+    (-> (world [sphere1 sphere2])
+        (set-light-sources [(light-sources/create-point-light (point/point -10 10 -10)
+                                                                    (color/color 1 1 1))]))))
 
 (defn- unsorted-intersections [world ray]
   (flatten
@@ -68,7 +64,7 @@
 (defn- is-inside? [eye-v normal-v]
   (< (tuple/dot eye-v normal-v) 0))
 
-(defn- compute-surface-parameters [ray object point eye-v]
+(defn- compute-surface-parameters [hierarchy ray object point eye-v]
   (let [basic-normal-v (shared/compute-normal object point)
         inside (is-inside? eye-v basic-normal-v)
         normal-v (if inside (tuple/neg basic-normal-v) basic-normal-v)]
@@ -79,7 +75,7 @@
      :reflection (tuple/reflect (:direction ray) normal-v)}))
 
 (defn prepare-computations
-  [ray intersection refractive-indices]
+  [hierarchy ray intersection refractive-indices]
   (let [object (:object intersection)
         ray-direction (:direction ray)
         point (tuple/add (:origin ray)
@@ -91,7 +87,7 @@
             :eye-v eye-v
             :t (:t intersection)}
            refractive-indices
-           (compute-surface-parameters ray object point eye-v))))
+           (compute-surface-parameters hierarchy ray object point eye-v))))
 
 (defn- filtered-transparencies [intersections light-distance]
   (map #(-> % :object :material :transparency)
@@ -178,7 +174,8 @@
    (let [intersections (intersect world ray)
          intersection (intersection/hit intersections)]
      (if intersection
-       (shade-hit world (prepare-computations ray
+       (shade-hit world (prepare-computations (:hierarchy world)
+                                              ray
                                               intersection
                                               (refraction/compute-refractive-indices intersection
                                                                                      intersections
