@@ -12,7 +12,7 @@
 (defn- create-memoized-local-to-world [zipper]
   (memoize (partial zipper/compute-local-to-world-transform zipper)))
 
-(defrecord CachingHierarchy [memoized-local-to-world memoized-world-to-local]
+(defrecord CachingHierarchy [root memoized-local-to-world memoized-world-to-local]
   grouping-shared/CoordinatesConverter  
   (local-to-world-coordinates [this shape svector]  
     (tuple/normalize
@@ -21,9 +21,13 @@
        (memoized-local-to-world shape) svector))))
   (world-to-local-coordinates [this shape point]
     (matrix/transform
-     (memoized-world-to-local shape) point)))
+     (memoized-world-to-local shape) point))
+  grouping-shared/ShapesContainer
+  (get-root [this]
+    root))
 
 (defn caching-hierarchy [group]
   (let [zipper (zipper/create-zipper group)]
-    (->CachingHierarchy (create-memoized-local-to-world zipper)
+    (->CachingHierarchy group
+                        (create-memoized-local-to-world zipper)
                         (create-memoized-world-to-local zipper))))

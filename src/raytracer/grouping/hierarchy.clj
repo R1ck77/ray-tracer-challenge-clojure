@@ -17,7 +17,10 @@
        (zipper/compute-local-to-world-transform group-zipper shape) svector))))
   (world-to-local-coordinates [this shape point]
     (matrix/transform
-     (zipper/compute-world-to-local-transform group-zipper shape) point)))
+     (zipper/compute-world-to-local-transform group-zipper shape) point))
+  grouping-shared/ShapesContainer
+  (get-root [this]
+    (yeszip/get-node group-zipper)))
 
 (defn hierarchy
   ([]

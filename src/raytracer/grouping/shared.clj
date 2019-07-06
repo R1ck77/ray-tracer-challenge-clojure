@@ -3,3 +3,6 @@
 (defprotocol CoordinatesConverter
   (local-to-world-coordinates [this shape svector])
   (world-to-local-coordinates [this shape point]))
+
+(defprotocol ShapesContainer
+  (get-root [this]))
