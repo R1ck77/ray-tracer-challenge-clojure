@@ -15,22 +15,18 @@
             [raytracer.svector :as svector]
             [raytracer.test-utils :refer :all]
             [raytracer.transform :as transform]
-            [raytracer.world :as world]))
+            [raytracer.world :as world]
+            [raytracer.grouping.shared :as shared]))
+
+;;; TODO/FIXME replace the (first/second (world/get-objects world)) with something better
 
 (def dummy-indices {:n1 1.76 :n2 2})
 
 (deftest test-create
   (testing "Creating a world"
     (let [world (world/world)]
-      (is (empty? (:objects world)))
+      (is (empty? (world/get-objects world)))
       (is (empty? (:light-sources world))))))
-
-(deftest test-add-object
-  (testing "Adding a new object"
-    (let [world (world/default-world)
-          new-object (shapes/plane)]
-      (is (contains? (apply hash-set (:objects (world/add-object world new-object)))
-                     new-object)))))
 
 (deftest test-default-world
   (testing "The default world"
@@ -44,11 +40,11 @@
       (is (contains? (:light-sources world)
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
-      (is (some #(= expected-sphere1 %) (:objects world)))
+      (is (some #(= expected-sphere1 %) (world/get-objects world)))
       (is (some #(and                  
                   (= (dissoc % :transform :inverse-transform)
                      (dissoc expected-sphere2 :transform :inverse-transform)))
-                (:objects world))))))
+                (world/get-objects world))))))
 
 (deftest test-intersect
   (testing "Intersect a world with a ray"
@@ -120,7 +116,7 @@
     (let [world (world/default-world)
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 -5)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 4 (first (:objects world)))
+                                                   (intersection/intersection 4 (first (world/get-objects world)))
                                                    dummy-indices)]
       (is (c= (color/color 0.38066 0.47583 0.2855)
               (world/shade-hit world
@@ -131,7 +127,7 @@
                                                                            (color/color 1 1 1)))
           intermediate (world/prepare-computations (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 0.5 (second (:objects world)))
+                                                   (intersection/intersection 0.5 (second (world/get-objects world)))
                                                    dummy-indices)]
       (is (c= (color/color 0.90498 0.90498 0.90498)
               (world/shade-hit world
@@ -156,7 +152,7 @@
                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                    :reflectivity 0.5))
-          world (world/add-object (world/default-world) shape)
+          world (shared/add-root-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersection (intersection/intersection const/√2 shape)]
@@ -172,8 +168,8 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (world/add-object floor)
-                    (world/add-object ball))
+                    (shared/add-root-object floor)
+                    (shared/add-root-object ball))
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersections [(intersection/intersection const/√2 floor)]
@@ -200,8 +196,8 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (world/add-object floor)
-                    (world/add-object ball))
+                    (shared/add-root-object floor)
+                    (shared/add-root-object ball))
           intersections [(intersection/intersection const/√2 floor)]
           refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
           intermediate-results (world/prepare-computations ray (first intersections) refractive-indices)]
@@ -229,9 +225,9 @@
                                      (svector/svector 0 0 1))))))
   (testing "The color with an intersection behind the ray"
     (let [world (world/set-objects (world/default-world)
-                                   (map reset-ambient-color (:objects (world/default-world))))
+                                   (map reset-ambient-color (world/get-objects (world/default-world))))
           ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
-      (is (c= (material/get-color (:material (second (:objects world))))
+      (is (c= (material/get-color (:material (second (world/get-objects world))))
               (world/color-at world ray)))))
   (testing "color_at() with mutually reflective surfaces"
     (let [light (light-sources/create-point-light (point/point 0 0 0)
@@ -339,7 +335,7 @@
                                                      :ambient 1)))
 
 (defn- change-second-object-material [world]
-  (let [objects (:objects world)]
+  (let [objects (world/get-objects world)]
     (world/set-objects world
                        (assoc objects 1 (update-ambient (second objects))))))
 
@@ -348,7 +344,7 @@
     (let [world (change-second-object-material (world/default-world))
           ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
-          intersection (intersection/intersection 1 (second (:objects world)))]
+          intersection (intersection/intersection 1 (second (world/get-objects world)))]
       (is (c= (color/color 0 0 0)
               (world/reflected-color world
                                      (world/prepare-computations ray
@@ -361,7 +357,7 @@
                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                    :reflectivity 0.5))
-          world (world/add-object (world/default-world) shape)
+          world (shared/add-root-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersection (intersection/intersection const/√2 shape)]
@@ -381,7 +377,7 @@
 (deftest test-refracted-color
   (testing "The refracted color for an opaque material"
     (let [world (change-second-object-material (world/default-world))
-          shape (first (:objects world))
+          shape (first (world/get-objects world))
           ray (ray/ray (point/point 0 0 -5)                       
                        (svector/svector 0 0 1))
           intersections [(intersection/intersection 4 shape)
@@ -391,7 +387,7 @@
                                      (world/prepare-computations ray (first intersections) dummy-indices)
                                      1)))))
   (testing "The refracted color at maximum recursive depth"
-    (let [shape (shapes/change-material (first (:objects (world/default-world)))
+    (let [shape (shapes/change-material (first (world/get-objects (world/default-world)))
                                         (material/material :transparency 1.0
                                                             :refractive-index 1.5))
           world (world/set-objects (world/default-world) (vector shape))
@@ -404,7 +400,7 @@
                                      (world/prepare-computations ray (first intersections) dummy-indices)
                                      0)))))
   (testing "The refracted color under total internal refraction"
-    (let [shape (shapes/change-material (first (:objects (world/default-world)))
+    (let [shape (shapes/change-material (first (world/get-objects (world/default-world)))
                                         (material/material :refractive-index 1.5
                                                             :transparency 1.0))
           world (world/set-objects (world/default-world) [shape])
@@ -415,10 +411,10 @@
           intermediate-result (world/prepare-computations ray (second intersections) dummy-indices)]
       (is (c= (color/color 0 0 0) (world/refracted-color world intermediate-result 10)))))
   (testing "The refracted color with a refracted ray"
-    (let [shape-a (shapes/change-material (first (:objects (world/default-world)))
+    (let [shape-a (shapes/change-material (first (world/get-objects (world/default-world)))
                                           (material/material :ambient 1.0
                                                               :pattern (pattern/test)))
-          shape-b (shapes/change-material (second (:objects (world/default-world)))
+          shape-b (shapes/change-material (second (world/get-objects (world/default-world)))
                                           (material/material :transparency 1.0
                                                               :refractive-index 1.5))
           world (world/set-objects (world/default-world) [shape-a shape-b])

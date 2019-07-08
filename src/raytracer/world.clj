@@ -7,6 +7,7 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.group :as group]
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]
             [raytracer.matrix :as matrix]
@@ -14,7 +15,8 @@
             [raytracer.light-sources :as light-sources]
             [raytracer.refraction :as refraction]
             [raytracer.phong :as phong]
-            [raytracer.hierarchy :as hierarchy]))
+            [raytracer.grouping.hierarchy :as hierarchy]
+            [raytracer.grouping.shared :as grouping-shared]))
 
 (def ^:dynamic *maximum-reflections* 4)
 (def ^:dynamic *basic-shade-detection* true)
@@ -29,6 +31,17 @@
     :light-sources #{}
     :material material/void-material}))
 
+(defn add-root-object
+  "Add a new object to the root group"
+  [world object]
+  (let [old-hierarchy (grouping-shared/get-root (:hierarchy world))]
+    (assoc world :hierarchy (grouping-shared/add-root-object old-hierarchy object))))
+
+(defn set-objects [world objects]
+  (assoc world :hierarchy (hierarchy/hierarchy (group/group objects))))
+
+(defn get-objects [world]
+  (grouping-shared/get-all-objects world))
 
 (defn set-light-sources [world & light-sources]
   (assoc world :light-sources (vec light-sources)))
