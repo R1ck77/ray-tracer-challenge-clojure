@@ -6,4 +6,4 @@
 
 (defprotocol ShapesContainer
   (get-root [this])
-  (get-all-objects [this]))
+  (get-all-objects [this])) ;;; TODO/FIXME not needed outside tests probably
