@@ -22,7 +22,10 @@
   (get-root [this]
     (grouping-shared/get-root group-zipper))
   (get-all-objects [this]
-    (grouping-shared/get-all-objects group-zipper)))
+    (grouping-shared/get-all-objects group-zipper))
+  grouping-shared/HierarchyEditor
+  (add-root-object [this object]
+    (grouping-shared/add-root-object group-zipper object)))
 
 (defn hierarchy
   ([]
