@@ -20,7 +20,9 @@
      (zipper/compute-world-to-local-transform group-zipper shape) point))
   grouping-shared/ShapesContainer
   (get-root [this]
-    (yeszip/get-node group-zipper)))
+    (grouping-shared/get-root group-zipper))
+  (get-all-objects [this]
+    (grouping-shared/get-all-objects group-zipper)))
 
 (defn hierarchy
   ([]

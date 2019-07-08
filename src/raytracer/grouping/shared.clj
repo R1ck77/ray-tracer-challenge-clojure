@@ -5,4 +5,5 @@
   (world-to-local-coordinates [this shape point]))
 
 (defprotocol ShapesContainer
-  (get-root [this]))
+  (get-root [this])
+  (get-all-objects [this]))

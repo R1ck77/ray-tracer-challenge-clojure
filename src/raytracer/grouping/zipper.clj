@@ -1,6 +1,7 @@
 (ns raytracer.grouping.zipper
   (:require [clojure.zip :as zip]
-            [raytracer.matrix :as matrix])
+            [raytracer.matrix :as matrix]
+            [raytracer.grouping.shared :as shared])
   (:import [raytracer.shapes.group Group]))
 
 (defn- do-find-node
@@ -45,10 +46,16 @@
                get-children
                new-node
                root)]
-    (reify GroupZipper
+    (reify
+      GroupZipper
       (compute-local-to-world-transform [this shape]
         (do-compute-local-to-world-transform zipper shape))
       (compute-world-to-local-transform [this shape]
         (do-compute-world-to-local-transform zipper shape))
       (find-node [this predicate]
-        (do-find-node zipper predicate)))))
+        (do-find-node zipper predicate))
+      shared/ShapesContainer
+      (get-root [this]
+        (throw (UnsupportedOperationException. "Not implemented")))
+      (get-all-objects [this]
+        (throw (UnsupportedOperationException. "Not implemented"))))))
