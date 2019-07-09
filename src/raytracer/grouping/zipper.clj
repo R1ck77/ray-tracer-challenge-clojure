@@ -1,16 +1,33 @@
 (ns raytracer.grouping.zipper
-  (:require [clojure.zip :as zip]
+  (:require [clojure.zip :as z]
             [raytracer.matrix :as matrix]
             [raytracer.grouping.shared :as shared])
   (:import [raytracer.shapes.group Group]))
 
+(defn- get-all-matching-objects [zipper predicate]
+  (loop [objects #{}
+         zipper zipper]
+    (if (z/end? zipper)
+      objects
+      (let [next (z/next zipper)
+            next-node (z/node next)]
+        (recur (if (predicate next-node)
+                 (conj objects next-node)
+                 objects)
+               next)))))
+
+(defn- get-all-non-group-objects [zipper]
+  (get-all-matching-objects zipper
+                            (complement
+                             #(instance? raytracer.shapes.group.Group %))))
+
 (defn- do-find-node
   ([zipper predicate]
-   (let [next (zip/next zipper)
-         current-node (zip/node next)]
+   (let [next (z/next zipper)
+         current-node (z/node next)]
      (if (predicate current-node)
        next     
-       (if (zip/end? next)
+       (if (z/end? next)
          nil
          (recur next predicate))))))
 
@@ -18,13 +35,13 @@
   (reduce #(matrix/mul4 %2 %)
           (reverse
            (map :inverse-transposed-transform
-                (conj (zip/path (do-find-node zipper #(= shape %)))
+                (conj (z/path (do-find-node zipper #(= shape %)))
                       shape)))))
 
 (defn- do-compute-world-to-local-transform  [zipper shape]
   (reduce #(matrix/mul4 %2 %)
           (map :inverse-transform
-               (conj (zip/path (do-find-node zipper #(= shape %)))
+               (conj (z/path (do-find-node zipper #(= shape %)))
                      shape))))
 
 (defn- branch? [node]
@@ -41,11 +58,14 @@
   (compute-world-to-local-transform [this shape])
   (find-node [this predicate]))
 
+(defn- new-group-zipper [root]
+  (z/zipper branch?
+              get-children
+              new-node
+              root))
+
 (defn create-zipper [root]
-  (let [zipper (zip/zipper branch?
-               get-children
-               new-node
-               root)]
+  (let [zipper (new-group-zipper root)]
     (reify
       GroupZipper
       (compute-local-to-world-transform [this shape]
@@ -56,6 +76,6 @@
         (do-find-node zipper predicate))
       shared/ShapesContainer
       (get-root [this]
-        (throw (UnsupportedOperationException. "Not implemented")))
+        root)
       (get-all-objects [this]
-        (throw (UnsupportedOperationException. "Not implemented"))))))
+        (get-all-non-group-objects zipper)))))
