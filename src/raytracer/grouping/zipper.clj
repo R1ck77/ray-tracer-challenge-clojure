@@ -31,7 +31,7 @@
   (instance? Group node))
 
 (defn- get-children [node]
-  (:children node))
+  (seq (:children node)))
 
 (defn- new-node [node children]
   (assoc node :children (vec children)))
