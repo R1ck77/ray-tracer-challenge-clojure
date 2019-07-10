@@ -1,8 +1,33 @@
 (ns raytracer.grouping.zipper
   (:require [clojure.zip :as z]
             [raytracer.matrix :as matrix]
-            [raytracer.grouping.shared :as shared])
+            [raytracer.grouping.shared :as shared]
+            [raytracer.shapes.group :as group])
   (:import [raytracer.shapes.group Group]))
+
+;;; TODO/FIXME Reference implementation: remove me once I have a better one
+(defn temp-all-nodes [zipper]
+  (println (z/node zipper))
+  (let [next (z/next zipper)]    
+    (when (not (z/end? next))
+      (recur next))))
+
+;;; TODO/FIXME wrong order of the results. Should return the first element 
+(defn- next-matching-zipper [zipper predicate]
+  (loop [zipper zipper]
+    (if (z/end? zipper)
+      nil
+      (let [next (z/next zipper)]
+        (if (predicate (z/node next))
+          next
+          (recur next))))))
+
+(defn- lazy-get-all-matching-objects [zipper predicate]
+  (let [next-zipper (next-matching-zipper zipper predicate)]
+    (if next-zipper
+     (cons (z/node next-zipper)
+           (lazy-seq (lazy-get-all-matching-objects next-zipper predicate)))
+     nil)))
 
 (defn- get-all-matching-objects [zipper predicate]
   (loop [objects #{}
@@ -19,7 +44,7 @@
 (defn- get-all-non-group-objects [zipper]
   (get-all-matching-objects zipper
                             (complement
-                             #(instance? raytracer.shapes.group.Group %))))
+                             #(instance? Group %))))
 
 (defn- do-find-node
   ([zipper predicate]
