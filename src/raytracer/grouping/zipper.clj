@@ -12,22 +12,31 @@
     (when (not (z/end? next))
       (recur next))))
 
-;;; TODO/FIXME wrong order of the results. Should return the first element 
-(defn- next-matching-zipper [zipper predicate]
-  (loop [zipper zipper]
-    (if (z/end? zipper)
-      nil
-      (let [next (z/next zipper)]
-        (if (predicate (z/node next))
-          next
-          (recur next))))))
+;;; TODO/FIXME another fixme
+(defn temp-get-all-nodes
+  ([zipper predicate]
+   (temp-get-all-nodes zipper predicate '()))
+  ([zipper predicate acc]
+   (let [current-node (z/node zipper)
+         new-list (if (predicate current-node)
+                    (cons current-node acc
+                          acc))]
+     (let [next (z/next zipper)]
+       (if (not (z/end? next))
+         (recur next predicate new-list)
+         new-list)))))
 
-(defn- lazy-get-all-matching-objects [zipper predicate]
-  (let [next-zipper (next-matching-zipper zipper predicate)]
-    (if next-zipper
-     (cons (z/node next-zipper)
-           (lazy-seq (lazy-get-all-matching-objects next-zipper predicate)))
-     nil)))
+(defn- next-node [zipper predicate]
+  (let [current-node (z/node zipper)
+        element (when (predicate current-node) current-node)
+        next (z/next zipper)]
+    (if (not (z/end? next)) ;;; !!!! return nil nil
+      (recur next predicate new-list)
+      new-list)))
+
+(defn lazy-get-all-matching-objects [zipper predicate]
+  (let [{:zipper zipper, :node node} (next-node zipper)]
+    (cons node (lazy-seq (lazy-get-all-matching-objects zipper predicate)))))
 
 (defn- get-all-matching-objects [zipper predicate]
   (loop [objects #{}
