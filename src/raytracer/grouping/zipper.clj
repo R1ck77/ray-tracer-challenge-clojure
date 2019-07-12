@@ -5,50 +5,21 @@
             [raytracer.shapes.group :as group])
   (:import [raytracer.shapes.group Group]))
 
-;;; TODO/FIXME Reference implementation: remove me once I have a better one
-(defn temp-all-nodes [zipper]
-  (println (z/node zipper))
-  (let [next (z/next zipper)]    
-    (when (not (z/end? next))
-      (recur next))))
-
-;;; TODO/FIXME another fixme
-(defn temp-get-all-nodes
-  ([zipper predicate]
-   (temp-get-all-nodes zipper predicate '()))
-  ([zipper predicate acc]
-   (let [current-node (z/node zipper)
-         new-list (if (predicate current-node)
-                    (cons current-node acc
-                          acc))]
-     (let [next (z/next zipper)]
-       (if (not (z/end? next))
-         (recur next predicate new-list)
-         new-list)))))
-
-(defn- next-node [zipper predicate]
+(defn- next-step [zipper]
   (let [current-node (z/node zipper)
-        element (when (predicate current-node) current-node)
         next (z/next zipper)]
-    (if (not (z/end? next)) ;;; !!!! return nil nil
-      (recur next predicate new-list)
-      new-list)))
+    {:node current-node
+     :zipper (if (not (z/end? next))
+               next)}))
 
-(defn lazy-get-all-matching-objects [zipper predicate]
-  (let [{:zipper zipper, :node node} (next-node zipper)]
-    (cons node (lazy-seq (lazy-get-all-matching-objects zipper predicate)))))
+(defn traverse [zipper]
+  (let [{zipper :zipper, node :node} (next-step zipper)]
+    (if zipper
+      (cons node (lazy-seq (traverse zipper)))
+      (list node))))
 
 (defn- get-all-matching-objects [zipper predicate]
-  (loop [objects #{}
-         zipper zipper]
-    (if (z/end? zipper)
-      objects
-      (let [next (z/next zipper)
-            next-node (z/node next)]
-        (recur (if (predicate next-node)
-                 (conj objects next-node)
-                 objects)
-               next)))))
+  (apply hash-set (filter predicate (traverse zipper))))
 
 (defn- get-all-non-group-objects [zipper]
   (get-all-matching-objects zipper
