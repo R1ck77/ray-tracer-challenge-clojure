@@ -27,7 +27,7 @@
   ([]
    (world []))
   ([root-objects]
-   {:hierarchy (hierarchy/hierarchy root-objects) ; TODO/FIXME sloooowwwww
+   {:hierarchy (hierarchy/hierarchy (group/group root-objects))
     :light-sources #{}
     :material material/void-material}))
 
@@ -54,14 +54,14 @@
   \"The Book made me do it.\""
   []
   (let [sphere1 (shapes/change-material (shapes/sphere)
-                                                  (material/with-color (color/color 0.8 1.0 0.6)
-                                                    :diffuse 0.7
-                                                    :specular 0.2))
+                                        (material/with-color (color/color 0.8 1.0 0.6)
+                                          :diffuse 0.7
+                                          :specular 0.2))
         sphere2 (shapes/change-transform (shapes/sphere)
-                                                   (transform/scale 0.5 0.5 0.5))]
+                                         (transform/scale 0.5 0.5 0.5))]
     (-> (world [sphere1 sphere2])
         (set-light-sources [(light-sources/create-point-light (point/point -10 10 -10)
-                                                                    (color/color 1 1 1))]))))
+                                                              (color/color 1 1 1))]))))
 
 (defn- unsorted-intersections [world ray]
   (flatten
