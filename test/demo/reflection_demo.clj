@@ -95,10 +95,9 @@
                       (shapes/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                     (transform/translate 1.5 0.5 -0.5)))))
 
-(def world (-> (world/world)
+(def world (-> (world/world [floor left-sphere middle-sphere air-sphere back-sphere right-sphere])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
-               (world/set-objects [floor left-sphere middle-sphere air-sphere back-sphere right-sphere])
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
 
 (defn create-camera [width height]
