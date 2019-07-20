@@ -41,7 +41,7 @@
   (assoc world :hierarchy (hierarchy/hierarchy (group/group objects))))
 
 (defn get-objects [world]
-  (grouping-shared/get-all-objects world))
+  (grouping-shared/get-all-objects (:hierarchy world)))
 
 (defn set-light-sources [world & light-sources]
   (assoc world :light-sources (vec light-sources)))
@@ -69,7 +69,7 @@
     (reduce (fn [acc object]
               (conj! acc (ray/intersect ray object)))
             (transient [])
-            (:objects world)))))
+            (grouping-shared/get-root (:hierarchy world))))))
 
 (defn intersect [world ray]
   (sort-by :t (unsorted-intersections world ray)))
