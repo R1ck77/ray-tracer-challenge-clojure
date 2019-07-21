@@ -69,18 +69,37 @@
               new-node
               root))
 
-(defn create-zipper [root]
-  (let [zipper (new-group-zipper root)]
-    (reify
-      GroupZipper
-      (compute-local-to-world-transform [this shape]
-        (do-compute-local-to-world-transform zipper shape))
-      (compute-world-to-local-transform [this shape]
-        (do-compute-world-to-local-transform zipper shape))
-      (find-node [this predicate]
-        (do-find-node zipper predicate))
-      shared/ShapesContainer
-      (get-root [this]
-        root)
-      (get-all-objects [this]
-        (get-all-non-group-objects zipper)))))
+(defn- go-to-parent [zipper]
+  (let [new-zipper (z/up zipper)]
+    (if new-zipper
+      (recur new-zipper)
+      zipper)))
+
+(defn- add-root-obj
+  "Meaningful only in tests, I suspect
+
+  Unwinds the object first"
+  [zipper object]
+  (z/append-child (go-to-parent zipper) object))
+
+(defn create-zipper
+  ([root]
+   (let [zipper (new-group-zipper root)]
+     (create-zipper root zipper)))
+  ([root zipper]
+   (reify
+     GroupZipper
+     (compute-local-to-world-transform [this shape]
+       (do-compute-local-to-world-transform zipper shape))
+     (compute-world-to-local-transform [this shape]
+       (do-compute-world-to-local-transform zipper shape))
+     (find-node [this predicate]
+       (do-find-node zipper predicate))
+     shared/ShapesContainer
+     (get-root [this]
+       root)
+     (get-all-objects [this]
+       (get-all-non-group-objects zipper))
+     shared/HierarchyEditor
+     (add-root-object [this object]
+       (create-zipper root (add-root-obj zipper object))))))

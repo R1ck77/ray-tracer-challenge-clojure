@@ -34,7 +34,7 @@
 (defn add-root-object
   "Add a new object to the root group"
   [world object]
-  (let [old-hierarchy (grouping-shared/get-root (:hierarchy world))]
+  (let [old-hierarchy (:hierarchy world)]
     (assoc world :hierarchy (grouping-shared/add-root-object old-hierarchy object))))
 
 (defn set-objects [world objects]

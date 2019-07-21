@@ -25,7 +25,7 @@
     (grouping-shared/get-all-objects group-zipper))
   grouping-shared/HierarchyEditor
   (add-root-object [this object]
-    (grouping-shared/add-root-object group-zipper object)))
+    (assoc this :group-zipper (grouping-shared/add-root-object group-zipper object))))
 
 (defn hierarchy
   ([]

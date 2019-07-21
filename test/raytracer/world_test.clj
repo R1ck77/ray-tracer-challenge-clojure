@@ -371,7 +371,7 @@
                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                   :reflectivity 0.5))
-          world (shared/add-root-object (world/default-world) shape)
+          world (world/add-root-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersection (intersection/intersection const/√2 shape)]
