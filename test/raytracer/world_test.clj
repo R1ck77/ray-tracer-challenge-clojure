@@ -153,7 +153,7 @@
           ray (ray/ray (point/point 0 0 5)
                        (svector/svector 0 0 1))
           intersection (intersection/intersection 4 sphere2)
-          comp (world/prepare-computations ray intersection dummy-indices)
+          comp (world/prepare-computations (:hierarchy world) ray intersection dummy-indices)
           color (world/shade-hit world comp 1)]
       (is (c= (color/color 0.1 0.1 0.1)
               color))))
@@ -163,12 +163,12 @@
                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                    :reflectivity 0.5))
-          world (shared/add-root-object (world/default-world) shape)
+          world (world/add-root-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersection (intersection/intersection const/√2 shape)]
       (is (c= (color/color 0.87677 0.92436 0.82918)
-              (world/shade-hit world (world/prepare-computations ray intersection dummy-indices) 1)))))
+              (world/shade-hit world (world/prepare-computations (:hierarchy world) ray intersection dummy-indices) 1)))))
   (testing "shade_hit() with a transparent material"
     (let [floor (-> (shapes/plane)
                     (shapes/change-transform (transform/translate 0 -1 0))
@@ -179,13 +179,14 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (shared/add-root-object floor)
-                    (shared/add-root-object ball))
+                    (world/add-root-object floor)
+                    (world/add-root-object ball))
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersections [(intersection/intersection const/√2 floor)]
           refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
-          intermediate-results (world/prepare-computations ray
+          intermediate-results (world/prepare-computations (:hierarchy world)
+                                                           ray
                                                            (first intersections)
                                                            refractive-indices)]
       (with-redefs [world/*basic-shade-detection* true]
@@ -207,11 +208,11 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (shared/add-root-object floor)
-                    (shared/add-root-object ball))
+                    (world/add-root-object floor)
+                    (world/add-root-object ball))
           intersections [(intersection/intersection const/√2 floor)]
           refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
-          intermediate-results (world/prepare-computations ray (first intersections) refractive-indices)]
+          intermediate-results (world/prepare-computations (:hierarchy world) ray (first intersections) refractive-indices)]
       (with-redefs [world/*basic-shade-detection* true]
         (is (c= (color/color 0.9339151479206158 0.6964342355067606 0.6924306968966569)
                 (world/shade-hit world intermediate-results 5))))
