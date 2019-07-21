@@ -18,8 +18,6 @@
             [raytracer.world :as world]
             [raytracer.grouping.shared :as shared]))
 
-;;; TODO/FIXME replace the (first/second (world/get-objects world)) with something better
-
 (def dummy-indices {:n1 1.76 :n2 2})
 
 (deftest test-create
@@ -179,8 +177,7 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (world/add-root-object floor)
-                    (world/add-root-object ball))
+                    (world/set-objects [floor ball]))
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersections [(intersection/intersection const/√2 floor)]
@@ -208,8 +205,8 @@
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                                                 :ambient 0.5)))
           world (-> (world/default-world)
-                    (world/add-root-object floor)
-                    (world/add-root-object ball))
+                    (world/set-objects (concat [floor ball]
+                                               (world/get-objects (world/default-world)))))
           intersections [(intersection/intersection const/√2 floor)]
           refractive-indices (refraction/compute-refractive-indices (first intersections) intersections 1)
           intermediate-results (world/prepare-computations (:hierarchy world) ray (first intersections) refractive-indices)]
@@ -239,7 +236,7 @@
     (let [world (world/set-objects (world/default-world)
                                    (map reset-ambient-color (world/get-objects (world/default-world))))
           ray (ray/ray (point/point 0 0 0.75) (svector/svector 0 0 -1))]
-      (is (c= (material/get-color (:material (first (world/get-objects world))))
+      (is (c= (material/get-color (:material (:shape2 (get-objects-by-name world))))
               (world/color-at world ray)))))
   (testing "color_at() with mutually reflective surfaces"
     (let [light (light-sources/create-point-light (point/point 0 0 0)
