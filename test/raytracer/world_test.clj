@@ -37,7 +37,7 @@
                                                                         :specular 0.2))
           expected-sphere2 (shapes/change-transform (shapes/sphere)
                                                     (transform/scale 0.5 0.5 0.5))]
-      (is (contains? (:light-sources world)
+      (is (contains? (apply hash-set (:light-sources world))
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
       (is (some #(= expected-sphere1 %) (world/get-objects world)))
