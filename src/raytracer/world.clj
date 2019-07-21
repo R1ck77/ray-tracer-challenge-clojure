@@ -60,16 +60,11 @@
         sphere2 (shapes/change-transform (shapes/sphere)
                                          (transform/scale 0.5 0.5 0.5))]
     (-> (world [sphere1 sphere2])
-        (set-light-sources [(light-sources/create-point-light (point/point -10 10 -10)
-                                                              (color/color 1 1 1))]))))
+        (set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
+                                                             (color/color 1 1 1))))))
 
 (defn- unsorted-intersections [world ray]
-  (flatten
-   (persistent!
-    (reduce (fn [acc object]
-              (conj! acc (ray/intersect ray object)))
-            (transient [])
-            (grouping-shared/get-root (:hierarchy world))))))
+  (ray/intersect ray (grouping-shared/get-root (:hierarchy world)))) ;; TODO/FIXME bogus
 
 (defn intersect [world ray]
   (sort-by :t (unsorted-intersections world ray)))
