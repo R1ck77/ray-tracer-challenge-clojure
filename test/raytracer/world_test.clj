@@ -28,9 +28,13 @@
       (is (empty? (world/get-objects world)))
       (is (empty? (:light-sources world))))))
 
+(defn- get-objects-by-name [world]
+  (into {} (map #(vector (:name %) %) (world/get-objects world))))
+
 (deftest test-default-world
   (testing "The default world"
     (let [world (world/default-world)
+          objects (get-objects-by-name world)
           expected-sphere1 (shapes/change-material (shapes/sphere)
                                                    (material/with-color (color/color 0.8 1.0 0.6)
                                                                         :diffuse 0.7
@@ -40,11 +44,8 @@
       (is (contains? (apply hash-set (:light-sources world))
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
-      (is (some #(= expected-sphere1 %) (world/get-objects world)))
-      (is (some #(and                  
-                  (= (dissoc % :transform :inverse-transform)
-                     (dissoc expected-sphere2 :transform :inverse-transform)))
-                (world/get-objects world))))))
+      (is (= expected-sphere1 (dissoc (:shape1 objects) :name)))
+      (is (= expected-sphere2 (dissoc (:shape2 objects) :name))))))
 
 (deftest test-intersect
   (testing "Intersect a world with a ray"
@@ -345,16 +346,18 @@
                                                      :ambient 1)))
 
 (defn- change-second-object-material [world]
-  (let [objects (world/get-objects world)]
-    (world/set-objects world
-                       (assoc objects 1 (update-ambient (second objects))))))
+  (let [objects (get-objects-by-name world)
+        first-sphere (:shape1 objects)
+        second-sphere (:shape2 objects)]
+    (world/set-objects world [first-sphere (update-ambient second-sphere)])))
 
 (deftest test-reflected-color
   (testing "The reflected color for a nonreflective material"
     (let [world (change-second-object-material (world/default-world))
+          objects (get-objects-by-name world)
           ray (ray/ray (point/point 0 0 0)
                        (svector/svector 0 0 1))
-          intersection (intersection/intersection 1 (second (world/get-objects world)))]
+          intersection (intersection/intersection 1 (:shape2 objects))]
       (is (c= (color/color 0 0 0)
               (world/reflected-color world
                                      (world/prepare-computations (:hierarchy world)
@@ -367,7 +370,7 @@
           shape (shapes/change-material (shapes/change-transform template-shape
                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
-                                                                   :reflectivity 0.5))
+                                                                  :reflectivity 0.5))
           world (shared/add-root-object (world/default-world) shape)
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
