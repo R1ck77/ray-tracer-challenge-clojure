@@ -6,7 +6,8 @@
             [raytracer.shapes.plane :as plane-ns]
             [raytracer.shapes.cube :as cube-ns]
             [raytracer.shapes.cylinder :as cylinder-ns]
-            [raytracer.shapes.cone :as cone-ns]))
+            [raytracer.shapes.cone :as cone-ns]
+            [raytracer.shapes.group :as group-ns]))
 
 (defn- glass-object [shape]
   (shapes/change-material shape
@@ -40,4 +41,8 @@
     (is (= true (:closed (shapes/cylinder :closed true)))))
   (testing "cone creates a cone"
     (is (= (cone-ns/cone) (shapes/cone)))
-    (is (= true (:closed (shapes/cone :closed true))))))
+    (is (= true (:closed (shapes/cone :closed true)))))
+  (testing "group creates a group"
+    (is (= (group-ns/group []) (shapes/group [])))
+    (is (= (group-ns/group [(shapes/sphere)])
+           (shapes/group [(shapes/sphere)])))))

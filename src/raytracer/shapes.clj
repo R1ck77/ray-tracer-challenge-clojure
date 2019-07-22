@@ -7,7 +7,8 @@
             [raytracer.shapes.plane :as plane-ns]
             [raytracer.shapes.cube :as cube-ns]
             [raytracer.shapes.cylinder :as cylinder-ns]
-            [raytracer.shapes.cone :as cone-ns]))
+            [raytracer.shapes.cone :as cone-ns]
+            [raytracer.shapes.group :as group-ns]))
 
 (defn change-transform [shape new-transform]
   (let [inverse (matrix/invert new-transform 4)]
@@ -34,3 +35,6 @@
 
 (defn cone [& args]
   (apply cone-ns/cone args))
+
+(defn group [& children]
+  (apply group-ns/group children))
