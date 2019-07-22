@@ -1,6 +1,5 @@
 (ns raytracer.ray
   (:require [raytracer.intersection :as intersection]
-            [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.utils :as utils]
             [raytracer.tuple :as tuple]
@@ -26,7 +25,6 @@
   (intersect [this shape]
     (shared/local-intersect shape (transform this (:inverse-transform shape)))))
 
-
 (defn normalize [ray]
   (assoc ray
          :direction (tuple/normalize (:direction ray))))
@@ -34,8 +32,3 @@
 (defn position [ray t]
   (tuple/add (:origin ray)
              (tuple/mul (:direction ray) t)))
-
-
-
-
-
