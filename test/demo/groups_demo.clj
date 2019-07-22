@@ -34,25 +34,26 @@
 (defn- create-marble [x z]
   (-> (shapes/sphere)
       (shapes/change-material
-       (material/material :diffuse 0.01
+       (material/material :diffuse 0.1
                           :specular 0.8
-                          :reflectivity 0.05
+                          :reflectivity 0.5
                           :transparency 0.99
-                          :refractive-index 2.0))
+                          :refractive-index 0.8
+                          :color (color/color 0 1 0)))
       (shapes/change-transform
-       (transform/translate (* 0.5 x) 0 (* 0.5 z)
+       (transform/translate (* 0.6 x) 0.0 (* 0.6 z)
                             (transform/scale 0.25 0.25 0.25)))))
 
 (defn- create-marble-floor []
   (shapes/change-transform
    (shapes/group
     (vec
-     (for [x (range -10 10)
-           z (range -10 10)]
+     (for [x (range -2 2)
+           z (range -2 2)]
        (create-marble x z))))
-   (transform/translate 0 0.125 0)))
+   (transform/translate 0 0.128 0)))
 
-(def world (-> (world/world [floor (create-marble-floor)])
+(def world (-> (world/world [(create-marble-floor) floor])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
