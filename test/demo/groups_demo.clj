@@ -46,15 +46,15 @@
 
 (defn- create-marbles-carpet [size]
   (vec
-   (for [x (range (- size) size)
-         z (range (- size) size)]
+   (for [x (range 0 size)
+         z (range 0 size)]
      (create-marble x z))))
 
 (defn- create-marble-floor []
   (shapes/change-transform
    (shapes/group
     (create-marbles-carpet 2))
-   (transform/translate 0 0.128 0)))
+      (transform/translate 0 0.128 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
