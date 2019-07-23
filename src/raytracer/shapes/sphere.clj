@@ -46,7 +46,10 @@
     (intersect-sphere-space this ray-in-plane-space))
   shared/Surface
   (compute-normal [this point]
-    (compute-normal this point)))
+    (compute-normal this point))
+  shared/BoundingBox
+  (get-sides [this]
+    ))
 
 (defn sphere []
   (map->Sphere 
