@@ -44,13 +44,16 @@
        (transform/translate (* 0.6 x) 0.0 (* 0.6 z)
                             (transform/scale 0.25 0.25 0.25)))))
 
+(defn- create-marbles-carpet [size]
+  (vec
+   (for [x (range (- size) size)
+         z (range (- size) size)]
+     (create-marble x z))))
+
 (defn- create-marble-floor []
   (shapes/change-transform
    (shapes/group
-    (vec
-     (for [x (range -2 2)
-           z (range -2 2)]
-       (create-marble x z))))
+    (create-marbles-carpet 2))
    (transform/translate 0 0.128 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
