@@ -1,13 +1,16 @@
 (ns raytracer.shapes.bounding-box-test
   (:require [clojure.test :refer :all]
+            [raytracer.point :as point]
+            [raytracer.ray :as ray]
+            [raytracer.transform :as transform]
             [raytracer.shapes.bounding-box :as bounding-box]))
 
 (deftest test-extremes-for-points
   (testing "Returns the unmodified point if there is only one"
-    (is (= [[1 2 3] [1 2 3]]
-           (bounding-box/extremes-from-points #{[1 2 3]}))))
+    (is (= [(point/point 1 2 3) (point/point 1 2 3)]
+           (bounding-box/extremes-from-points #{(point/point 1 2 3)}))))
   (testing "Returns the minimum and maximum values for all coordinates, respectively"
-    (is (= [[-1000 -100 1] [5 1000 3]]
-           (bounding-box/extremes-from-points #{[1 2 3]
-                                                [-1000 1000 2]
-                                                [5 -100 1]})))))
+    (is (= [(point/point -1000 -100 1) (point/point 5 1000 3)]
+           (bounding-box/extremes-from-points #{(point/point 1 2 3)
+                                                (point/point -1000 1000 2)
+                                                (point/point 5 -100 1)})))))

@@ -1,4 +1,5 @@
-(ns raytracer.shapes.bounding-box)
+(ns raytracer.shapes.bounding-box
+  (:require [raytracer.point :as point]))
 
 (defprotocol BoundingBox
   (get-sides [this] "Return each side of the box")
@@ -6,14 +7,21 @@
 
 (def unit-cube (reify BoundingBox
                  (get-sides [this]
-                   [2 2 2])
+                   (point/point 2 2 2))
                  (get-extremes [this]
-                   #{[-1 -1 -1] [1 1 1]})))
+                   #{(point/point -1 -1 -1) (point/point 1 1 1)})))
+
+(defn- to-vector [point]
+  (vector (:x point)
+          (:y point)
+          (:z point)))
+
 
 (defn- filter-points [points f]
   {:pre [(not (empty? points))]}
   (reduce (fn [accumulator point]
-            (map f accumulator point))
+            (apply point/point
+                   (map f (to-vector accumulator) (to-vector point))))
           points))
 
 (defn extremes-from-points [points]
