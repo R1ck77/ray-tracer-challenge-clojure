@@ -27,8 +27,10 @@
                (:material (shapes/change-material sphere new-material))))))))
 
 (deftest test-bounding-box-protocol
-  (testing "a sphere is inscribed in a cube of side 2"
-    (is (= [2 2 2] (bounding-box/get-sides (sphere/sphere))))))
+  (testing "a sphere's bounding box is a AABB of side 2"
+    (is (= [(point/point -1 -1 -1)
+            (point/point 1 1 1)]
+           (bounding-box/get-corners (sphere/sphere))))))
 
 (deftest test-sphere-intersection
   (let [sphere (shapes/sphere)]

@@ -2,14 +2,11 @@
   (:require [raytracer.point :as point]))
 
 (defprotocol BoundingBox
-  (get-sides [this] "Return each side of the box")
-  (get-extremes [this] "Return the two extremes vertices of the box"))
+  (get-corners [this] "Return the two extremes vertices of the box"))
 
 (def unit-box (reify BoundingBox
-                 (get-sides [this]
-                   (point/point 2 2 2))
-                 (get-extremes [this]
-                   #{(point/point -1 -1 -1) (point/point 1 1 1)})))
+                 (get-corners [this]
+                   [(point/point -1 -1 -1) (point/point 1 1 1)])))
 
 (defn- to-vector [point]
   (vector (:x point)

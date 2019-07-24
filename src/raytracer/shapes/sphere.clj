@@ -49,9 +49,7 @@
   (compute-normal [this point]
     (compute-normal this point))
   bounding-box/BoundingBox
-  (get-sides [this]
-    [2 2 2])
-  (get-extremes [this]
+  (get-corners [this]
     (vector (point/point -1 -1 -1)
             (point/point 1 1 1))))
 
