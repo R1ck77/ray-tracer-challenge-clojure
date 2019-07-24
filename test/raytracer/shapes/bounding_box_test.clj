@@ -14,3 +14,6 @@
            (bounding-box/extremes-from-points #{(point/point 1 2 3)
                                                 (point/point -1000 1000 2)
                                                 (point/point 5 -100 1)})))))
+
+(deftest test-box-points-from-extremes
+  (testing "Convert 2 points in a bounding box in the "))

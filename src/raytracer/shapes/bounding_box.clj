@@ -5,7 +5,7 @@
   (get-sides [this] "Return each side of the box")
   (get-extremes [this] "Return the two extremes vertices of the box"))
 
-(def unit-cube (reify BoundingBox
+(def unit-box (reify BoundingBox
                  (get-sides [this]
                    (point/point 2 2 2))
                  (get-extremes [this]
@@ -40,7 +40,7 @@
    [(:x p1) (:y p2) (:z p2)]
    [(:x p2) (:y p2) (:z p2)]])
 
-(defn cube-points-from-extremes [p1 p2]
+(defn box-points-from-extremes [p1 p2]
   (map #(apply point/point %) (vertices-vectors-from-extremes p1 p2)))
 
 (defn transform
