@@ -16,4 +16,13 @@
                                                 (point/point 5 -100 1)})))))
 
 (deftest test-box-points-from-extremes
-  (testing "Convert 2 points in a bounding box in the "))
+  (testing "Convert 2 points in a bounding box to a list of box vertices"
+    (is (= #{(point/point 0, 0, 0)
+             (point/point 10 0 0)
+             (point/point 0 10 0)
+             (point/point 10 10 0)
+             (point/point 0 0 10)
+             (point/point 10 0 10)
+             (point/point 0 10 10)
+             (point/point 10 10 10)}
+           (bounding-box/box-points-from-extremes (point/point 0 0 0) (point/point 10 10 10))))))

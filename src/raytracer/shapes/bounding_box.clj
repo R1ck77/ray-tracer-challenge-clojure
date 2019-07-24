@@ -31,17 +31,17 @@
           (filter-points points max)))
 
 (defn- vertices-vectors-from-extremes [p1 p2]
-  [[(:x p1) (:y p1) (:z p1)]
-   [(:x p2) (:y p1) (:z p1)]
-   [(:x p1) (:y p2) (:z p1)]
-   [(:x p2) (:y p2) (:z p1)]
-   [(:x p1) (:y p1) (:z p2)]
-   [(:x p2) (:y p1) (:z p2)]
-   [(:x p1) (:y p2) (:z p2)]
-   [(:x p2) (:y p2) (:z p2)]])
+  #{[(:x p1) (:y p1) (:z p1)]
+    [(:x p2) (:y p1) (:z p1)]
+    [(:x p1) (:y p2) (:z p1)]
+    [(:x p2) (:y p2) (:z p1)]
+    [(:x p1) (:y p1) (:z p2)]
+    [(:x p2) (:y p1) (:z p2)]
+    [(:x p1) (:y p2) (:z p2)]
+    [(:x p2) (:y p2) (:z p2)]})
 
 (defn box-points-from-extremes [p1 p2]
-  (map #(apply point/point %) (vertices-vectors-from-extremes p1 p2)))
+  (into #{}  (map #(apply point/point %) (vertices-vectors-from-extremes p1 p2))))
 
 (defn transform
   "Return an axis aligned bounding box transformed by transform"
