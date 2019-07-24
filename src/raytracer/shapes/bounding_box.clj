@@ -16,12 +16,14 @@
           (:y point)
           (:z point)))
 
+(defn combine-points [f point1 point2]
+  (apply point/point
+         (map f (to-vector point1) (to-vector point2))))
+
 
 (defn- filter-points [points f]
   {:pre [(not (empty? points))]}
-  (reduce (fn [accumulator point]
-            (apply point/point
-                   (map f (to-vector accumulator) (to-vector point))))
+  (reduce (partial combine-points f)
           points))
 
 (defn extremes-from-points [points]
