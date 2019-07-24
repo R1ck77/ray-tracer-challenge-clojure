@@ -20,7 +20,6 @@
   (apply point/point
          (map f (to-vector point1) (to-vector point2))))
 
-
 (defn- filter-points [points f]
   {:pre [(not (empty? points))]}
   (reduce (partial combine-points f)
@@ -30,6 +29,19 @@
   {:pre [(not (empty? points))]}  
   (vector (filter-points points min)
           (filter-points points max)))
+
+(defn- vertices-vectors-from-extremes [p1 p2]
+  [[(:x p1) (:y p1) (:z p1)]
+   [(:x p2) (:y p1) (:z p1)]
+   [(:x p1) (:y p2) (:z p1)]
+   [(:x p2) (:y p2) (:z p1)]
+   [(:x p1) (:y p1) (:z p2)]
+   [(:x p2) (:y p1) (:z p2)]
+   [(:x p1) (:y p2) (:z p2)]
+   [(:x p2) (:y p2) (:z p2)]])
+
+(defn cube-points-from-extremes [p1 p2]
+  (map #(apply point/point %) (vertices-vectors-from-extremes p1 p2)))
 
 (defn transform
   "Return an axis aligned bounding box transformed by transform"
