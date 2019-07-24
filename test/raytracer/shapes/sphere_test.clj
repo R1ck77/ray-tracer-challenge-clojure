@@ -9,7 +9,8 @@
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
             [raytracer.material :as material]
-            [raytracer.shapes.sphere :as sphere]))
+            [raytracer.shapes.sphere :as sphere]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (deftest test-sphere
   (let [sphere (shapes/sphere)]
@@ -24,6 +25,10 @@
       (let [new-material (assoc (material/material) :ambient 0.25)]
         (is (= new-material
                (:material (shapes/change-material sphere new-material))))))))
+
+(deftest test-bounding-box-protocol
+  (testing "a sphere is inscribed in a cube of side 2"
+    (is (= [2 2 2] (bounding-box/get-sides (sphere/sphere))))))
 
 (deftest test-sphere-intersection
   (let [sphere (shapes/sphere)]

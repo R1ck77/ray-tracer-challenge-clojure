@@ -5,7 +5,8 @@
             [raytracer.matrix :as matrix]
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def center (point/point 0 0 0))
 
@@ -47,9 +48,12 @@
   shared/Surface
   (compute-normal [this point]
     (compute-normal this point))
-  shared/BoundingBox
+  bounding-box/BoundingBox
   (get-sides [this]
-    ))
+    [2 2 2])
+  (get-extremes [this]
+    (vector (point/point -1 -1 -1)
+            (point/point 1 1 1))))
 
 (defn sphere []
   (map->Sphere 
