@@ -7,7 +7,8 @@
             [raytracer.point :as point]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defn- check-cap [ray t]
   (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))
@@ -97,6 +98,14 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cylinder-side-normal point-object-space))))
 
+(defn compute-finite-corners
+  "Return the bounding box for a closed cylinder"
+  [cone]
+  (:pre [(:closed cone)
+         (<= (:minimum cone) (:maximum cone))])
+  (vector (point/point -1.0 (float (:minimum cone)) -1.0)
+          (point/point 1.0 (float (:maximum cone)) 1.0)))
+
 (defrecord Cylinder [minimum maximum closed inverse-transform inverse-transposed-transform])
 
 (extend-type Cylinder
@@ -109,7 +118,13 @@
      (shared/as-vector
       (matrix/transform (:inverse-transposed-transform this)
                         (compute-cylinder-normal this
-                                                 (matrix/transform (:inverse-transform this) point)))))))
+                                                 (matrix/transform (:inverse-transform this) point))))))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (if (:closed this)
+      (compute-finite-corners this)
+      (vector (point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
+              (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)))))
 
 (defn cylinder 
   [& {:as args-map}]
