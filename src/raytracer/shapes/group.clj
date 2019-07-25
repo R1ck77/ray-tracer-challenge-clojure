@@ -7,7 +7,8 @@
             [raytracer.ray :as ray]
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def group)
 
@@ -23,7 +24,10 @@
   (local-intersect [this ray-object-space]
     (intersect this ray-object-space))
   shared/Surface
-  (compute-normal [this point]))
+  (compute-normal [this point])
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (throw (UnsupportedOperationException. "TODO!"))))
 
 (defn group [children]
   (->Group children
