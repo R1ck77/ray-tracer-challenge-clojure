@@ -9,7 +9,8 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]            
             [raytracer.shapes.cube :as cube]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def a-cube (cube/cube))
 
@@ -19,6 +20,12 @@
       (is (:material cube))
       (is (= matrix/identity-matrix (:inverse-transform cube)))
       (is (v= matrix/identity-matrix (:inverse-transposed-transform cube))))))
+
+(deftest test-bounding-box-protocol
+  (testing "The cube is its own bounding box"
+    (is (= [(point/point -1 -1 -1)
+            (point/point 1 1 1)]
+           (bounding-box/get-corners (cube/cube))))))
 
 (defmacro test-no-intersection [name origin direction]
  `(testing ~(format "A ray misses a cube (%s)" name)

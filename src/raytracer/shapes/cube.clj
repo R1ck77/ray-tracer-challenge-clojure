@@ -6,7 +6,8 @@
             [raytracer.point :as point]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defrecord Cube [material inverse-transform inverse-transposed-transform])
 
@@ -71,7 +72,11 @@
      (shared/as-vector
       (matrix/transform (:inverse-transposed-transform this)
                         (compute-cube-normal this
-                                             (matrix/transform (:inverse-transform this) point)))))))
+                                             (matrix/transform (:inverse-transform this) point))))))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (vector (point/point -1 -1 -1)
+            (point/point 1 1 1))))
 
 (defn cube []
   (->Cube (material/material)
