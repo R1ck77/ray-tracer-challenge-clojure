@@ -8,9 +8,16 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
-            [raytracer.shapes.plane :as plane]))
+            [raytracer.shapes.plane :as plane]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def a-plane (plane/plane))
+
+(deftest test-bounding-box
+  (testing "The plane is its own bounding box"
+    (is (= [(point/point Double/NEGATIVE_INFINITY 0.0 Double/NEGATIVE_INFINITY)
+            (point/point Double/POSITIVE_INFINITY 0.0 Double/POSITIVE_INFINITY)]
+           (bounding-box/get-corners (plane/plane))))))
 
 (deftest test-constructor
   (testing "The courtesy constructor function fills material, inverse transform and its transpose"
