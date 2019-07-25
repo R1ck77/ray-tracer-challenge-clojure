@@ -7,7 +7,8 @@
             [raytracer.point :as point]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defn- check-cap [ray t]
   (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))
@@ -115,6 +116,18 @@
 
 (defrecord Cone [minimum maximum closed inverse-transform inverse-transposed-transform])
 
+(defn compute-finite-corners
+  "Return the bounding box for a closed cone"
+  [cone]
+  (:pre [(:closed cone)
+         (<= (:minimum cone) (:maximum cone))])
+  (let [minimum (:minimum cone)
+        maximum (:maximum cone)
+        size (max (Math/abs (float minimum))
+                  (Math/abs (float maximum)))]
+    (vector (point/point (- size) (float minimum) (- size))
+            (point/point size (float maximum) size))))
+
 (extend-type Cone
   shared/Intersectable
   (local-intersect [this ray-object-space]
@@ -125,7 +138,13 @@
      (shared/as-vector
       (matrix/transform (:inverse-transposed-transform this)
                         (compute-cone-normal this
-                                             (matrix/transform (:inverse-transform this) point)))))))
+                                             (matrix/transform (:inverse-transform this) point))))))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (if (:closed this)
+      (compute-finite-corners this)
+      (vector (point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
+              (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)))))
 
 (defn cone 
   [& {:as args-map}]

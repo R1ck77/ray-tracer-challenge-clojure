@@ -9,11 +9,34 @@
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
             [raytracer.shapes.cone :as cone]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def a-cone (cone/cone))
 
 (def √2 (Math/sqrt 2))
+
+(deftest test-bounding-box-protocol
+  (testing "Bounding box for an infinite cone"
+    (is (= [(point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
+            (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)]
+           (bounding-box/get-corners (cone/cone :closed false, :minimum -4, :maximum 4)))))
+  (testing "Bounding box for a cone between -4, 4"
+    (is (= [(point/point -4.0 -4.0 -4.0)
+            (point/point 4.0 4.0 4.0)]
+           (bounding-box/get-corners (cone/cone :closed true, :minimum -4, :maximum 4)))))
+  (testing "Bounding box for a cone between -10, -3"
+    (is (= [(point/point -10.0 -10.0 -10.0)
+            (point/point 10.0 -3.0 10.0)]
+           (bounding-box/get-corners (cone/cone :closed true, :minimum -10, :maximum -3)))))
+  (testing "Bounding box for a cone between 3, 100"
+    (is (= [(point/point -100.0 3.0 -100.0)
+            (point/point 100.0 100.0 100.0)]
+           (bounding-box/get-corners (cone/cone :closed true, :minimum 3, :maximum 100)))))
+    (testing "Bounding box for a cone between -50, -50 (degenerate)"
+    (is (= [(point/point -50.0 -50.0 -50.0)
+            (point/point 50.0 -50.0 50.0)]
+           (bounding-box/get-corners (cone/cone :closed true, :minimum -50, :maximum -50))))))
 
 (deftest test-equality
   (testing "Two cones are equals if the share the same characteristics"
