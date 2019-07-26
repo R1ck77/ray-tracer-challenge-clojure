@@ -2,7 +2,8 @@
   (:require [raytracer.point :as point]))
 
 (defprotocol BoundingBox
-  (get-corners [this] "Return the two extremes vertices of the box"))
+  (get-corners [this] "Return the two extremes vertices of the box")
+  (hit [this ray] "Returns true if the ray hit the bounding box"))
 
 (def unit-box (reify BoundingBox
                  (get-corners [this]
