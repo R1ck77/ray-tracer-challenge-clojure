@@ -106,7 +106,7 @@
   (vector (point/point -1.0 (float (:minimum cone)) -1.0)
           (point/point 1.0 (float (:maximum cone)) 1.0)))
 
-(defrecord Cylinder [minimum maximum closed inverse-transform inverse-transposed-transform])
+(defrecord Cylinder [minimum maximum closed transform inverse-transform inverse-transposed-transform])
 
 (extend-type Cylinder
   shared/Intersectable
@@ -132,9 +132,11 @@
                      :minimum Double/NEGATIVE_INFINITY
                      :maximum Double/POSITIVE_INFINITY}
                     args-map)]
-    (let [inverse (matrix/invert (:transform args) 4)]
+    (let [transform (:transform args)
+          inverse (matrix/invert transform 4)]
       (->Cylinder (:minimum args)
                   (:maximum args)
                   (:closed args)
+                  transform
                   inverse
                   (matrix/transpose inverse)))))

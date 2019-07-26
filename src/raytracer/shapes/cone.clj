@@ -114,7 +114,7 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cone-side-normal point-object-space))))
 
-(defrecord Cone [minimum maximum closed inverse-transform inverse-transposed-transform])
+(defrecord Cone [minimum maximum closed transform inverse-transform inverse-transposed-transform])
 
 (defn compute-finite-corners
   "Return the bounding box for a closed cone"
@@ -152,9 +152,11 @@
                      :minimum Double/NEGATIVE_INFINITY
                      :maximum Double/POSITIVE_INFINITY}
                     args-map)]
-    (let [inverse (matrix/invert (:transform args) 4)]
+    (let [transform (:transform args)
+          inverse (matrix/invert transform 4)]
       (->Cone (:minimum args)
               (:maximum args)
               (:closed args)
+              transform
               inverse
               (matrix/transpose inverse)))))

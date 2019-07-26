@@ -9,7 +9,7 @@
             [raytracer.intersection :as intersection]
             [raytracer.shapes.bounding-box :as bounding-box]))
 
-(defrecord Cube [material inverse-transform inverse-transposed-transform])
+(defrecord Cube [material transform inverse-transform inverse-transposed-transform])
 
 (defn- signed-infinity [numerator _]
   (if (>= numerator 0)
@@ -80,6 +80,7 @@
 
 (defn cube []
   (->Cube (material/material)
+          matrix/identity-matrix
           matrix/identity-matrix
           matrix/identity-matrix))
 

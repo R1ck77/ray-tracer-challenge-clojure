@@ -12,7 +12,8 @@
 
 (defn change-transform [shape new-transform]
   (let [inverse (matrix/invert new-transform 4)]
-    (merge shape {:inverse-transform inverse
+    (merge shape {:transform new-transform
+                  :inverse-transform inverse
                   :inverse-transposed-transform (matrix/transpose inverse)})))
 
 (defn change-material [shape new-material]

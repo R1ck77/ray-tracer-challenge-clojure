@@ -9,7 +9,7 @@
             [raytracer.intersection :as intersection]
             [raytracer.shapes.bounding-box :as bounding-box]))
 
-(defrecord Plane [material inverse-transform inverse-transposed-transform])
+(defrecord Plane [material transform inverse-transform inverse-transposed-transform])
 
 (defn- xz-plane-intersection [ray]
   (- (/ (:y (:origin ray))
@@ -37,5 +37,6 @@
 
 (defn plane []
   (map->Plane {:material (material/material)
+               :transform matrix/identity-matrix
                :inverse-transform matrix/identity-matrix
                :inverse-transposed-transform matrix/identity-matrix}))
