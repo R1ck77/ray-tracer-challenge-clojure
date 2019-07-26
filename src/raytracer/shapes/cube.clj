@@ -76,7 +76,8 @@
   bounding-box/BoundingBox
   (get-corners [this]
     (vector (point/point -1 -1 -1)
-            (point/point 1 1 1))))
+            (point/point 1 1 1)))
+  (hit [this ray] true))
 
 (defn cube []
   (->Cube (material/material)

@@ -33,7 +33,8 @@
     bounding-box/BoundingBox
     (get-corners [this]
       (vector (point/point Double/NEGATIVE_INFINITY 0.0 Double/NEGATIVE_INFINITY)
-              (point/point Double/POSITIVE_INFINITY 0.0 Double/POSITIVE_INFINITY))))
+              (point/point Double/POSITIVE_INFINITY 0.0 Double/POSITIVE_INFINITY)))
+    (hit [this ray] true))
 
 (defn plane []
   (map->Plane {:material (material/material)

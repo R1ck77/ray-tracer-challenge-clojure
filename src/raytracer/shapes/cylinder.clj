@@ -124,7 +124,8 @@
     (if (:closed this)
       (compute-finite-corners this)
       (vector (point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
-              (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)))))
+              (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY))))
+  (hit [this ray] true))
 
 (defn cylinder 
   [& {:as args-map}]
