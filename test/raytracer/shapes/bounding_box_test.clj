@@ -1,9 +1,13 @@
 (ns raytracer.shapes.bounding-box-test
   (:require [clojure.test :refer :all]
+            [raytracer.const :as const]
             [raytracer.point :as point]
+            [raytracer.tuple :as tuple]
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
             [raytracer.shapes.bounding-box :as bounding-box]))
+
+(def small-value (/ const/EPSILON 100))
 
 (deftest test-extremes-for-points
   (testing "Returns the unmodified point if there is only one"
@@ -26,3 +30,30 @@
              (point/point 0 10 10)
              (point/point 10 10 10)}
            (bounding-box/box-points-from-extremes (point/point 0 0 0) (point/point 10 10 10))))))
+
+(deftest test-almost-identical
+  (testing "Returns true for points where each coordinate is different by less than const/EPSILON"
+    (is (bounding-box/almost-identical (tuple/tuple (+ 1 small-value) (+ 2 small-value) 3 4) (tuple/tuple (- 1 small-value) 2 (+ 3 small-value) (+ 4 small-value))))
+    (is (bounding-box/almost-identical (tuple/tuple 1.0 2.0 3.0 4.0) (tuple/tuple 1 2 3 4))))
+  (testing "Returns false if any coordinate differs for EPSILON or more"
+    (let [delta (* const/EPSILON 1.1)]
+      (is (not (bounding-box/almost-identical (tuple/tuple delta 2 3 12) (tuple/tuple 0 2 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 (+ 2 delta) 3 12) (tuple/tuple 0 2 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 (+ 3 delta) 12) (tuple/tuple 0 2 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 (+ 12 delta)) (tuple/tuple 0 2 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple delta 2 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple 0 (+ 2 delta) 3 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple 0 2 (+ 3 delta) 12))))
+      (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple 0 2 3 (+ 12 delta))))))))
+
+(deftest test-compute-transformed-extremes
+  (testing "Returns an empty collection if the input points are almost identical"
+    (let [extremes [(point/point small-value (- small-value) small-value)
+                    (point/point 0 0.0 0.0)]
+          transform (transform/translate 10 20 30 (transform/rotate-x const/half𝛑))]
+      (is (empty? (bounding-box/compute-transformed-corners extremes transform)))))
+  (testing "Returns the same points (within error) if the transform is the identity"
+    (let [extremes [(point/point 1 2 3)
+                    (point/point 5 6 7)]]
+      (is (= extremes
+             (bounding-box/compute-transformed-corners extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))

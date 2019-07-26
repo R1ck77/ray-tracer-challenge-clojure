@@ -1,8 +1,11 @@
 (ns raytracer.shapes.bounding-box
-  (:require [raytracer.point :as point]))
+  (:require [raytracer.const :as const]
+            [raytracer.point :as point]
+            [raytracer.matrix :as matrix]))
 
 (defprotocol BoundingBox
   (get-corners [this] "Return the two extremes vertices of the box")
+  (get-transformed-points [this] "Return 8 points in parent space, or an empty collection if the object is point-like")
   (hit [this ray] "Returns true if the ray hit the bounding box"))
 
 (def unit-box (reify BoundingBox
@@ -41,14 +44,15 @@
 (defn box-points-from-extremes [p1 p2]
   (into #{}  (map #(apply point/point %) (vertices-vectors-from-extremes p1 p2))))
 
-(defn transform
-  "Return an axis aligned bounding box transformed by transform"
-  [this transform]
-  ;;; Transform all the points and then get the new bounding box
-  )
+(defn almost-identical [point1 point2]
+  (and
+   (< (Math/abs (float (- (:x point1) (:x point2)))) const/EPSILON)
+   (< (Math/abs (float (- (:y point1) (:y point2)))) const/EPSILON)
+   (< (Math/abs (float (- (:z point1) (:z point2)))) const/EPSILON)
+   (< (Math/abs (float (- (:w point1) (:w point2)))) const/EPSILON)))
 
-(defn merge
-  "Return a bounding box that contains both boxes"
-  [this other]
-  ;;; Create the union of the points and get the new bounding box
-  )
+(defn compute-transformed-corners [extremes transform]
+  (if (apply almost-identical extremes)
+    []
+    (map #(matrix/transform transform %)
+         (apply box-points-from-extremes extremes))))
