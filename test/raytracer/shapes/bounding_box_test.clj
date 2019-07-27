@@ -46,6 +46,10 @@
       (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple 0 2 (+ 3 delta) 12))))
       (is (not (bounding-box/almost-identical (tuple/tuple 0 2 3 12) (tuple/tuple 0 2 3 (+ 12 delta))))))))
 
+(defn- same-extremes [[point-a-min point-a-max] [point-b-min point-b-max]]
+  (and (bounding-box/almost-identical point-a-min point-b-min)
+       (bounding-box/almost-identical point-b-max point-b-max)))
+
 (deftest test-compute-transformed-extremes
   (testing "Returns an empty collection if the input points are almost identical"
     (let [extremes [(point/point small-value (- small-value) small-value)
@@ -59,13 +63,13 @@
              (map bounding-box/almost-identical
                   extremes
                   (bounding-box/compute-transformed-corners extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))
-    (testing "Returns a properly rotated cube if you turn the cube by 45 degrees"
+  (testing "Returns a properly rotated cube if you turn the cube by 45 degrees"
     (let [extremes [(point/point -2 -2 -2)
                     (point/point 2 2 2)]
           diagonal (* 2 (Math/sqrt 2))
-          expected [(point/point (- diagonal) (- diagonal) (- diagonal))
-                    (point/point diagonal diagonal diagonal)]]
-      (is (= '(true true)
-             (map bounding-box/almost-identical
-                  expected
-                  (bounding-box/compute-transformed-corners extremes (transform/rotate-y (/ const/half𝛑 4)))))))))
+          expected [(point/point (- diagonal) -2 (- diagonal))
+                    (point/point diagonal 2 diagonal)]]
+      
+      (is (same-extremes expected
+                         (bounding-box/compute-transformed-corners extremes
+                                                                   (transform/rotate-y const/quarter𝛑)))))))
