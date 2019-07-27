@@ -38,4 +38,4 @@
   (apply cone-ns/cone args))
 
 (defn group [& children]
-  (apply group-ns/group children))
+  (group-ns/group children))

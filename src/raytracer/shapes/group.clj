@@ -12,6 +12,8 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
+(def ^:dynamic *use-bounding-boxes* true)
+
 (def group)
 
 (defn- intersect [group ray-object-space]
@@ -25,9 +27,14 @@
   (bounding-box/extremes-from-points
    (mapcat bounding-box/get-transformed-points children)))
 
+(defprotocol Parent
+  (get-children [this])
+  (is-empty? [this])
+  (set-children [this children]))
+
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
-(defrecord Group [children inverse-transform inverse-transposed-transform]
+(defrecord Group [children transform inverse-transform inverse-transposed-transform aabb-extremes] ;;; TODO/FIXME this is really effed up
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (intersect this ray-object-space))
@@ -35,17 +42,55 @@
   (compute-normal [this point])
   bounding-box/BoundingBox
   (hit [this ray]
-    (aabb-intersection/hit (bounding-box/get-corners this) ray))
+    (if *use-bounding-boxes*
+      (aabb-intersection/hit aabb-extremes ray)
+      true))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
     (compute-extremes children))
   (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (:transform this)))
+  Parent
+  (get-children [this]
+    children)
+  (is-empty? [this] false)
+  (set-children [this new-children]
+    (merge this {:children new-children
+                 :aabb-extremes (compute-extremes new-children)})))
+
+(defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    [])
+  bounding-box/BoundingBox
+  (hit [this ray] false)
+  (get-corners [this]
+    [(point/point 0 0 0) (point/point 0 0 0)])
+  (get-transformed-points [this]
+    [(point/point 0 0 0) (point/point 0 0 0)])
+  Parent
+  (get-children [this]
+    [])
+  (is-empty? [this] true)
+  (set-children [this new-children]
+    (->Group new-children
+             (:transform this)
+             (:inverse-transform this)
+             (:inverse-transposed-transform this)
+             (compute-extremes new-children))))
 
 (defn group [children]
-  (->Group children
-           matrix/identity-matrix
-           matrix/identity-matrix))
+  (if (empty? children)
+    (->EmptyGroup matrix/identity-matrix
+                  matrix/identity-matrix
+                  matrix/identity-matrix)
+    (->Group children
+             matrix/identity-matrix
+             matrix/identity-matrix
+             matrix/identity-matrix
+             (compute-extremes children))))
+
+
 
 (def empty-group (group []))
 
