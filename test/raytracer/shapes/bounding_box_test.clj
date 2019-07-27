@@ -52,8 +52,20 @@
                     (point/point 0 0.0 0.0)]
           transform (transform/translate 10 20 30 (transform/rotate-x const/half𝛑))]
       (is (empty? (bounding-box/compute-transformed-corners extremes transform)))))
-  (testing "Returns the same points (within error) if the transform is the identity"
+  (testing "Returns the same points (within error) if the transform is the identity matrix"
     (let [extremes [(point/point 1 2 3)
                     (point/point 5 6 7)]]
-      (is (= extremes
-             (bounding-box/compute-transformed-corners extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))
+      (is (= '(true true)
+             (map bounding-box/almost-identical
+                  extremes
+                  (bounding-box/compute-transformed-corners extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))
+    (testing "Returns a properly rotated cube if you turn the cube by 45 degrees"
+    (let [extremes [(point/point -2 -2 -2)
+                    (point/point 2 2 2)]
+          diagonal (* 2 (Math/sqrt 2))
+          expected [(point/point (- diagonal) (- diagonal) (- diagonal))
+                    (point/point diagonal diagonal diagonal)]]
+      (is (= '(true true)
+             (map bounding-box/almost-identical
+                  expected
+                  (bounding-box/compute-transformed-corners extremes (transform/rotate-y (/ const/half𝛑 4)))))))))

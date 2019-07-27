@@ -54,5 +54,6 @@
 (defn compute-transformed-corners [extremes transform]
   (if (apply almost-identical extremes)
     []
-    (map #(matrix/transform transform %)
-         (apply box-points-from-extremes extremes))))
+    (extremes-from-points
+     (map #(matrix/transform transform %)
+          (apply box-points-from-extremes extremes)))))
