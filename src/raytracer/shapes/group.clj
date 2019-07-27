@@ -21,6 +21,10 @@
                                                                        (:inverse-transform %)))
                              (:children group))))))
 
+(defn compute-extremes [children]
+  (bounding-box/extremes-from-points
+   (mapcat bounding-box/get-transformed-points children)))
+
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
 (defrecord Group [children inverse-transform inverse-transposed-transform]
@@ -33,8 +37,7 @@
   (hit [this ray]
     (aabb-intersection/hit (bounding-box/get-corners this) ray))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
-    (bounding-box/extremes-from-points
-     (mapcat bounding-box/get-transformed-points children)))
+    (compute-extremes children))
   (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (:transform this))))
