@@ -31,15 +31,12 @@
   bounding-box/BoundingBox
   (hit [this ray]
     (throw (UnsupportedOperationException. "not supported (yet)")))
-  (get-corners [this]  ;;; TODO/FIXME this *has* to be cached at object creation
-    #_(if (empty? children)
-      (vector (point/point 0.0 0.0 0.0) ;;; I don't like that
-              (point/point 0.0 0.0 0.0))
-      (bounding-box/extremes-from-points
-       (mapcat get-transformed-points children))))
+  (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
+    (bounding-box/extremes-from-points
+     (mapcat bounding-box/get-transformed-points children)))
   (get-transformed-points [this]
-   #_ (bounding-box/compute-transformed-points (get-corners this)
-                                             (:transform this))))
+    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
+                                                        (:transform this))))
 
 (defn group [children]
   (->Group children
