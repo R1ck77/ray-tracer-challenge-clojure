@@ -32,8 +32,8 @@
                        (svector/svector 0 1 0))))
     bounding-box/BoundingBox
     (get-corners [this]
-      (vector (point/point Double/NEGATIVE_INFINITY 0.0 Double/NEGATIVE_INFINITY)
-              (point/point Double/POSITIVE_INFINITY 0.0 Double/POSITIVE_INFINITY)))
+      (vector (point/point const/neg-inf 0.0 const/neg-inf)
+              (point/point const/inf 0.0 const/inf)))
     (hit [this ray] true)
     (get-transformed-points [this]
       (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)

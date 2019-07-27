@@ -12,4 +12,8 @@
 
 (def quarter𝛑 (/ 𝛑 4))
 
+(def inf 1e200)
+
+(def neg-inf -1e200)
+
 

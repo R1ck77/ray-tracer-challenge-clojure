@@ -1,5 +1,6 @@
 (ns raytracer.shapes.plane-test
   (:require [clojure.test :refer :all]
+            [raytracer.const :as const]
             [raytracer.test-utils :refer :all]
             [raytracer.svector :as svector]
             [raytracer.shapes :as shapes]
@@ -15,8 +16,8 @@
 
 (deftest test-bounding-box
   (testing "The plane is its own bounding box"
-    (is (= [(point/point Double/NEGATIVE_INFINITY 0.0 Double/NEGATIVE_INFINITY)
-            (point/point Double/POSITIVE_INFINITY 0.0 Double/POSITIVE_INFINITY)]
+    (is (= [(point/point const/neg-inf 0.0 const/neg-inf)
+            (point/point const/inf 0.0 const/inf)]
            (bounding-box/get-corners (plane/plane))))))
 
 (deftest test-constructor
