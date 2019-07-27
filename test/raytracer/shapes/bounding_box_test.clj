@@ -50,19 +50,19 @@
   (and (bounding-box/almost-identical point-a-min point-b-min)
        (bounding-box/almost-identical point-b-max point-b-max)))
 
-(deftest test-compute-transformed-extremes
+(deftest test-compute-filtered-transformed-extremes
   (testing "Returns an empty collection if the input points are almost identical"
     (let [extremes [(point/point small-value (- small-value) small-value)
                     (point/point 0 0.0 0.0)]
           transform (transform/translate 10 20 30 (transform/rotate-x const/half𝛑))]
-      (is (empty? (bounding-box/compute-transformed-corners extremes transform)))))
+      (is (empty? (bounding-box/compute-filtered-transformed-extremes extremes transform)))))
   (testing "Returns the same points (within error) if the transform is the identity matrix"
     (let [extremes [(point/point 1 2 3)
                     (point/point 5 6 7)]]
       (is (= '(true true)
              (map bounding-box/almost-identical
                   extremes
-                  (bounding-box/compute-transformed-corners extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))
+                  (bounding-box/compute-filtered-transformed-extremes extremes (transform/rotate-x (- const/half𝛑) (transform/rotate-x const/half𝛑))))))))
   (testing "Returns a properly rotated cube if you turn the cube by 45 degrees"
     (let [extremes [(point/point -2 -2 -2)
                     (point/point 2 2 2)]
@@ -71,5 +71,9 @@
                     (point/point diagonal 2 diagonal)]]
       
       (is (same-extremes expected
-                         (bounding-box/compute-transformed-corners extremes
-                                                                   (transform/rotate-y const/quarter𝛑)))))))
+                         (bounding-box/compute-filtered-transformed-extremes extremes
+                                                                             (transform/rotate-y const/quarter𝛑))))))
+  (testing "Returns a an empty collection if the input points are collapsed to a single point"
+    (let [extremes [(point/point -10 -10 -10)
+                    (point/point 3 3 3)]]      
+      (is (empty? (bounding-box/compute-filtered-transformed-extremes extremes (transform/scale 0 0 0)))))))

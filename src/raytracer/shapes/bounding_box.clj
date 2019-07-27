@@ -51,9 +51,13 @@
    (< (Math/abs (float (- (:z point1) (:z point2)))) const/EPSILON)
    (< (Math/abs (float (- (:w point1) (:w point2)))) const/EPSILON)))
 
-(defn compute-transformed-corners [extremes transform]
-  (if (apply almost-identical extremes)
-    []
-    (extremes-from-points
-     (map #(matrix/transform transform %)
-          (apply box-points-from-extremes extremes)))))
+(defn- transform-extremes [extremes transform]
+  (extremes-from-points
+   (map #(matrix/transform transform %)
+        (apply box-points-from-extremes extremes))))
+
+(defn compute-filtered-transformed-extremes [extremes transform]
+  (let [result (transform-extremes extremes transform)]
+    (if (apply almost-identical result)
+      []
+      result)))
