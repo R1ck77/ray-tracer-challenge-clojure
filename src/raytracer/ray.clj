@@ -6,7 +6,8 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
-            [raytracer.material :as material]))
+            [raytracer.material :as material]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defprotocol RayCaster
   (intersect [this direction]))
@@ -23,7 +24,10 @@
 (extend-type Ray
   RayCaster
   (intersect [this shape]
-    (shared/local-intersect shape (transform this (:inverse-transform shape)))))
+    (let [object-space-ray (transform this (:inverse-transform shape))]
+     (if (bounding-box/hit shape this)
+       (shared/local-intersect shape object-space-ray)
+       []))))
 
 (defn normalize [ray]
   (assoc ray
