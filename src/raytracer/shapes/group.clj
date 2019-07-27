@@ -34,7 +34,7 @@
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
     (bounding-box/extremes-from-points
      (mapcat bounding-box/get-transformed-points children)))
-  (get-transformed-points [this]
+  (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (:transform this))))
 
