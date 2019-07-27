@@ -124,7 +124,7 @@
           intermediate (world/prepare-computations (:hierarchy world)
                                                    (ray/ray (point/point 0 0 -5)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 4 (first (world/get-objects world)))
+                                                   (intersection/intersection 4 (:shape1 (get-objects-by-name world)))
                                                    dummy-indices)]
       (is (ta/c= (color/color 0.38066 0.47583 0.2855)
                  (world/shade-hit world
@@ -136,7 +136,7 @@
           intermediate (world/prepare-computations (:hierarchy world)
                                                    (ray/ray (point/point 0 0 0)
                                                             (svector/svector 0 0 1))
-                                                   (intersection/intersection 0.5 (second (world/get-objects world)))
+                                                   (intersection/intersection 0.5 (:shape2 (get-objects-by-name world)))
                                                    dummy-indices)]
       (is (ta/c= (color/color 0.90498 0.90498 0.90498)
                  (world/shade-hit world
@@ -423,10 +423,12 @@
           intermediate-result (world/prepare-computations (:hierarchy world) ray (second intersections) dummy-indices)]
       (is (ta/c= (color/color 0 0 0) (world/refracted-color world intermediate-result 10)))))
   (testing "The refracted color with a refracted ray"
-    (let [shape-a (shapes/change-material (first (world/get-objects (world/default-world)))
+    (let [world (world/default-world)
+          objects-by-name (get-objects-by-name world)
+          shape-a (shapes/change-material (:shape1 objects-by-name)
                                           (material/material :ambient 1.0
                                                              :pattern (pattern/test-pattern)))
-          shape-b (shapes/change-material (second (world/get-objects (world/default-world)))
+          shape-b (shapes/change-material (:shape2 objects-by-name)
                                           (material/material :transparency 1.0
                                                              :refractive-index 1.5))
           world (world/set-objects (world/default-world) [shape-a shape-b])
