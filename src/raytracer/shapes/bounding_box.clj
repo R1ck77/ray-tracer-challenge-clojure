@@ -5,6 +5,7 @@
 
 (defprotocol BoundingBox
   (get-corners [this] "Return the two extremes vertices of the box")
+  ;;; TODO/FIXME change this into "transformed-extremes"
   (get-transformed-points [this] "Return 8 points in parent space, or an empty collection if the object is point-like")
   (hit [this ray] "Returns true if the ray hit the bounding box"))
 

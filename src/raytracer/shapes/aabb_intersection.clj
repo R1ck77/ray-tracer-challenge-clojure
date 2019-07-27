@@ -1,6 +1,11 @@
 (ns raytracer.shapes.aabb-intersection
   (:require [raytracer.const :as const]
+            [raytracer.point :as point]
             [raytracer.intersection :as intersection]))
+
+(def unit-aabb-min-point (point/point -1 -1 -1))
+(def unit-aabb-max-point (point/point 1 1 1))
+(def unit-aabb-extremes [unit-aabb-min-point unit-aabb-max-point])
 
 (defn- signed-infinity [numerator _]
   (if (>= numerator 0)
@@ -18,7 +23,7 @@
            b (operator (- axis-max origin) direction)]
        (if (> a b) [b a] [a b])))))
 
-(defn local-intersect-t [ray]
+(defn local-intersect-t [[min-point max-point] ray]
   (let [origin (:origin ray)
         direction (:direction ray)]
     (let [[tminx tmaxx] (check-axis -1 1 (:x origin) (:x direction))
@@ -34,7 +39,10 @@
             []
             [min max]))))))
 
+(defn hit [extremes ray]
+  (not (empty? (local-intersect-t extremes ray))))
+
 (defn local-intersect [cube ray]
   ;;; TODO/FIXME potentially slow. May be worth an "if"
   (mapv #(intersection/intersection % cube)
-        (local-intersect-t ray)))
+        (local-intersect-t unit-aabb-extremes ray)))

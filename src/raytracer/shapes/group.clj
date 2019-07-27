@@ -7,6 +7,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
             [raytracer.shapes.bounding-box :as bounding-box]            
+            [raytracer.shapes.aabb-intersection :as aabb-intersection]
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
@@ -30,7 +31,7 @@
   (compute-normal [this point])
   bounding-box/BoundingBox
   (hit [this ray]
-    (throw (UnsupportedOperationException. "not supported (yet)")))
+    (aabb-intersection/hit (bounding-box/get-corners this) ray))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
     (bounding-box/extremes-from-points
      (mapcat bounding-box/get-transformed-points children)))
