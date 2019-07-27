@@ -140,7 +140,7 @@
 
 (deftest test-test-pattern
   (testing "The pattern returns the point coordinate"
-    (let [pattern (pattern/test)]
+    (let [pattern (pattern/test-pattern)]
       (is (c= (color/color 0.2 0.3 0.4) (pattern/color-at pattern
                                                           (shapes/sphere)
                                                           (point/point 0.2 0.3 0.4)))))))

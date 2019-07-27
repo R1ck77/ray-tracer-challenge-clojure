@@ -1,7 +1,7 @@
 (ns raytracer.utils
   (:require [raytracer.const :as const]))
 
-(defn zero? [v]
+(defn about-zero? [v]
   (< (Math/abs (double v)) const/EPSILON))
 
 (defmacro quick-map

@@ -425,7 +425,7 @@
   (testing "The refracted color with a refracted ray"
     (let [shape-a (shapes/change-material (first (world/get-objects (world/default-world)))
                                           (material/material :ambient 1.0
-                                                              :pattern (pattern/test)))
+                                                              :pattern (pattern/test-pattern)))
           shape-b (shapes/change-material (second (world/get-objects (world/default-world)))
                                           (material/material :transparency 1.0
                                                               :refractive-index 1.5))

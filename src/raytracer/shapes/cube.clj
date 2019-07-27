@@ -44,14 +44,14 @@
 (defn- sign [value]
   (if (< value 0) -1 1))
 
-(defn- compare [point field-1 field-2]
+(defn- compare-coordinate [point field-1 field-2]
   (if (> (Math/abs (float (get point field-1)))
          (Math/abs (float (get point field-2))))
     field-1
     field-2))
 
 (defn- get-field-of-largest-component [point]
-  (compare point :z (compare point :y :x)))
+  (compare-coordinate point :z (compare-coordinate point :y :x)))
 
 (defn- compute-cube-normal [cube point]
   (let [field (get-field-of-largest-component point)

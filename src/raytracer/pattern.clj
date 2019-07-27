@@ -56,7 +56,7 @@
                (:y point)
                (:z point)))
 
-(defn test []
+(defn test-pattern []
   (create-pattern test-color-function nil))
 
 (defn- ring-color-function [function-data point]
