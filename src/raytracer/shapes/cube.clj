@@ -77,7 +77,10 @@
   (get-corners [this]
     (vector (point/point -1 -1 -1)
             (point/point 1 1 1)))
-  (hit [this ray] true))
+  (hit [this ray] true)
+  (get-transformed-points [this]
+    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
+                                                        (:transform this))))
 
 (defn cube []
   (->Cube (material/material)

@@ -29,7 +29,8 @@
              (point/point 10 0 10)
              (point/point 0 10 10)
              (point/point 10 10 10)}
-           (bounding-box/box-points-from-extremes (point/point 0 0 0) (point/point 10 10 10))))))
+           (bounding-box/box-points-from-extremes (point/point 0 0 0)
+                                                  (point/point 10 10 10))))))
 
 (deftest test-almost-identical
   (testing "Returns true for points where each coordinate is different by less than const/EPSILON"
@@ -76,4 +77,5 @@
   (testing "Returns a an empty collection if the input points are collapsed to a single point"
     (let [extremes [(point/point -10 -10 -10)
                     (point/point 3 3 3)]]      
-      (is (empty? (bounding-box/compute-filtered-transformed-extremes extremes (transform/scale 0 0 0)))))))
+      (is (empty? (bounding-box/compute-filtered-transformed-extremes extremes
+                                                                      (transform/scale 0 0 0)))))))

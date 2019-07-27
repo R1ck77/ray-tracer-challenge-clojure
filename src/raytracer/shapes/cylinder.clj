@@ -125,7 +125,10 @@
       (compute-finite-corners this)
       (vector (point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
               (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY))))
-  (hit [this ray] true))
+  (hit [this ray] true)
+  (get-transformed-points [this]
+    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
+                                                        (:transform this))))
 
 (defn cylinder 
   [& {:as args-map}]
