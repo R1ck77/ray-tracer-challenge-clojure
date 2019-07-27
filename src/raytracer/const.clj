@@ -6,7 +6,10 @@
 
 (def half√2 (/ √2 2))
 
-(def half𝛑 (/ Math/PI 2))
+(def 𝛑 Math/PI)
 
+(def half𝛑 (/ 𝛑 2))
+
+(def quarter𝛑 (/ 𝛑 4))
 
 
