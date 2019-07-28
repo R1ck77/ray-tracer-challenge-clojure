@@ -46,14 +46,14 @@
 
 (defn- create-marbles-carpet [size]
   (vec
-   (for [x (range 0 size)
-         z (range 0 size)]
+   (for [x (range (- size) size)
+         z (range (- size) size)]
      (create-marble x z))))
 
 (defn- create-marble-floor []
   (shapes/change-transform
-   (shapes/group
-    (create-marbles-carpet 2))
+   (apply shapes/group
+    (create-marbles-carpet 10))
       (transform/translate 0 0.128 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
@@ -73,3 +73,10 @@
    (spit *output-file*
          (canvas/canvas-to-ppm (camera/render (create-camera width height)
                                               world)))))
+
+(defn quick-demo []
+  ;;; 270" no smart grouping, 20x20
+  (time
+   (with-redefs [*image-resolution* [200 200]
+                 world/*maximum-reflections* 1]
+     (render-demo))))
