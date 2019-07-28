@@ -24,8 +24,10 @@
                              (:children group))))))
 
 (defn compute-extremes [children]
-  (bounding-box/extremes-from-points
-   (mapcat bounding-box/get-transformed-points children)))
+  (let [corners (mapcat bounding-box/get-transformed-points children)]
+    (if (empty? corners)
+      [(point/point 0 0 0) (point/point 0 0 0)]
+      (bounding-box/extremes-from-points corners))))
 
 (defprotocol Parent
   (get-children [this])
