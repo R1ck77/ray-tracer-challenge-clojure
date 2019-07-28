@@ -2,7 +2,9 @@
 
 Made for educational and entertainment purposes. Still work in progress.
 
-The first part of the project was put together deliberately avoiding Object Oriented design and disregarding otimizations in favor of a clean FP approach, as a way to better appreciate both OO and FP.
+The first part of the project was put together deliberately avoiding Object Oriented design and disregarding otimizations in favor of a clean FP approach, as a way to better appreciate both OO and FP (which I did, and I want OO back, just as I expected).
+
+Step two includes OO experimentation with Clojure, and focus of Clojure on records performances is showing. 
 
 Being an educational project and a way to enjoy programming for its own sake, experimentation and fun design are favored above everything else.
 
