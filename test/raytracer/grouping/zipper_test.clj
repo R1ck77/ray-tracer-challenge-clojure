@@ -37,5 +37,3 @@
            (shared/get-all-objects
             (zipper/create-zipper
              (group/group [(group/group [(group/group [])])])))))))
-
-

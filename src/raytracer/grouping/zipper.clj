@@ -3,7 +3,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.grouping.shared :as shared]
             [raytracer.shapes.group :as group])
-  (:import [raytracer.shapes.group Parent]))
+  (:import [raytracer.shapes.group Parent Group EmptyGroup]))
 
 (defn- next-step [zipper]
   (let [current-node (z/node zipper)
@@ -50,7 +50,7 @@
                      shape))))
 
 (defn- branch? [node]
-  (instance? Parent node))
+  (satisfies? group/Parent node))
 
 (defn- get-children [node]
   (seq (group/get-children node)))
