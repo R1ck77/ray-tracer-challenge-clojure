@@ -376,7 +376,7 @@
     (let [plane (-> (shapes/plane)
                     (shapes/change-material (material/material :reflectivity 0.5))
                     (shapes/change-transform (transform/translate 0 -1 0)))
-          world (world/set-objects default-world plane)
+          world (world/set-objects default-world [plane])
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           intersection (intersection/intersection const/√2 plane)]
