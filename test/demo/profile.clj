@@ -1,5 +1,5 @@
 (ns demo.profile
-  (:require [demo.cubes-demo :as demo]
+  (:require [demo.groups-demo :as demo]
             [raytracer.world :as world]
             [raytracer.camera :as camera]))
 
