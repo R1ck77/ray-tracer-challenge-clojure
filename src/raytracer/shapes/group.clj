@@ -23,8 +23,15 @@
                                                                        (:inverse-transform %)))
                              (:children group))))))
 
-(defn compute-extremes [children]
-  (let [corners (mapcat bounding-box/get-transformed-points children)]
+(defn compute-extremes
+  "This method makes testing a mess. I'm wiring something to accept non BoundingBox objects too
+
+  (otherwise I get the worst of two world, strictly typed execution in a weakly typed language…)"
+  [children]
+  (let [corners (mapcat (fn [children]
+                          (if (satisfies? bounding-box/BoundingBox children)
+                            (bounding-box/get-transformed-points children)
+                            [])) children)]
     (if (empty? corners)
       [(point/point 0 0 0) (point/point 0 0 0)]
       (bounding-box/extremes-from-points corners))))
