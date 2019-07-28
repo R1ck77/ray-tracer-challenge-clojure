@@ -1,4 +1,4 @@
-(ns demo.reflection-demo
+(ns demo.groups-demo
   (:require [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.canvas :as canvas]            
@@ -7,6 +7,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.group :as group]
             [raytracer.material :as material]
             [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]
@@ -44,16 +45,43 @@
        (transform/translate (* 0.6 x) 0.0 (* 0.6 z)
                             (transform/scale 0.25 0.25 0.25)))))
 
-(defn- create-marbles-carpet [size]
-  (vec
+(defn- get-group-extremes [marbles-dict]
+  (let [indices (map first marbles-dict)
+        all-x (sort (map first indices))
+        all-z (sort (map second indices))]
+    {:min-x (first all-x)
+     :max-x (last all-x)
+     :min-z (first all-z)
+     :max-z (last all-z)}))
+
+(defn- bin-marbles [marbles-dict half-x half-z]
+  (reduce (fn bin-marble [accumulator [[x z] marble :as indexed-marble]]
+            (let [index (+ (if (> x half-x) 1 0)
+                           (if (> z half-z) 2 0))]
+              (update-in accumulator [index] #(conj % indexed-marble))))
+          {0 [], 1 [], 2 [], 3 []}
+          marbles-dict))
+
+(defn- partition-marbles [marbles-dict limit]
+  (:pre [(> limit 1)])
+  (if (<= (count marbles-dict) limit)
+    (apply shapes/group (vals marbles-dict))
+    (let [{:keys [min-x max-x min-z max-z]} (get-group-extremes marbles-dict)
+          half-x (/ (+ max-x min-x) 2)
+          half-z (/ (+ max-z min-z) 2)
+          partitioned (bin-marbles marbles-dict half-x half-z)]
+      (apply shapes/group
+             (map #(partition-marbles (into {} %) limit) (vals partitioned))))))
+
+(defn- create-all-marbles [size]
+  (into {}
    (for [x (range (- size) size)
          z (range (- size) size)]
-     (create-marble x z))))
+     (vector [x z] (create-marble x z)))))
 
 (defn- create-marble-floor []
   (shapes/change-transform
-   (apply shapes/group
-    (create-marbles-carpet 10))
+   (time (partition-marbles (create-all-marbles 10) 10))
       (transform/translate 0 0.128 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
@@ -76,6 +104,7 @@
 
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
+  ;;; 228" with just one extra group? Not sure
   (time
    (with-redefs [*image-resolution* [200 200]
                  world/*maximum-reflections* 1]
