@@ -41,7 +41,8 @@
   (local-intersect [this ray-object-space]
     (intersect this ray-object-space))
   shared/Surface
-  (compute-normal [this point])
+  (compute-normal [this point]
+    (throw (UnsupportedOperationException. "Normal of group computed")))
   bounding-box/BoundingBox
   (hit [this ray]
     (if *use-bounding-boxes*
