@@ -18,6 +18,7 @@
 
 (def ^:dynamic *output-file* "groups-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
+(def ^:dynamic *maximum-group-size* 1e9)
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -81,7 +82,7 @@
 
 (defn- create-marble-floor []
   (shapes/change-transform
-   (time (partition-marbles (create-all-marbles 10) 10))
+   (time (partition-marbles (create-all-marbles 10) *maximum-group-size*))
       (transform/translate 0 0.128 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
