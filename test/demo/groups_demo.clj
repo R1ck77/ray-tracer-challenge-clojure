@@ -1,6 +1,7 @@
 (ns demo.groups-demo
   (:require [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.tuple :as tuple]
             [raytracer.canvas :as canvas]            
             [raytracer.color :as color]
             [raytracer.ray :as ray]
@@ -8,6 +9,7 @@
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
             [raytracer.shapes.group :as group]
+            [raytracer.shapes.bounding-box :as bounding-box]
             [raytracer.material :as material]
             [raytracer.pattern :as pattern]
             [raytracer.light-sources :as light-sources]
@@ -18,7 +20,8 @@
 
 (def ^:dynamic *output-file* "groups-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
-(def ^:dynamic *maximum-group-size* 1e9)
+(def ^:dynamic *maximum-group-size* 4)
+(def ^:dynamic *print-aabb-volumes* false)
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -63,16 +66,25 @@
           {0 [], 1 [], 2 [], 3 []}
           marbles-dict))
 
+(defn print-volume [group]
+  (when *print-aabb-volumes*
+    (let [extremes (bounding-box/get-corners group)
+          sides (tuple/sub (second extremes) (first extremes))
+          volume (tuple/dot sides sides)]
+      (println volume)))
+  group)
+
 (defn- partition-marbles [marbles-dict limit]
   (:pre [(> limit 1)])
-  (if (<= (count marbles-dict) limit)
-    (apply shapes/group (vals marbles-dict))
-    (let [{:keys [min-x max-x min-z max-z]} (get-group-extremes marbles-dict)
-          half-x (/ (+ max-x min-x) 2)
-          half-z (/ (+ max-z min-z) 2)
-          partitioned (bin-marbles marbles-dict half-x half-z)]
-      (apply shapes/group
-             (map #(partition-marbles (into {} %) limit) (vals partitioned))))))
+  (let [result (if (<= (count marbles-dict) limit)
+                 (apply shapes/group (vals marbles-dict))
+                 (let [{:keys [min-x max-x min-z max-z]} (get-group-extremes marbles-dict)
+                       half-x (/ (+ max-x min-x) 2)
+                       half-z (/ (+ max-z min-z) 2)
+                       partitioned (bin-marbles marbles-dict half-x half-z)]
+                   (apply shapes/group
+                          (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]
+    (print-volume result)))
 
 (defn- create-all-marbles [size]
   (into {}
@@ -106,7 +118,9 @@
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
-  (time
-   (with-redefs [*image-resolution* [200 200]
-                 world/*maximum-reflections* 1]
-     (render-demo))))
+  (with-redefs [*image-resolution* [50 50]
+                group/*statistics* true
+                world/*maximum-reflections* 2]
+    (reset! group/hit-count-statistics [0 0])
+    (time (render-demo))
+    (println @group/hit-count-statistics)))
