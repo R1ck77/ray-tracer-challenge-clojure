@@ -21,13 +21,13 @@
   (ray (matrix/transform matrix (:origin input-ray))
        (matrix/transform matrix (:direction input-ray))))
 
+(defn- ray-intersection [ray shape]
+  (shared/local-intersect shape (transform ray (:inverse-transform shape))))
+
 (extend-type Ray
   RayCaster
   (intersect [this shape]
-    (let [object-space-ray (transform this (:inverse-transform shape))]
-     (if (bounding-box/hit shape this)
-       (shared/local-intersect shape object-space-ray)
-       []))))
+    (ray-intersection this shape)))
 
 (defn normalize [ray]
   (assoc ray
