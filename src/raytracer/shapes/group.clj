@@ -13,6 +13,9 @@
             [raytracer.intersection :as intersection]))
 
 (def ^:dynamic *use-bounding-boxes* true)
+(def ^:dynamic *statistics* false) ; whether sampling the number of aabb hits or not
+
+(def hit-count-statistics (atom [0 0])) ; used for debugging statistics only
 
 (def group)
 
@@ -41,20 +44,34 @@
   (is-empty? [this])
   (set-children [this children]))
 
+(defn- update-statistics
+  "Only used to debug the aabb statistics"
+  [hit]
+  (if *statistics*
+    (swap! hit-count-statistics
+           #(vector (if hit (inc (first %)) (first %))
+                    (inc (second %))))))
+
+(defn- bounding-box-check [group ray]
+  (or (not *use-bounding-boxes*)
+      (bounding-box/hit group ray)))
+
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
 (defrecord Group [children transform inverse-transform inverse-transposed-transform aabb-extremes] ;;; TODO/FIXME this is really effed up
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    (intersect this ray-object-space))
+    (if (bounding-box-check this ray-object-space)
+      (intersect this ray-object-space)
+      []))
   shared/Surface
   (compute-normal [this point]
     (throw (UnsupportedOperationException. "Normal of group computed")))
   bounding-box/BoundingBox
   (hit [this ray]
-    (if *use-bounding-boxes*
-      (aabb-intersection/hit aabb-extremes ray)
-      true))
+    (let [result (aabb-intersection/hit aabb-extremes ray)]
+      (update-statistics result)
+      result))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
     (compute-extremes children))
   (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…

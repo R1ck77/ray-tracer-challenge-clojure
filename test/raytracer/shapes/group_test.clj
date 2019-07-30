@@ -33,12 +33,13 @@
       (is (= [sphere2 sphere2 sphere1 sphere1]
              (map :object xs)))))
 
-  (testing "Intersecting a transformed group"
-    (let [sphere (shapes/change-transform (shapes/sphere)
-                                          (transform/translate 5 0 0))
-          group (shapes/change-transform (group/group [sphere])
-                                         (transform/scale 2 2 2))]
-      (is (= 2 (count (shared/local-intersect group
-                                              (ray/ray (point/point 10 0 -10)
-                                                       (svector/svector 0 0 1)))))))))
+  (testing "Intersecting a transformed group (bounding box ignored)"
+    (with-redefs [group/*use-bounding-boxes* false]
+      (let [sphere (shapes/change-transform (shapes/sphere)
+                                            (transform/translate 5 0 0))
+            group (shapes/change-transform (group/group [sphere])
+                                           (transform/scale 2 2 2))]
+        (is (= 2 (count (shared/local-intersect group
+                                                (ray/ray (point/point 10 0 -10)
+                                                         (svector/svector 0 0 1))))))))))
 
