@@ -6,8 +6,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
-            [raytracer.material :as material]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.material :as material]))
 
 (defprotocol RayCaster
   (intersect [this direction]))

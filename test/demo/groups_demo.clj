@@ -32,7 +32,7 @@
                                                                                           (color/color 0 0 1))
                                                                          matrix/identity-matrix)))
 
-(def floor (-> (shapes/plane)
+#_(def floor (-> (shapes/plane)
                (shapes/change-material room-material)
                (shapes/change-transform (transform/translate 0 -0.0001 0))))
 
@@ -46,8 +46,8 @@
                           :refractive-index 0.8
                           :color (color/color 0 1 0)))
       (shapes/change-transform
-       (transform/translate (* 0.6 x) 0.0 (* 0.6 z)
-                            (transform/scale 0.25 0.25 0.25)))))
+       (transform/translate (* 1.0 x) 1.0 (* 1.0 z)
+                            (transform/scale 0.5 0.5 0.5)))))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
@@ -87,17 +87,18 @@
     (print-volume result)))
 
 (defn- create-all-marbles [size]
-  (into {}
+  {[0 0] (create-marble 0 0)}
+  #_(into {}
    (for [x (range (- size) size)
          z (range (- size) size)]
      (vector [x z] (create-marble x z)))))
 
 (defn- create-marble-floor []
   (shapes/change-transform
-   (time (partition-marbles (create-all-marbles 10) *maximum-group-size*))
+   (time (partition-marbles (create-all-marbles 3) *maximum-group-size*))
       (transform/translate 0 0.128 0)))
 
-(def world (-> (world/world [(create-marble-floor) floor])
+(def world (-> (world/world [(create-marble-floor) #_ floor])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
@@ -118,9 +119,9 @@
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
-  (with-redefs [*image-resolution* [50 50]
+  (with-redefs [*image-resolution* [300 300]
                 group/*statistics* true
-                world/*maximum-reflections* 2]
+                world/*maximum-reflections* 0]
     (reset! group/hit-count-statistics [0 0])
     (time (render-demo))
     (println @group/hit-count-statistics)))
