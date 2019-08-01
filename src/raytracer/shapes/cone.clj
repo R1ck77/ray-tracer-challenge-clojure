@@ -129,6 +129,9 @@
             (point/point size (float maximum) size))))
 
 (extend-type Cone
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))

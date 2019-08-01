@@ -59,6 +59,10 @@
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
 (defrecord Group [children transform inverse-transform inverse-transposed-transform aabb-extremes] ;;; TODO/FIXME this is really effed up
+  shared/Transformable
+  (transform [this transform-matrix]
+    (assoc (shared/change-transform this transform-matrix)
+           :aabb-extremes aabb-extremes))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (if (bounding-box-check this ray-object-space)

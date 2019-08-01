@@ -58,8 +58,8 @@
                                            :diffuse 0.7
                                            :specular 0.2))
                        :name :shape1)
-        sphere2 (assoc (shapes/change-transform (shapes/sphere)
-                                                (transform/scale 0.5 0.5 0.5))
+        sphere2 (assoc (shared/transform (shapes/sphere)
+                                         (transform/scale 0.5 0.5 0.5))
                        :name :shape2)]
     (-> (world [sphere1 sphere2])
         (set-light-sources (light-sources/create-point-light (point/point -10 10 -10)

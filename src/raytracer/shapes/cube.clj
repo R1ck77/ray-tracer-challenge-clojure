@@ -33,6 +33,9 @@
       :default (throw (IllegalStateException. "Unexpected condition in cube/compute-normal")))))
 
 (extend-type Cube
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (aabb-intersection/local-intersect this ray-object-space))

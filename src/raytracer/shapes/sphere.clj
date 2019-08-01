@@ -42,6 +42,9 @@
                                  (point/point 0 0 0))))))
 
 (extend-type Sphere
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-plane-space]
     (intersect-sphere-space this ray-in-plane-space))

@@ -6,6 +6,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
             [raytracer.camera :as camera]
@@ -24,32 +25,32 @@
 ;;; Set the y to 5 and stranger things start happening
 (def water (-> (shapes/plane)
                (shapes/change-material (material/material :color [0 0 0.01]
-                                                           :specular 1
-                                                           :shiness 300
-                                                           :reflectivity 0.8
-                                                           :transparency 0.9 
-                                                           :pattern nil))
-               (shapes/change-transform (transform/translate 0 5 0))))
+                                                          :specular 1
+                                                          :shiness 300
+                                                          :reflectivity 0.8
+                                                          :transparency 0.9 
+                                                          :pattern nil))
+               (shared/transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
                      (shapes/change-material (material/material :specular 0.1
-                                                                 :ambient 0.05
-                                                                 :reflectivity 0.0
-                                                                 :transparency 0.0
-                                                                 :pattern (pattern/checker [0 8 8] [0.01 0.01 0.01])))
-                     (shapes/change-transform (transform/translate 0 1e-3 0))))
+                                                                :ambient 0.05
+                                                                :reflectivity 0.0
+                                                                :transparency 0.0
+                                                                :pattern (pattern/checker [0 8 8] [0.01 0.01 0.01])))
+                     (shared/transform (transform/translate 0 1e-3 0))))
 
 
 (def matte-sphere (-> (shapes/sphere)
                       (shapes/change-material (material/material :color [0.9 0 0]
-                                                                  :shiness 100
-                                                                  :specular 0.8
-                                                                  :diffuse 0.7
-                                                                  :specular 0.1
-                                                                  :refractive-index 1.52
-                                                                  :reflectivity 0.1
-                                                                  :transparency 0.01))                       
-                      (shapes/change-transform (transform/translate -4 2 0 (transform/scale 4 4 4)))))
+                                                                 :shiness 100
+                                                                 :specular 0.8
+                                                                 :diffuse 0.7
+                                                                 :specular 0.1
+                                                                 :refractive-index 1.52
+                                                                 :reflectivity 0.1
+                                                                 :transparency 0.01))                       
+                      (shared/transform (transform/translate -4 2 0 (transform/scale 4 4 4)))))
 
 (def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)

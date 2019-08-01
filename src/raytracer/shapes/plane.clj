@@ -22,6 +22,9 @@
                                        this-plane))))
 
 (extend-type Plane
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))

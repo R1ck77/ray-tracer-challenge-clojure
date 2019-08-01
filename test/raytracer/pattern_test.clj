@@ -6,6 +6,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.pattern :as pattern]))
 
 (def white (color/color 1 1 1))
@@ -116,8 +117,8 @@
 
 (deftest test-color-at-object-version
   (testing "Stripes with an object transformation"
-    (let [object (shapes/change-transform (shapes/sphere)
-                                          (transform/scale 2 2 2))
+    (let [object (shared/transform (shapes/sphere)
+                                   (transform/scale 2 2 2))
           pattern (pattern/stripe white black)]
       (is-white? (pattern/color-at pattern
                                    object
@@ -130,8 +131,8 @@
                                    object
                                    (point/point 1.5 0 0)))))
   (testing "Stripes with both an object and a pattern transformation"
-    (let [object (shapes/change-transform (shapes/sphere)
-                                          (transform/scale 2 2 2))
+    (let [object (shared/transform (shapes/sphere)
+                                   (transform/scale 2 2 2))
           pattern (pattern/change-transform (pattern/stripe white black)
                                             (transform/translate 0.5 0 0))]
       (is-white? (pattern/color-at pattern

@@ -8,6 +8,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.shapes.group :as group]
             [raytracer.shapes.bounding-box :as bounding-box]
             [raytracer.material :as material]
@@ -34,7 +35,7 @@
 
 #_(def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shapes/change-transform (transform/translate 0 -0.0001 0))))
+               (shared/transform (transform/translate 0 -0.0001 0))))
 
 (defn- create-marble [x z]
   (-> (shapes/sphere)
@@ -45,9 +46,8 @@
                           :transparency 0.99
                           :refractive-index 0.8
                           :color (color/color 0 1 0)))
-      (shapes/change-transform
-       (transform/translate (* 1.0 x) 1.0 (* 1.0 z)
-                            (transform/scale 0.5 0.5 0.5)))))
+      (shared/transform
+       (transform/translate (* 0.0 x) 1.5 (* 0.0 z)))))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
@@ -94,7 +94,7 @@
      (vector [x z] (create-marble x z)))))
 
 (defn- create-marble-floor []
-  (shapes/change-transform
+  (shared/transform
    (time (partition-marbles (create-all-marbles 3) *maximum-group-size*))
       (transform/translate 0 0.128 0)))
 
@@ -105,7 +105,7 @@
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                        (world/view-transform (point/point 0 1.5 -5)
+                        (world/view-transform (point/point 0 2.5 -5)
                                               (point/point 0 1 0)
                                               (svector/svector 0 1 0))))
 

@@ -26,8 +26,8 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :object (shapes/change-transform sphere-template
-                                    (transform/scale 5 5 5))
+   :object (shared/transform sphere-template
+                             (transform/scale 5 5 5))
    :screen-z 0
    :light-source (light-sources/create-point-light (point/point -10 10 -10)
                                                    (color/color 1 1 1))})

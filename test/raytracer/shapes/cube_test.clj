@@ -72,7 +72,7 @@
   (test-compute-normal "upper corner" [1 1 1] [1 0 0])
   (test-compute-normal "lower corner" [-1 -1 -1] [-1 0 0])
   (testing "normal is computed accounting for the cube transforms"
-    (let [transformed-cube (shapes/change-transform a-cube
-                                                    (transform/rotate-y Math/PI))]
+    (let [transformed-cube (shared/transform a-cube
+                                             (transform/rotate-y Math/PI))]
       (is (t= (svector/svector 0 0 -1)
               (shared/compute-normal transformed-cube (point/point 0.2 0.1 -0.5))))))) 

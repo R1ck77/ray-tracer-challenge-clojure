@@ -120,8 +120,8 @@
   (testing "Two cylinders are equals if the share the same characteristics"
     (is (= (cylinder/cylinder)
            (cylinder/cylinder)))
-    (let [transformed-cylinder (shapes/change-transform a-cylinder
-                                                        (transform/translate 1 2 3 ))]
+    (let [transformed-cylinder (shared/transform a-cylinder
+                                                 (transform/translate 1 2 3 ))]
       (is (= transformed-cylinder transformed-cylinder))
       (is (not= transformed-cylinder (cylinder/cylinder))))))
 

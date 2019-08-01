@@ -5,6 +5,7 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.shapes.group :as group]
             [raytracer.transform :as transform]
             [raytracer.material :as material]
@@ -18,13 +19,13 @@
 (deftest test-compute-refractive-indices
     (testing "Finding n1 and n2 at various intersections"
     (let [sphere-a (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/scale 2 2 2))
+                       (shared/transform (transform/scale 2 2 2))
                        (shapes/update-material #(material/update-material % :refractive-index 1.5)))
           sphere-b (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/translate 0 0 -0.25))
+                       (shared/transform (transform/translate 0 0 -0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.0)))
           sphere-c (-> (shapes-test/glass-sphere)
-                       (shapes/change-transform (transform/translate 0 0 0.25))
+                       (shared/transform (transform/translate 0 0 0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.5)))
           ray (ray/ray (point/point 0 0 -4)
                        (svector/svector 0 0 1))

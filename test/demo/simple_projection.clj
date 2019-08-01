@@ -7,6 +7,7 @@
             [raytracer.canvas :as canvas]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.shared :as shared]
             [raytracer.ray :as ray]))
 
 (def canvas-size {:width 160, :height 100})
@@ -19,8 +20,8 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :object (shapes/change-transform (shapes/sphere)
-                                    (transform/scale 5 5 5))
+   :object (shared/transform (shapes/sphere)
+                             (transform/scale 5 5 5))
    :screen-z 0})
 
 (defn- compute-pixel-coordinates [scene-z half-width half-height x y] 

@@ -36,8 +36,8 @@
       (is (t= expected-normal
               (shared/compute-normal a-plane (point/point 5 0 150)))))
     (testing "The normal of the plane is computed accounting for the transform"
-      (let [transformed-plane (shapes/change-transform a-plane
-                                                       (transform/rotate-x (/ Math/PI 2)))]
+      (let [transformed-plane (shared/transform a-plane
+                                                (transform/rotate-x (/ Math/PI 2)))]
         (is (t= (svector/svector 0 0 1)
                 (shared/compute-normal transformed-plane
                                        (point/point 1000 1000 0))))))))

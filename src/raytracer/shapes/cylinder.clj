@@ -109,6 +109,9 @@
 (defrecord Cylinder [minimum maximum closed transform inverse-transform inverse-transposed-transform])
 
 (extend-type Cylinder
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
