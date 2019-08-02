@@ -90,6 +90,9 @@
                  :aabb-extremes (compute-extremes new-children)})))
 
 (defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
+  shared/change-transform
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     [])
