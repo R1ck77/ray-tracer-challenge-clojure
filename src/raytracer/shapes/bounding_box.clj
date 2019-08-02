@@ -52,7 +52,7 @@
    (< (Math/abs (float (- (:z point1) (:z point2)))) const/EPSILON)
    (< (Math/abs (float (- (:w point1) (:w point2)))) const/EPSILON)))
 
-(defn- transform-extremes [extremes transform]
+(defn transform-extremes [extremes transform] ;;; TODO/FIXME test this!
   (extremes-from-points
    (map #(matrix/transform transform %)
         (apply box-points-from-extremes extremes))))

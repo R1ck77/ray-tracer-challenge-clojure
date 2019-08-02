@@ -30,14 +30,15 @@
   "This method makes testing a mess. I'm wiring something to accept non BoundingBox objects too
 
   (otherwise I get the worst of two world, strictly typed execution in a weakly typed language…)"
-  [children]
+  [group-transform children]
   (let [corners (mapcat (fn [children]
                           (if (satisfies? bounding-box/BoundingBox children)
                             (bounding-box/get-transformed-points children)
                             [])) children)]
     (if (empty? corners)
       [(point/point 0 0 0) (point/point 0 0 0)]
-      (bounding-box/extremes-from-points corners))))
+      (bounding-box/transform-extremes (bounding-box/extremes-from-points corners)
+                                       group-transform))))
 
 (defprotocol Parent
   (get-children [this])
@@ -62,7 +63,7 @@
   shared/Transformable
   (transform [this transform-matrix]
     (assoc (shared/change-transform this transform-matrix)
-           :aabb-extremes aabb-extremes))
+           :aabb-extremes (compute-extremes transform-matrix (:children this))))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (if (bounding-box-check this ray-object-space)
@@ -77,7 +78,7 @@
       (update-statistics result)
       result))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
-    (compute-extremes children))
+    (compute-extremes transform children))
   (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (:transform this)))
@@ -90,7 +91,7 @@
                  :aabb-extremes (compute-extremes new-children)})))
 
 (defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
-  shared/change-transform
+  shared/Transformable
   (transform [this transform-matrix]
     (shared/change-transform this transform-matrix))
   shared/Intersectable
@@ -122,7 +123,7 @@
              matrix/identity-matrix
              matrix/identity-matrix
              matrix/identity-matrix
-             (compute-extremes children))))
+             (compute-extremes matrix/identity-matrix children))))
 
 
 
