@@ -24,7 +24,7 @@
 (defn- get-all-non-group-objects [zipper]
   (get-all-matching-objects zipper
                             (complement
-                             #(instance? Parent %))))
+                             #(satisfies? group/Parent %))))
 
 (defn- do-find-node
   ([zipper predicate]
@@ -65,9 +65,9 @@
 
 (defn- new-group-zipper [root]
   (z/zipper branch?
-              get-children
-              new-node
-              root))
+            get-children
+            new-node
+            root))
 
 (defn- go-to-parent [zipper]
   (let [new-zipper (z/up zipper)]
