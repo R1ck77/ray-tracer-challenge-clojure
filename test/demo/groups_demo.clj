@@ -23,6 +23,7 @@
 (def ^:dynamic *image-resolution* [800 600])
 (def ^:dynamic *maximum-group-size* 4)
 (def ^:dynamic *print-aabb-volumes* false)
+(def ^:dynamic *marbles-side* 10)
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -35,23 +36,26 @@
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.0001 0))))
+               (shared/transform (transform/translate 0 -0.00001 0))))
 
 (defn- create-marble [x z]
-  (-> (shapes/sphere)
-      (shapes/change-material
-       (material/material :diffuse (rand 0.6)
-                          :specular (rand 0.9)
-                          :reflectivity (rand 0.5)
-                          :transparency (rand 0.99)
-                          :refractive-index (rand 1.0)
-                          :pattern (pattern/solid
-                                    (color/color (rand 1)
-                                                 (rand 1)
-                                                 (rand 1)))))
-      (shared/transform
-       (transform/translate (* 1.0 x) 0.125 (* 1.0 z)
-                            (transform/scale 0.25 0.25 0.25)))))
+  (let [space 0.5]
+    (-> (shapes/sphere)
+        (shapes/change-material
+         (material/material :diffuse (rand 0.6)
+                            :specular (rand 0.9)
+                            :reflectivity (rand 0.5)
+                            :transparency (rand 0.99)
+                            :refractive-index (rand 1.0)
+                            :pattern (pattern/solid
+                                      (color/color (rand 1)
+                                                   (rand 1)
+                                                   (rand 1)))))
+        (shared/transform
+         (transform/translate (- (rand space)) 0 (- (rand space))
+                              (transform/translate (* space x) 0 (* space z)
+                                                   (transform/translate (* x 0.5) 0.25 (* z 0.5) 
+                                                                        (transform/scale 0.25 0.25 0.25))))))))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
@@ -97,8 +101,8 @@
 
 (defn- create-marble-floor []
   (shared/transform
-   (time (partition-marbles (create-all-marbles 3) *maximum-group-size*))
-      (transform/translate 0 0.128 0)))
+   (time (partition-marbles (create-all-marbles *marbles-side*) *maximum-group-size*))
+      (transform/translate 0 0 0)))
 
 (def world (-> (world/world [(create-marble-floor) floor])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
@@ -121,9 +125,9 @@
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
-  (with-redefs [*image-resolution* [500 500]
+  (with-redefs [*image-resolution* [300 300]
                 group/*statistics* true
-                world/*maximum-reflections* 4]
+                world/*maximum-reflections* 0]
     (reset! group/hit-count-statistics [0 0])
     (time (render-demo))
     (println @group/hit-count-statistics)))
