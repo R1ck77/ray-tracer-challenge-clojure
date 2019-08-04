@@ -95,9 +95,11 @@
 
 (defn- create-all-marbles [size]
   (into {}
-   (for [x (range (- size) size)
-         z (range (- size) size)]
-     (vector [x z] (create-marble x z)))))
+        (pmap (fn [[x z :as coords]]
+               (vector coords (create-marble x z)))
+             (for [x (range (- size) size)
+                   z (range (- size) size)]
+               (vector x z)))))
 
 (defn- create-marble-floor []
   (shared/transform
