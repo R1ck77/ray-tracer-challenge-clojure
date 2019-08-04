@@ -97,7 +97,7 @@
                       (shared/transform (->> (transform/scale 0.5 0.5 0.5)
                                              (transform/translate 1.5 0.5 -0.5)))))
 
-(def world (-> (world/world [floor (shapes/group left-sphere middle-sphere air-sphere back-sphere right-sphere)])
+(def world (-> (world/world [floor (shapes/group [left-sphere middle-sphere air-sphere back-sphere right-sphere])])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))

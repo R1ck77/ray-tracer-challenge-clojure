@@ -31,5 +31,5 @@
 (defn cone [& args]
   (apply cone-ns/cone args))
 
-(defn group [& children]
+(defn group [children]
   (group-ns/group children))

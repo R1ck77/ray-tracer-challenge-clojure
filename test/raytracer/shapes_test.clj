@@ -43,6 +43,6 @@
     (is (= (cone-ns/cone) (shapes/cone)))
     (is (= true (:closed (shapes/cone :closed true)))))
   (testing "group creates a group"
-    (is (= (group-ns/group []) (shapes/group)))
+    (is (= (group-ns/group []) (shapes/group [])))
     (is (= (group-ns/group [(shapes/sphere)])
-           (shapes/group (shapes/sphere))))))
+           (shapes/group [(shapes/sphere)])))))
