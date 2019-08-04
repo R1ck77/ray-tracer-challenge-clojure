@@ -50,8 +50,7 @@
   "A world used for testing.
 
   It kind of sucks conceptually that this function is here,
-  but at least at the moment I'll keep it here because
-  \"The Book made me do it.\""
+  but at least at the moment I will because \"The Book made me do it.\""
   []
   (let [sphere1 (assoc (shapes/change-material (shapes/sphere)
                                          (material/with-color (color/color 0.8 1.0 0.6)
