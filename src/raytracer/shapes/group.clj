@@ -88,7 +88,7 @@
   (is-empty? [this] false)
   (set-children [this new-children]
     (merge this {:children new-children
-                 :aabb-extremes (compute-extremes new-children)})))
+                 :aabb-extremes (compute-extremes transform new-children)})))
 
 (defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
   shared/Transformable
@@ -112,7 +112,7 @@
              (:transform this)
              (:inverse-transform this)
              (:inverse-transposed-transform this)
-             (compute-extremes new-children))))
+             (compute-extremes (:transform this) new-children))))
 
 (defn group [children]
   (if (empty? children)
