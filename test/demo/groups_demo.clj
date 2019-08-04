@@ -33,21 +33,25 @@
                                                                                           (color/color 0 0 1))
                                                                          matrix/identity-matrix)))
 
-#_(def floor (-> (shapes/plane)
+(def floor (-> (shapes/plane)
                (shapes/change-material room-material)
                (shared/transform (transform/translate 0 -0.0001 0))))
 
 (defn- create-marble [x z]
   (-> (shapes/sphere)
       (shapes/change-material
-       (material/material :diffuse 0.1
-                          :specular 0.8
-                          :reflectivity 0.5
-                          :transparency 0.99
-                          :refractive-index 0.8
-                          :color (color/color 0 1 0)))
+       (material/material :diffuse (rand 0.6)
+                          :specular (rand 0.9)
+                          :reflectivity (rand 0.5)
+                          :transparency (rand 0.99)
+                          :refractive-index (rand 1.0)
+                          :pattern (pattern/solid
+                                    (color/color (rand 1)
+                                                 (rand 1)
+                                                 (rand 1)))))
       (shared/transform
-       (transform/translate (* 0.0 x) 1.5 (* 0.0 z)))))
+       (transform/translate (* 1.0 x) 0.125 (* 1.0 z)
+                            (transform/scale 0.25 0.25 0.25)))))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
@@ -77,18 +81,16 @@
 (defn- partition-marbles [marbles-dict limit]
   (:pre [(> limit 1)])
   (let [result (if (<= (count marbles-dict) limit)
-                 (apply shapes/group (vals marbles-dict))
+                 (shapes/group (vals marbles-dict))
                  (let [{:keys [min-x max-x min-z max-z]} (get-group-extremes marbles-dict)
                        half-x (/ (+ max-x min-x) 2)
                        half-z (/ (+ max-z min-z) 2)
                        partitioned (bin-marbles marbles-dict half-x half-z)]
-                   (apply shapes/group
-                          (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]
+                   (shapes/group (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]
     (print-volume result)))
 
 (defn- create-all-marbles [size]
-  {[0 0] (create-marble 0 0)}
-  #_(into {}
+  (into {}
    (for [x (range (- size) size)
          z (range (- size) size)]
      (vector [x z] (create-marble x z)))))
@@ -98,7 +100,7 @@
    (time (partition-marbles (create-all-marbles 3) *maximum-group-size*))
       (transform/translate 0 0.128 0)))
 
-(def world (-> (world/world [(create-marble-floor) #_ floor])
+(def world (-> (world/world [(create-marble-floor) floor])
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                           (color/color 1 1 1)))
                (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
@@ -119,9 +121,9 @@
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
-  (with-redefs [*image-resolution* [300 300]
+  (with-redefs [*image-resolution* [500 500]
                 group/*statistics* true
-                world/*maximum-reflections* 0]
+                world/*maximum-reflections* 4]
     (reset! group/hit-count-statistics [0 0])
     (time (render-demo))
     (println @group/hit-count-statistics)))
