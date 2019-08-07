@@ -16,8 +16,8 @@
 (defn update-material [shape material-update-f]
   (change-material shape (material-update-f (:material shape))))
 
-(defn sphere []
-  (sphere-ns/sphere))
+(defn sphere [& args]
+  (apply sphere-ns/sphere args))
 
 (defn plane []
   (plane-ns/plane))
