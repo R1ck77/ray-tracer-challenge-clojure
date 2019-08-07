@@ -39,23 +39,22 @@
                (shared/transform (transform/translate 0 -0.00001 0))))
 
 (defn- create-marble [x z]
-  (let [space 0.5]
-    (-> (shapes/sphere)
-        (shapes/change-material
-         (material/material :diffuse (rand 0.6)
-                            :specular (rand 0.9)
-                            :reflectivity (rand 0.5)
-                            :transparency (rand 0.99)
-                            :refractive-index (rand 1.0)
-                            :pattern (pattern/solid
-                                      (color/color (rand 1)
-                                                   (rand 1)
-                                                   (rand 1)))))
-        (shared/transform
-         (transform/translate (- (rand space)) 0 (- (rand space))
-                              (transform/translate (* space x) 0 (* space z)
-                                                   (transform/translate (* x 0.5) 0.25 (* z 0.5) 
-                                                                        (transform/scale 0.25 0.25 0.25))))))))
+  (let [space 0.5
+        material (material/material :diffuse (rand 0.6)
+                                    :specular (rand 0.9)
+                                    :reflectivity (rand 0.5)
+                                    :transparency (rand 0.99)
+                                    :refractive-index (rand 1.0)
+                                    :pattern (pattern/solid
+                                              (color/color (rand 1)
+                                                           (rand 1)
+                                                           (rand 1))))
+        transform (transform/translate (+ (* x 0.5) (* space (- x (rand))))
+                                       0.25
+                                       (+ (* z 0.5) (* space (- z (rand))))
+                                       (transform/scale 0.25 0.25 0.25))]
+    (-> (shapes/sphere :material material
+                       :transform transform))))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
