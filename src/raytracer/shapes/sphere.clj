@@ -60,9 +60,22 @@
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (:transform this))))
 
-(defn sphere []
-  (map->Sphere 
-   {:material (material/material)
-    :transform matrix/identity-matrix
-    :inverse-transform matrix/identity-matrix
-    :inverse-transposed-transform matrix/identity-matrix}))
+(defn- quick-invert [m]
+  (if (= m matrix/identity-matrix)
+    matrix/identity-matrix
+    (matrix/invert m 4)))
+
+(defn- quick-transpose [m]
+  (if (= m matrix/identity-matrix)
+    matrix/identity-matrix
+    (matrix/transpose m)))
+
+(defn sphere [& {:as args-map}]
+  (let [transform (or (:transform args-map)
+                      matrix/identity-matrix)
+        inverse (quick-invert transform)]
+    (map->Sphere 
+     {:material (or (:material args-map) (material/material))
+      :transform transform
+      :inverse-transform inverse
+      :inverse-transposed-transform (quick-transpose inverse)})))

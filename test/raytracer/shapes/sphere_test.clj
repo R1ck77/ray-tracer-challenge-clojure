@@ -10,7 +10,8 @@
             [raytracer.transform :as transform]
             [raytracer.material :as material]
             [raytracer.shapes.sphere :as sphere]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box])
+  (:import [raytracer.shapes.sphere Sphere]))
 
 (deftest test-sphere
   (let [sphere (shapes/sphere)]
@@ -24,7 +25,18 @@
     (testing "a sphere may be assigned a material"
       (let [new-material (assoc (material/material) :ambient 0.25)]
         (is (= new-material
-               (:material (shapes/change-material sphere new-material))))))))
+               (:material (shapes/change-material sphere new-material)))))))
+  (testing "create a sphere with a courtesy constructor"
+    (let [transform (transform/translate 2 3 4)
+          new-material (assoc (material/material) :ambient 0.25)]
+      (is (= (shared/transform (sphere/sphere) transform)
+             (sphere/sphere :transform transform)))
+      (is (= (shapes/change-material (sphere/sphere)
+                                     new-material)
+             (sphere/sphere :material new-material)))
+      (is (= (shapes/change-material (shared/transform (sphere/sphere) transform) new-material)
+             (sphere/sphere :material new-material :transform transform)))
+      (is (instance? Sphere (sphere/sphere :material new-material))))))
 
 (deftest test-bounding-box-protocol
   (testing "a sphere's bounding box is a AABB of side 2"
