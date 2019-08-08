@@ -52,9 +52,10 @@
         transform (transform/translate (+ (* x 0.5) (* space (- x (rand))))
                                        0.25
                                        (+ (* z 0.5) (* space (- z (rand))))
-                                       (transform/scale 0.25 0.25 0.25))]
-    (-> (shapes/sphere :material material
-                       :transform transform))))
+                                       (transform/scale 0.25 0.25 0.25))
+        transform matrix/identity-matrix]
+    (shapes/sphere :material material
+                   :transform transform)))
 
 (defn- get-group-extremes [marbles-dict]
   (let [indices (map first marbles-dict)
@@ -95,10 +96,10 @@
 (defn- create-all-marbles [size]
   (into {}
         (pmap (fn [[x z :as coords]]
-               (vector coords (create-marble x z)))
-             (for [x (range (- size) size)
-                   z (range (- size) size)]
-               (vector x z)))))
+                (vector coords (create-marble x z)))
+              (for [x (range (- size) size)
+                    z (range (- size) size)]
+                (vector x z)))))
 
 (defn- create-marble-floor []
   (shared/transform

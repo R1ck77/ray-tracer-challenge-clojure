@@ -1,6 +1,10 @@
 (ns raytracer.transform
   (:require [raytracer.matrix :as matrix]))
 
+;;; TODO/FIXME go full OO and keep track for each matrix the type of transform
+;;;   in this way you can have the inverse ready made and combine them
+;;;   symbolically. Particularly useful in the groups-demo (marbles creation)
+
 (defn- translation [tx ty tz]
   (matrix/create [1 0 0 tx
                   0 1 0 ty
