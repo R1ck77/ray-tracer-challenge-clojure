@@ -23,81 +23,75 @@
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
 
-(def perlin-data (perlin/create-perlin-data [3 3 3]))
-
-(def room-material (material/material :specular 0.0
-                                      :reflectivity 0.5
-                                      :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
-                                                                                          (color/color 0 0 1))
-                                                                         matrix/identity-matrix)))
-
-(def floor (-> (shapes/plane)
-               (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.0001 0))))
-
-(def left-cone (-> (shapes/cone :minimum -1
-                                :maximum 0)
-                   (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
-                                                              :reflectivity 0.3
-                                                              :pattern (pattern/change-transform (pattern/stripe (color/color 0 1 0)
-                                                                                                                 (color/color 1 1 1))
-                                                                                                 (transform/scale 0.2 0.2 0.2
-                                                                                                                  (transform/rotate-y (/ Math/PI 5))))))
-                   (shared/transform (->> (transform/scale 0.75 0.75 0.75)
-                                          (transform/translate -1.5 0.75 -1.5)))))
-
-(def middle-cylinder (-> (shapes/cylinder :minimum 0
-                                          :maximum 0.6
-                                          :closed false
-                                          )
-                         (shapes/change-material (material/material :color (color/color 0 0.05 0.1)
-                                                                    :diffuse 0.1
-                                                                    :specular 0.3
-                                                                    :reflectivity 0.99
-                                                                    :transparency 0.0
-                                                                    :refractive-index 2.0))
+(defn create-world []
+  (let [perlin-data (perlin/create-perlin-data [3 3 3])
+        room-material (material/material :specular 0.0
+                                         :reflectivity 0.5
+                                         :pattern (pattern/change-transform (pattern/checker (color/color 1 0 0)
+                                                                                             (color/color 0 0 1))
+                                                                            matrix/identity-matrix))
+        floor (-> (shapes/plane)
+                  (shapes/change-material room-material)
+                  (shared/transform (transform/translate 0 -0.0001 0)))
+        left-cone (-> (shapes/cone :minimum -1
+                                   :maximum 0)
+                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
+                                                                 :reflectivity 0.3
+                                                                 :pattern (pattern/change-transform (pattern/stripe (color/color 0 1 0)
+                                                                                                                    (color/color 1 1 1))
+                                                                                                    (transform/scale 0.2 0.2 0.2
+                                                                                                                     (transform/rotate-y (/ Math/PI 5))))))
+                      (shared/transform (->> (transform/scale 0.75 0.75 0.75)
+                                             (transform/translate -1.5 0.75 -1.5))))
+        middle-cylinder (-> (shapes/cylinder :minimum 0
+                                             :maximum 0.6
+                                             :closed false
+                                             )
+                            (shapes/change-material (material/material :color (color/color 0 0.05 0.1)
+                                                                       :diffuse 0.1
+                                                                       :specular 0.3
+                                                                       :reflectivity 0.99
+                                                                       :transparency 0.0
+                                                                       :refractive-index 2.0))
                          
-                         (shared/transform (transform/translate -0.5 0 0.5))))
-
-(def back-cylinder (-> (shapes/cylinder :closed true
-                                        :maximum 1
-                                        :minimum -1)
-                       (shapes/change-material (material/material :color (apply color/color (map #(/ % 255) [200 110 200]))
-                                                                  :diffuse 0.4
-                                                                  :specular 0.5
-                                                                  :refractive-index 2.0
-                                                                  :reflectivity 0.3
-                                                                  :transparency 0.0
-                                                                  :refractive-index 0.0))
+                            (shared/transform (transform/translate -0.5 0 0.5)))
+        back-cylinder (-> (shapes/cylinder :closed true
+                                           :maximum 1
+                                           :minimum -1)
+                          (shapes/change-material (material/material :color (apply color/color (map #(/ % 255) [200 110 200]))
+                                                                     :diffuse 0.4
+                                                                     :specular 0.5
+                                                                     :refractive-index 2.0
+                                                                     :reflectivity 0.3
+                                                                     :transparency 0.0
+                                                                     :refractive-index 0.0))
                        
-                       (shared/transform (transform/translate 1.75 2 5.5
-                                                              (transform/scale 2 2 2)))))
-
-(def right-cylinder (-> (shapes/cylinder :closed true
-                                         :minimum -1
-                                         :maximum 1)
-                        (shapes/change-material (material/material :diffuse 0.7
-                                                                   :specular 0.3
-                                                                   :reflectivity 0.2
-                                                                   :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
-                                                                                                                                             (color/color 0.0 0 0.0)) 
-                                                                                                                               (fn [pattern point]
-                                                                                                                                 (let [noise (perlin/noise perlin-data (vector (:x point)
-                                                                                                                                                                               (:y point)
-                                                                                                                                                                               (:z point)))]
-                                                                                                                                   (pattern/color-at pattern (point/point (+ (:x point) noise)
-                                                                                                                                                                          (:y point)
-                                                                                                                                                                          (+ (:z point) noise))))))
-                                                                                                      (transform/scale 0.5 0.125 0.125
-                                                                                                                       (transform/rotate-z 0.23423)))))
-                        (shared/transform (->> (transform/scale 0.5 0.5 0.5)
-                                               (transform/translate 1.5 0.5 -0.5)))))
-
-(def world (-> (world/world)
-               (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
-                                                                          (color/color 1 1 1)))
-               (world/set-objects [floor left-cone middle-cylinder back-cylinder right-cylinder])
-               (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0)))))
+                          (shared/transform (transform/translate 1.75 2 5.5
+                                                                 (transform/scale 2 2 2))))
+        right-cylinder (-> (shapes/cylinder :closed true
+                                            :minimum -1
+                                            :maximum 1)
+                           (shapes/change-material (material/material :diffuse 0.7
+                                                                      :specular 0.3
+                                                                      :reflectivity 0.2
+                                                                      :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
+                                                                                                                                                (color/color 0.0 0 0.0)) 
+                                                                                                                                  (fn [pattern point]
+                                                                                                                                    (let [noise (perlin/noise perlin-data (vector (:x point)
+                                                                                                                                                                                  (:y point)
+                                                                                                                                                                                  (:z point)))]
+                                                                                                                                      (pattern/color-at pattern (point/point (+ (:x point) noise)
+                                                                                                                                                                             (:y point)
+                                                                                                                                                                             (+ (:z point) noise))))))
+                                                                                                         (transform/scale 0.5 0.125 0.125
+                                                                                                                          (transform/rotate-z 0.23423)))))
+                           (shared/transform (->> (transform/scale 0.5 0.5 0.5)
+                                                  (transform/translate 1.5 0.5 -0.5))))]
+    (-> (world/world)
+        (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
+                                                                   (color/color 1 1 1)))
+        (world/set-objects [floor left-cone middle-cylinder back-cylinder right-cylinder])
+        (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0))))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
@@ -110,4 +104,4 @@
   ([width height]
    (spit *output-file*
          (canvas/canvas-to-ppm (camera/render (create-camera width height)
-                                              world)))))
+                                              (create-world))))))
