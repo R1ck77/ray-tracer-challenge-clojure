@@ -73,9 +73,10 @@
 (defn sphere [& {:as args-map}]
   (let [transform (or (:transform args-map)
                       matrix/identity-matrix)
-        inverse (quick-invert transform)]
+        inverse (or (:inverse-transform args-map) (quick-invert transform))
+        inverse-transposed (quick-transpose inverse)]
     (map->Sphere 
      {:material (or (:material args-map) (material/material))
       :transform transform
       :inverse-transform inverse
-      :inverse-transposed-transform (quick-transpose inverse)})))
+      :inverse-transposed-transform inverse-transposed})))
