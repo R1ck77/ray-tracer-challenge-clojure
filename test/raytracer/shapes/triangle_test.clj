@@ -4,7 +4,8 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.triangle :as triangle]))
+            [raytracer.shapes.triangle :as triangle]
+            [raytracer.ray :as ray]))
 
 (deftest test-constructor
   (let [triangle (triangle/triangle (point/point 0 1 0)
@@ -30,3 +31,33 @@
       (is (tu/t= normal (shared/compute-normal triangle (point/point 0 0.5 0))))
       (is (tu/t= normal (shared/compute-normal triangle (point/point -0.5 0.75 0))))
       (is (tu/t= normal (shared/compute-normal triangle (point/point 0.5 0.25 0)))))))
+
+(deftest test-local-intersect
+  (let [triangle (triangle/triangle (point/point 0 1 0)
+                                    (point/point -1 0 0)
+                                    (point/point 1 0 0))]
+    (testing "Intersecting a ray parallel to the triangle"
+      (is (= []
+             (shared/local-intersect triangle
+                                     (ray/ray (point/point 0 -1 -2)
+                                              (svector/svector 0 1 0))))))
+    (testing "A ray misses the p1-p3 edge"
+      (is (= []
+             (shared/local-intersect triangle
+                                     (ray/ray (point/point 1 1 -2)
+                                              (svector/svector 0 0 1))))))
+    (testing "A ray misses the p1-p2 edge"
+      (is (= []
+             (shared/local-intersect triangle
+                                     (ray/ray (point/point -1 1 -2)
+                                              (svector/svector 0 0 1))))))
+    (testing "A ray misses the p2-p3 edge"
+      (is (= []
+             (shared/local-intersect triangle
+                                     (ray/ray (point/point 0 -1 -2)
+                                              (svector/svector 0 0 1))))))
+    (testing "A ray strikes a triangle"
+      (is (tu/v= [2]
+                 (map :t (shared/local-intersect triangle
+                                                 (ray/ray (point/point 0 0.5 -2)
+                                                          (svector/svector 0 0 1)))))))))
