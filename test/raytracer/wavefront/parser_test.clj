@@ -12,7 +12,7 @@ who traveled much faster than light.
 She set out one day
 in a relative way,
 and came back the previous night.")]
-      (is (= 5 (:ignored result)))))
+      (is (= 5 (count (:ignored result))))))
   (testing "Vertex records"
     (let [result (parser/parse "v -1 1 0
 v -1.0000 0.5000 0.0000
