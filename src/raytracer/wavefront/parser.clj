@@ -23,18 +23,38 @@
               ;;; that "str" is bad
               (conj vertices (apply point/point (mapv #(Double/valueOf (str %)) (rest tokens))))))))
 
+(defn- triangles-from-vertices [grouped-vertices]
+  (mapv #(apply triangle/triangle %) grouped-vertices))
+
+(defn- indices-to-points [all-vertices grouped-indices]
+  (map (fn [indices-group]
+         (map #(get all-vertices %) indices-group)) grouped-indices))
+
+(defn- group-vertex-indices
+  "Given N vertices, return a list of triangle vertices
+
+  Uses the fan decomposition of a polygon, which works only for convex figures"
+  [xn]
+  (let [start (first xn)]
+    (mapv #(conj % start)
+          (partition 2 1 (rest xn) ))))
+
+(defn int-tokens [strings]
+  (map #(Integer/valueOf (str %)) strings))
+
 (defmethod parse-tokens "f"
   [acc line]
   (let [tokens (tokens line)
         group (:current-group acc)
-        new-face (apply triangle/triangle
-                        (map #(get (:vertices acc) %)
-                             ;;; this "str" is bad
-                             (map #(Integer/valueOf (str %)) (rest tokens))))]
+        new-faces (triangles-from-vertices
+                   (indices-to-points (:vertices acc)
+                    (group-vertex-indices
+                     (int-tokens (rest tokens)))))]
     (update-in acc
                [:groups group]
                (fn [faces]
-                 (conj faces new-face)))))
+                 (vec
+                  (concat faces new-faces))))))
 
 (defmethod parse-tokens :default
   [acc line]
