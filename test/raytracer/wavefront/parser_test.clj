@@ -34,16 +34,34 @@ v 1 0 0
 v 1 1 0
 f 1 2 3
 f 1 3 4")
+          vertices (:vertices result)
           default-group (-> result :groups :default-group)]
-      (is (= (triangle/triangle (point/point -1 1 0)
-                                (point/point -1 0 0)
-                                (point/point 1 0 0))
+      (is (= (triangle/triangle (get vertices 1)
+                                (get vertices 2)
+                                (get vertices 3))
              (get default-group 1)))
-      (is (= (triangle/triangle (point/point -1 1 0)
-                                (point/point 1 0 0)
-                                (point/point 1 1 0))
-             (get default-group 2))))
-
-
-    
-    ))
+      (is (= (triangle/triangle (get vertices 1)
+                                (get vertices 3)
+                                (get vertices 4))
+             (get default-group 2)))))
+  (testing "Parsing polygon faces"
+    (let [results (parser/parse "v -1 1 0
+v -1 0 0
+v 1 0 0
+v 1 1 0
+v 0 2 0
+f 1 2 3 4 5")
+          vertices (:vertices results)
+          default-group (-> results :groups :default-group)]
+      (is (= (triangle/triangle (get vertices 1)
+                                (get vertices 2)
+                                (get vertices 3))
+             (get default-group 1)))
+      (is (= (triangle/triangle (get vertices 1)
+                                (get vertices 3)
+                                (get vertices 4))
+             (get default-group 2)))
+      (is (= (triangle/triangle (get vertices 1)
+                                (get vertices 4)
+                                (get vertices 5))
+             (get default-group 3))))))
