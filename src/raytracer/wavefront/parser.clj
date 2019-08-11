@@ -56,6 +56,15 @@
                  (vec
                   (concat faces new-faces))))))
 
+(defmethod parse-tokens "g"
+  [acc line]
+  (let [tokens (tokens line)
+        new-group (first (rest tokens))
+        updated-acc (assoc acc :current-group new-group)]
+    (if-not (-> acc :groups (get new-group))
+      (assoc-in updated-acc [:groups new-group] [nil])
+      updated-acc)))
+
 (defmethod parse-tokens :default
   [acc line]
   (update acc
