@@ -79,11 +79,9 @@
            :groups {:default-group [nil]}}
           (string/split-lines text)))
 
-(defn- empty-group? [group]
-  (not= 1 (count group)))
-
 (defn get-non-empty-groups [parsing-result]
-  (map (complement empty-group?)
-       (map second
-            (:groups parsing-result)))) ;;; TODO/FIXME to test!
+  (filter (complement empty?)
+          (map rest
+               (map second
+                    (:groups parsing-result))))) ;;; TODO/FIXME test this!
 

@@ -1,5 +1,6 @@
 (ns raytracer.shapes.obj-test
   (:require [clojure.test :refer :all]
+            [raytracer.test-utils :refer [with-temp-file]]
             [raytracer.shapes.obj :as obj]))
 
 (deftest test-obj
