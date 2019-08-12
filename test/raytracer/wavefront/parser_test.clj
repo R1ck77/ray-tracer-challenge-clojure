@@ -92,5 +92,3 @@ f 1 3 4")
                                  (get vertices 4))]
              second-group)))))
 
-(deftest test-parse-as-group
-  (testing "Returns a group with the parsed objects"))
