@@ -78,3 +78,6 @@
            :vertices [nil]
            :groups {:default-group [nil]}}
           (string/split-lines text)))
+
+(defn parse-as-group [text]
+  (group/group(parse text)))
