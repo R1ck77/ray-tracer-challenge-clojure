@@ -54,3 +54,10 @@
   (and (eps= (:r c1) (:r c2))
        (eps= (:g c1) (:g c2))
        (eps= (:b c1) (:b c2))))
+
+(defmacro with-temp-file [name & forms]
+  `(let [~name (java.io.File/createTempFile "pre" ".suff")]
+     (try 
+       ~@forms
+       (finally
+         (.delete ~name)))))
