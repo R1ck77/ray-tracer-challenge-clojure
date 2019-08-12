@@ -19,7 +19,7 @@
 
 ;;; Note: the result of this demo changes with the evolution of the underlying functions
 
-(def ^:dynamic *output-file* "groups-demo.ppm")
+(def ^:dynamic *output-file* "obj-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
 
 (def halfπ (/ Math/PI 2))
