@@ -3,8 +3,10 @@
             [raytracer.point :as point]
             [raytracer.tuple :as tuple]
             [raytracer.svector :as svector]
+            [raytracer.matrix :as matrix]
             [raytracer.intersection :as intersection]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defn- local-intersect-triangle [{:keys [p1 e1 e2] :as triangle} {:keys [origin direction] :as ray}]
   (let [dir-cross-e2 (tuple/cross direction e2)
@@ -29,7 +31,17 @@
     normal)
   shared/Intersectable
   (local-intersect [this ray]
-    (local-intersect-triangle this ray)))
+    (local-intersect-triangle this ray))
+
+
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (vector (point/point -1000 -1000 -1000)
+            (point/point 1000 1000 1000)))
+  (hit [this ray] true)
+  (get-transformed-points [this]
+    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
+                                                        matrix/identity-matrix)))
 
 (defn triangle [p1 p2 p3]
   (let [edge1 (tuple/sub p2 p1)
