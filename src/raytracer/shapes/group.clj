@@ -125,7 +125,5 @@
              matrix/identity-matrix
              (compute-extremes matrix/identity-matrix children))))
 
-
-
 (def empty-group (group []))
 
