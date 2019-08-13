@@ -5,6 +5,7 @@
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
             [raytracer.intersection :as intersection]
+            [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.bounding-box :as bounding-box]))
 
@@ -25,27 +26,31 @@
                 [(intersection/intersection (* f (tuple/dot e2 origin-cross-e1))
                                             triangle)]))))))))
 
-(defrecord Triangle [p1 p2 p3 e1 e2 normal]
+(defrecord Triangle [p1 p2 p3 e1 e2 normal material transform inverse-transform inverse-transposed-transform]
+  shared/Transformable
+  (transform [this transform-matrix]
+    (shared/change-transform this transform-matrix))
+  shared/Intersectable
+  (local-intersect [this ray-in-sphere-space]
+    (local-intersect-triangle this ray-in-sphere-space))
   shared/Surface
   (compute-normal [this point]
     normal)
-  shared/Intersectable
-  (local-intersect [this ray]
-    (local-intersect-triangle this ray))
-
-
   bounding-box/BoundingBox
   (get-corners [this]
-    (vector (point/point -1000 -1000 -1000)
-            (point/point 1000 1000 1000)))
+    (bounding-box/extremes-from-points [p1 p2 p3]))
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        matrix/identity-matrix)))
+                                                        (:transform this))))
 
 (defn triangle [p1 p2 p3]
   (let [edge1 (tuple/sub p2 p1)
         edge2 (tuple/sub p3 p1)]
     (->Triangle p1 p2 p3
                 edge1 edge2
-                (tuple/normalize (tuple/cross edge2 edge1)))))
+                (tuple/normalize (tuple/cross edge2 edge1))
+                (material/material)
+                matrix/identity-matrix
+                matrix/identity-matrix
+                matrix/identity-matrix)))
