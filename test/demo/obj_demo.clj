@@ -8,6 +8,7 @@
             [raytracer.matrix :as matrix]
             [raytracer.transform :as transform]
             [raytracer.shapes :as shapes]
+            [raytracer.shapes.triangle :as triangle]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.group :as group]
             [raytracer.material :as material]
@@ -42,12 +43,9 @@
                                               (svector/svector 0 1 0))))
 
 (defn load-wavefront []
-  (-> (obj/obj (clojure.java.io/resource "obj/teapot.obj"))
-      (shapes/change-material (material/material :specular 0.4
-                                                 :reflectivity 0.4
-                                                 :ambient 0.3
-                                                 :diffuse 0.5
-                                                 :pattern (pattern/solid (color/color 1.0 0.0 0.0))))))
+  (triangle/triangle (point/point 1 1 0)
+                     (point/point -1 1 0)
+                     (point/point 0 0 0)))
 
 (defn render-demo
   ([] (apply render-demo *image-resolution*))
