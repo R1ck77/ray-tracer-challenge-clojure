@@ -43,9 +43,7 @@
                                               (svector/svector 0 1 0))))
 
 (defn load-wavefront []
-  (triangle/triangle (point/point 1 1 0)
-                     (point/point -1 1 0)
-                     (point/point 0 0 0)))
+  (obj/obj (clojure.java.io/resource "obj/teapot.obj")))
 
 (defn render-demo
   ([] (apply render-demo *image-resolution*))
