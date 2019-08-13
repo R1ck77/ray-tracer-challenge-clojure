@@ -46,8 +46,8 @@
   (transform [this transform-matrix]
     (shared/change-transform this transform-matrix))
   shared/Intersectable
-  (local-intersect [this ray-in-plane-space]
-    (intersect-sphere-space this ray-in-plane-space))
+  (local-intersect [this ray-in-sphere-space]
+    (intersect-sphere-space this ray-in-sphere-space))
   shared/Surface
   (compute-normal [this point]
     (compute-normal this point))
@@ -59,7 +59,7 @@
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (:transform this))))
-
+;;; TODO/FIXME This should go in a transform cache
 (defn- quick-invert [m]
   (if (= m matrix/identity-matrix)
     matrix/identity-matrix
