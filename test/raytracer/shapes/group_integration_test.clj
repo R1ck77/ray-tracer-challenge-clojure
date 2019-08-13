@@ -1,5 +1,6 @@
 (ns raytracer.shapes.group-integration-test
   (:require [clojure.test :refer :all]
+            [raytracer.test-utils :as test-utils]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.ray :as ray]
@@ -16,7 +17,11 @@
       (let [teapot (load-wavefront)
             ray (ray/ray (point/point 0 0.5 0)
                          (svector/svector 0 0 -1))]
-        (shared/local-intersect teapot ray)))))
+        (is (= [-1.8516431924882633          
+                -1.8516431924882628
+                1.8516431924882628
+                1.8516431924882633]
+               (map :t (shared/local-intersect teapot ray))))))))
 
 (deftest test-local-intersect-on-large-group-no-bounding-box
   (testing "Intersection with a large group doesn't throw (no bounding box)"
@@ -24,4 +29,8 @@
       (let [big-group (first (group/get-children (load-wavefront)))
            ray (ray/ray (point/point 0 0.5 0)
                         (svector/svector 0 0 -1))]
-       (shared/local-intersect big-group ray)))))
+       (is (= [-1.8516431924882633          
+               -1.8516431924882628
+               1.8516431924882628
+               1.8516431924882633]
+              (map :t (shared/local-intersect big-group ray))))))))

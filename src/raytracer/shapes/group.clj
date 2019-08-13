@@ -21,7 +21,7 @@
 
 (defn- intersect [group ray-object-space]
   (let [transformed-ray (ray/transform ray-object-space (:inverse-transform group))]
-    (sort-by :t (reduce concat
+    (sort-by :t (apply concat
                         (map #(shared/local-intersect % (ray/transform transformed-ray
                                                                        (:inverse-transform %)))
                              (:children group))))))
