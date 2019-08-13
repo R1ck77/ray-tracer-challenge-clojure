@@ -27,10 +27,10 @@
   (testing "Intersection with a large group doesn't throw (no bounding box)"
     (with-redefs [group/*use-bounding-boxes* false]
       (let [big-group (first (group/get-children (load-wavefront)))
-           ray (ray/ray (point/point 0 0.5 0)
-                        (svector/svector 0 0 -1))]
-       (is (= [-1.8516431924882633          
-               -1.8516431924882628
-               1.8516431924882628
-               1.8516431924882633]
-              (map :t (shared/local-intersect big-group ray))))))))
+            ray (ray/ray (point/point 0 0.5 0)
+                         (svector/svector 0 0 -1))]
+        (is (= [-1.8516431924882633          
+                -1.8516431924882628
+                1.8516431924882628
+                1.8516431924882633]
+               (map :t (shared/local-intersect big-group ray))))))))
