@@ -58,7 +58,7 @@
                                                              (swap! counter inc) ; TODO a coordinated transaction could go here, but who cares…
                                                              (swap! names #(assoc % new-node new-name))
                                                              new-node)))
-            changed-objects (zipper/get-all-matching-objects updated-zipper (fn [_] true))]
+            changed-objects (#'zipper/new-group-zipper (shared/get-root updated-zipper))]
         (is (= @names
                (reduce (fn [acc node]
                          (assoc acc node (:name node)))

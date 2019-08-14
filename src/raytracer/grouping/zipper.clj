@@ -82,6 +82,11 @@
   [zipper object]
   (z/append-child (go-to-parent zipper) object))
 
+(defn- edit-zipper [k edit-f]
+  (if-not (z/end? k)                               
+    (recur (z/next (z/edit k edit-f)) edit-f)
+    (z/root k)))
+
 (defn create-zipper
   ([root]
    (let [zipper (new-group-zipper root)]
@@ -104,4 +109,4 @@
      (add-root-object [this object]
        (create-zipper root (add-root-obj zipper object)))
      (update-objects [this update-f]
-       zipper))))
+       (create-zipper (edit-zipper zipper update-f))))))
