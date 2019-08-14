@@ -18,7 +18,7 @@
       (cons node (lazy-seq (traverse zipper)))
       (list node))))
 
-(defn- get-all-matching-objects [zipper predicate]
+(defn get-all-matching-objects [zipper predicate]
   (apply hash-set (filter predicate (traverse zipper))))
 
 (defn- get-all-non-group-objects [zipper]
@@ -102,4 +102,6 @@
        (get-all-non-group-objects zipper))
      shared/HierarchyEditor
      (add-root-object [this object]
-       (create-zipper root (add-root-obj zipper object))))))
+       (create-zipper root (add-root-obj zipper object)))
+     (update-objects [this update-f]
+       zipper))))

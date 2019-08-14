@@ -37,3 +37,30 @@
            (shared/get-all-objects
             (zipper/create-zipper
              (group/group [(group/group [(group/group [])])])))))))
+
+(deftest testing-update-objects
+  (testing "Updates all objects, group objects included"
+    (let [root (group/group [(shapes/sphere)
+                             (shapes/sphere)
+                             (group/group [])
+                             (shapes/cube)
+                             (group/group [(group/group [(shapes/cone)
+                                                         (shapes/cube)
+                                                         (shapes/sphere)])
+                                           (shapes/cube)
+                                           (shapes/sphere)])])
+          zipper (zipper/create-zipper root)
+          counter (atom 0)
+          names (atom {})]
+      (let [updated-zipper (shared/update-objects zipper (fn [node]
+                                                           (let [new-name (str "name-" @counter)
+                                                                 new-node (assoc node :name new-name)]
+                                                             (swap! counter inc) ; TODO a coordinated transaction could go here, but who cares…
+                                                             (swap! names #(assoc % new-node new-name))
+                                                             new-node)))
+            changed-objects (zipper/get-all-matching-objects updated-zipper (fn [_] true))]
+        (is (= @names
+               (reduce (fn [acc node]
+                         (assoc acc node (:name node)))
+                       {}
+                       changed-objects)))))))
