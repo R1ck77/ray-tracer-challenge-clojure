@@ -57,6 +57,9 @@
   (or (not *use-bounding-boxes*)
       (bounding-box/hit group ray)))
 
+(defprotocol Optimizer
+  (optimize [this max-objects] "Return a new group optimized to have less than max-objects per group"))
+
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
 (defrecord Group [children transform inverse-transform inverse-transposed-transform aabb-extremes] ;;; TODO/FIXME this is really effed up
@@ -88,7 +91,11 @@
   (is-empty? [this] false)
   (set-children [this new-children]
     (merge this {:children new-children
-                 :aabb-extremes (compute-extremes transform new-children)})))
+                 :aabb-extremes (compute-extremes transform new-children)}))
+  Optimizer
+  (optimize [this max-objects]
+    (println "* Warning: optimization not yet implemented!")
+    this))
 
 (defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
   shared/Transformable
@@ -112,7 +119,9 @@
              (:transform this)
              (:inverse-transform this)
              (:inverse-transposed-transform this)
-             (compute-extremes (:transform this) new-children))))
+             (compute-extremes (:transform this) new-children)))
+  Optimizer
+  (optimize [this max-objects] this))
 
 (defn group [children]
   (if (empty? children)
