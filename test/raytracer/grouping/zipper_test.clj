@@ -11,7 +11,6 @@
 (def shape-c (assoc (shapes/sphere) :name :shape-c))
 (def shape-d (assoc (shapes/sphere) :name :shape-d))
 
-
 (deftest testing-get-root
   (testing "Returns the group at the root of the hieararchy"
     (let [root (group/group [(shapes/sphere) (shapes/sphere) (shapes/sphere)])]
@@ -51,16 +50,15 @@
                                            (shapes/sphere)])])
           zipper (zipper/create-zipper root)
           counter (atom 0)
-          names (atom {})]
+          names (atom #{})]
       (let [updated-zipper (shared/update-objects zipper (fn [node]
                                                            (let [new-name (str "name-" @counter)
                                                                  new-node (assoc node :name new-name)]
                                                              (swap! counter inc) ; TODO a coordinated transaction could go here, but who cares…
-                                                             (swap! names #(assoc % new-node new-name))
+                                                             (swap! names #(conj % new-name))
                                                              new-node)))
-            changed-objects (#'zipper/new-group-zipper (shared/get-root updated-zipper))]
+            new-objects (zipper/get-all-matching-objects (#'zipper/new-group-zipper (shared/get-root updated-zipper))
+                                                         (constantly true)) 
+            set-names (into #{} (map :name new-objects))]
         (is (= @names
-               (reduce (fn [acc node]
-                         (assoc acc node (:name node)))
-                       {}
-                       changed-objects)))))))
+               set-names))))))
