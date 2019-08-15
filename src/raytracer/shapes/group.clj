@@ -9,6 +9,7 @@
             [raytracer.shapes.bounding-box :as bounding-box]            
             [raytracer.shapes.aabb-intersection :as aabb-intersection]
             [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.optimizers.optimizer :as optimizer]
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]))
 
@@ -58,7 +59,7 @@
       (bounding-box/hit group ray)))
 
 (defprotocol Optimizer
-  (optimize [this max-objects] "Return a new group optimized to have less than max-objects per group"))
+  (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
 
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
@@ -93,9 +94,8 @@
     (merge this {:children new-children
                  :aabb-extremes (compute-extremes transform new-children)}))
   Optimizer
-  (optimize [this max-objects]
-    (println "* Warning: optimization not yet implemented!")
-    this))
+  (optimize [this optimizer]
+    (optimizer/optimize optimizer this)))
 
 (defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
   shared/Transformable
@@ -121,7 +121,7 @@
              (:inverse-transposed-transform this)
              (compute-extremes (:transform this) new-children)))
   Optimizer
-  (optimize [this max-objects] this))
+  (optimize [this optimizer] this))
 
 (defn group [children]
   (if (empty? children)
