@@ -18,8 +18,8 @@
 
 (deftest test-bounding-box-protocol
   (testing "Bounding box for an infinite cone"
-    (is (= [(point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
-            (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)]
+    (is (= [(point/point -4.0 -4.0 -4.0)
+            (point/point 4.0 4.0 4.0)]
            (bounding-box/get-corners (cone/cone :closed false, :minimum -4, :maximum 4)))))
   (testing "Bounding box for a cone between -4, 4"
     (is (= [(point/point -4.0 -4.0 -4.0)
@@ -48,16 +48,16 @@
 
 (deftest test-constructor
   (testing "The default minimum and maximum for a cone"
-    (is (= Double/POSITIVE_INFINITY (:maximum a-cone)))
-    (is (= Double/NEGATIVE_INFINITY (:minimum a-cone))))
+    (is (= const/inf (:maximum a-cone)))
+    (is (= const/neg-inf (:minimum a-cone))))
   (testing "A cone can be created with a set minimum"
     (let [cone (cone/cone :minimum 12)]
-      (is (= Double/POSITIVE_INFINITY (:maximum cone)))
+      (is (= const/inf (:maximum cone)))
       (is (= 12 (:minimum cone)))))
   (testing "A cone can be created with a set maximum"
     (let [cone (cone/cone :maximum 100)]
       (is (= 100 (:maximum cone)))
-      (is (= Double/NEGATIVE_INFINITY (:minimum a-cone)))))
+      (is (= const/neg-inf (:minimum a-cone)))))
   (testing "A cone can be created with a set minimum and maximum"
     (let [cone (cone/cone :maximum 100 :minimum 12)]
       (is (= 12 (:minimum cone)))

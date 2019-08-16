@@ -119,8 +119,7 @@
 (defn compute-finite-corners
   "Return the bounding box for a closed cone"
   [cone]
-  (:pre [(:closed cone)
-         (<= (:minimum cone) (:maximum cone))])
+  (:pre [(<= (:minimum cone) (:maximum cone))])
   (let [minimum (:minimum cone)
         maximum (:maximum cone)
         size (max (Math/abs (float minimum))
@@ -144,10 +143,7 @@
                                              (matrix/transform (:inverse-transform this) point))))))
   bounding-box/BoundingBox
   (get-corners [this]
-    (if (:closed this)
-      (compute-finite-corners this)
-      (vector (point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
-              (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY))))
+    (compute-finite-corners this))
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
@@ -156,8 +152,8 @@
 (defn cone 
   [& {:as args-map}]
   (let [args (merge {:transform matrix/identity-matrix
-                     :minimum Double/NEGATIVE_INFINITY
-                     :maximum Double/POSITIVE_INFINITY}
+                     :minimum const/neg-inf
+                     :maximum const/inf}
                     args-map)]
     (let [transform (:transform args)
           inverse (matrix/invert transform 4)]
