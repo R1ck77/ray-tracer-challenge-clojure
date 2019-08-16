@@ -15,7 +15,22 @@
 Infinites are not composed, so if any point of the shape is infinite, the shape will be"
   [shape]
   (not (empty?
-    (filter is-infinite-point? (bounding-box/get-transformed-points shape)))))
+        (filter is-infinite-point? (bounding-box/get-transformed-points shape)))))
+
+
+(defn- sort-shapes [shapes predicate positive-key negative-key]
+  (reduce (fn sort-shape [acc shape]
+            (update acc
+                    (if (predicate shape)
+                      positive-key
+                      negative-key)
+                    #(conj % shape)))
+          {positive-key []
+           negative-key []}
+          shapes))
+
+(defn- sort-infinite-shapes [shapes]
+  (sort-shapes shapes is-infinite? :infinite :finite))
 
 (defn- bisect-recursively [group max-size]
   (println "* Warning: optimization not yet implemented!")
