@@ -18,8 +18,8 @@
 
 (deftest test-bounding-box-protocol
   (testing "Bounding box for an infinite cylinder"
-    (is (= [(point/point Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY Double/NEGATIVE_INFINITY)
-            (point/point Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY Double/POSITIVE_INFINITY)]
+    (is (= [(point/point -1.0 -4.0 -1.0)
+            (point/point 1.0 4.0 1.0)]
            (bounding-box/get-corners (cylinder/cylinder :closed false, :minimum -4, :maximum 4)))))
   (testing "Bounding box for a cylinder between -4, 4"
     (is (= [(point/point -1.0 -4.0 -1.0)
@@ -127,16 +127,16 @@
 
 (deftest test-constructor
   (testing "The default minimum and maximum for a cylinder"
-    (is (= Double/POSITIVE_INFINITY (:maximum a-cylinder)))
-    (is (= Double/NEGATIVE_INFINITY (:minimum a-cylinder))))
+    (is (= const/inf (:maximum a-cylinder)))
+    (is (= const/neg-inf (:minimum a-cylinder))))
   (testing "A cylinder can be created with a set minimum"
     (let [cylinder (cylinder/cylinder :minimum 12)]
-      (is (= Double/POSITIVE_INFINITY (:maximum cylinder)))
+      (is (= const/inf (:maximum cylinder)))
       (is (= 12 (:minimum cylinder)))))
   (testing "A cylinder can be created with a set maximum"
     (let [cylinder (cylinder/cylinder :maximum 100)]
       (is (= 100 (:maximum cylinder)))
-      (is (= Double/NEGATIVE_INFINITY (:minimum a-cylinder)))))
+      (is (= const/neg-inf (:minimum a-cylinder)))))
   (testing "A cylinder can be created with a set minimum and maximum"
     (let [cylinder (cylinder/cylinder :maximum 100 :minimum 12)]
       (is (= 12 (:minimum cylinder)))
