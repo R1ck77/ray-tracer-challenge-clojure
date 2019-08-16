@@ -1,6 +1,21 @@
 (ns raytracer.shapes.optimizers.bisection-recursive
   (:require [raytracer.shapes.optimizers.optimizer :as optimizer]
-           [raytracer.shapes.group :as group]))
+            [raytracer.const :as const]
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.group :as group]))
+
+(defn- is-infinite-point? [{x :x, y :y, z :z}]
+  (or (>= (Math/abs (float x)) const/inf)
+      (>= (Math/abs (float y)) const/inf)
+      (>= (Math/abs (float z)) const/inf)))
+
+(defn is-infinite?
+  "Returns true if the extension of a shape is infinite.
+
+Infinites are not composed, so if any point of the shape is infinite, the shape will be"
+  [shape]
+  (not (empty?
+    (filter is-infinite-point? (bounding-box/get-transformed-points shape)))))
 
 (defn- bisect-recursively [group max-size]
   (println "* Warning: optimization not yet implemented!")
