@@ -48,3 +48,17 @@
     (is (not (box/contains (box/box (point/point -1 -1 -1)
                                     (point/point 1 1 0.999))
                            (shapes/sphere))))))
+
+(deftest test-partition
+  (testing "partition on generic boxes returns a set with 8 new boxes"
+    (let [result (box/bisect (box/box (point/point 0 0 0)
+                                         (point/point 1 1 1)))]
+      (is (= 8 (count result)))
+      (is (set? result))))
+  (testing "partition works on degenerate boxes, but returns less elements"
+    (is (= 1 (count (box/bisect (box/box (point/point 0 0 0)
+                                         (point/point 0 0 0))))))
+    (is (= 2 (count (box/bisect (box/box (point/point 0 2 0)
+                                         (point/point 1 2 0))))))
+    (is (= 4 (count (box/bisect (box/box (point/point 0 0 0)
+                                         (point/point 1 2 0))))))))
