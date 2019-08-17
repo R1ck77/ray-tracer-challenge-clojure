@@ -16,10 +16,10 @@
   {:pre [(ordered? min-point max-point)]}
   (->Box min-point max-point))
 
-(defn- contains-shape [box shape]
+(defn- contains-shape [container shape]
   (let [shape-box (apply box (bounding-box/get-transformed-points shape))]
-    (and (compare-points <= (:min-point box) (:min-point shape-box))
-         (compare-points >= (:max-point box) (:min-point shape-box)))))
+    (and (compare-points <= (:min-point container) (:min-point shape-box))
+         (compare-points >= (:max-point container) (:max-point shape-box)))))
 
 (defn- create-sub-boxes
   "Returns a set of 8 vectors containing the points with the extremes of the original group bisection"
