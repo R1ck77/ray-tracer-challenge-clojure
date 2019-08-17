@@ -9,6 +9,19 @@
       (>= (Math/abs (float y)) const/inf)
       (>= (Math/abs (float z)) const/inf)))
 
+(defn- compute-extremes
+  "Return the size of a bounding box containing all shapes"
+  [shapes]
+  (bounding-box/get-corners (group/group shapes)))
+
+
+(defn- partition-shapes
+  "Recursively partition each group into at most max-size objects"
+  [shapes max-size]
+  (let [[min-point max-point] (compute-extremes shapes)]
+    
+    ))
+
 (defn is-infinite?
   "Returns true if the extension of a shape is infinite.
 
@@ -18,7 +31,11 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
         (filter is-infinite-point? (bounding-box/get-transformed-points shape)))))
 
 
-(defn- sort-shapes [shapes predicate positive-key negative-key]
+(defn- sort-shapes
+  "sort shapes and put them in a dictionary depending how they are classified by the predicate
+
+  Shapes passing the test go in a vector under 'positive-key' and the other in a vector in 'negative-key'"
+  [shapes predicate positive-key negative-key]
   (reduce (fn sort-shape [acc shape]
             (update acc
                     (if (predicate shape)
@@ -29,12 +46,19 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
            negative-key []}
           shapes))
 
-(defn- sort-infinite-shapes [shapes]
+(defn- sort-infinite-shapes
+  "sort shapes in a dictionary {:finite [], :infinite []} depending on the size"
+  [shapes]
   (sort-shapes shapes is-infinite? :infinite :finite))
 
-(defn- bisect-recursively [group max-size]
-  (println "* Warning: optimization not yet implemented!")
-  group)
+(defn- bisect-recursively
+  "Create a spatially balanced tree of groups of shapes
+
+  Infinite shapes are ignored and kept in a special group, the other are split in some way"
+  [group max-size]
+  (let [{finite :finite, infinite :infinite} (sort-infinite-shapes (:children group))]
+    (group/group (conj (partition-shapes finite max-size)
+                       (group/group infinite)))))
 
 (defn create [max-size]
   (reify optimizer/GroupOptimizer
