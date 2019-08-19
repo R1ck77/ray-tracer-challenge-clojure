@@ -15,7 +15,14 @@
     (let [sphere (shapes/sphere)
           intersection (intersection/intersection 2.4 sphere)]
       (is (identical? sphere (:object intersection)))
-      (is (= 2.4 (:t intersection))))))
+      (is (= 2.4 (:t intersection)))
+      (is (nil? (intersection/getUV intersection)))))
+  (testing "create a new uv intersection"
+    (let [sphere (shapes/sphere)
+          intersection (intersection/uv-intersection 2.4 sphere 0.2 0.5)]
+      (is (identical? sphere (:object intersection)))
+      (is (= 2.4 (:t intersection)))
+      (is (= [0.2 0.5] (intersection/getUV intersection))))))
 
 (deftest test-intersections
   (testing "exciting \"intersections\" function"

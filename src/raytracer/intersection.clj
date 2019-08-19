@@ -6,10 +6,22 @@
             [raytracer.matrix :as matrix]
             [raytracer.material :as material]))
 
-(defrecord Intersection [t object])
+(defprotocol TextureCoordinatesProvider
+  (getUV [this] "Return a vector with the s and t coordinates or nil") )
+
+(defrecord Intersection [t object]
+  TextureCoordinatesProvider
+  (getUV [this] nil))
 
 (defn intersection [t object]
   (->Intersection t object))
+
+(defrecord UVIntersection [t object u v]
+  TextureCoordinatesProvider
+  (getUV [this] [u v]))
+
+(defn uv-intersection [t object u v]
+  (->UVIntersection t object u v))
 
 (defn intersections [ & args]
   (vec args))
