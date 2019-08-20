@@ -5,6 +5,8 @@
             [raytracer.shapes.bounding-box :as bounding-box]
             [raytracer.shapes.group :as group]))
 
+(def ^:dynamic *debug-logs* false)
+
 (defn- is-infinite-point? [{x :x, y :y, z :z}]
   (or (>= (Math/abs (float x)) const/inf)
       (>= (Math/abs (float y)) const/inf)
@@ -41,7 +43,7 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
 ;;;; STUFF TO MOVE ABOVE THIS POINT
 
 (defn- debug-print-intermediate [{:keys [sub-boxes, outliers] :as result}]
-  (println "Results: " (map count (vals sub-boxes)) "Outliers: " (count outliers))
+  (if *debug-logs* (println "Results: " (map count (vals sub-boxes)) "Outliers: " (count outliers)))
   result)
 
 (def partition-shapes)
@@ -78,7 +80,8 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
 (defn- partition-shapes
   "Recursively partition each group into at most max-size objects, returns a list of shapes"
   [shapes max-size]
-  (if (not (zero? (count shapes)))
+  (if (and *debug-logs*
+           (not (zero? (count shapes))))
     (println (format "%d shapes (vs %d)" (count shapes) max-size)))
   (if (<= (count shapes) max-size)
     shapes
@@ -99,7 +102,7 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
   Infinite shapes are ignored and kept in a special group, the other are split in some way"
   [group max-size]
   {:pre [(satisfies? group/Parent group)]}
-  (println (format "Group of %d children" (count (:children group))))
+  (if *debug-logs* (println (format "Group of %d children" (count (:children group)))))
   (group/set-children group (-> group
                                 :children
                                 (partition-children max-size)
