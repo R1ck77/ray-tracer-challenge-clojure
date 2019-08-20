@@ -23,8 +23,9 @@
                   v (* f (tuple/dot direction origin-cross-e1))]
               (if (or (< v 0) (> (+ v u) 1))
                 []
-                [(intersection/intersection (* f (tuple/dot e2 origin-cross-e1))
-                                            triangle)]))))))))
+                [(intersection/uv-intersection (* f (tuple/dot e2 origin-cross-e1))
+                                            triangle
+                                            u v)]))))))))
 
 (defrecord Triangle [p1 p2 p3 e1 e2 normal material transform inverse-transform inverse-transposed-transform]
   shared/Transformable
