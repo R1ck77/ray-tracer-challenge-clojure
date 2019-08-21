@@ -14,6 +14,7 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as sshared]
             [raytracer.shapes-test :as shapes-test]
+            [raytracer.shapes.smooth-triangle :as smooth-triangle]
             [raytracer.svector :as svector]
             [raytracer.transform :as transform]
             [raytracer.world :as world]
@@ -117,7 +118,23 @@
           z-point (:z (:point intermediate-result))
           z-under-point (:z (:under-point intermediate-result))]
       (is (<= (* 0.5 const/EPSILON) z-under-point))
-      (is (< z-point z-under-point)))))
+      (is (< z-point z-under-point))))
+  (testing "Preparing the normal on a smooth triangle"
+    (let [tri (smooth-triangle/smooth-triangle (point/point 0 1 0)
+                                               (point/point -1 0 0)
+                                               (point/point 1 0 0)
+                                               (svector/svector 0 1 0)
+                                               (svector/svector -1 0 0)
+                                               (svector/svector 1 0 0))
+          intersection (intersection/uv-intersection 1 tri 0.45 0.25)
+          ray (ray/ray (point/point -0.2 0.3 -2)
+                       (svector/svector 0 0 1))
+          intermediate-result (world/prepare-computations (:hierarchy (world/world [tri]))
+                                                          ray
+                                                          intersection
+                                                          dummy-indices)]
+      (is (ta/t= (svector/svector -0.5547, 0.83205, 0)
+                 (:normal-v intermediate-result))))))
 
 (deftest test-shade-hit
   (testing "Shading an intersection"
