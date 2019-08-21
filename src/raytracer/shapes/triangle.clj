@@ -35,8 +35,13 @@
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
   shared/Surface
+  (compute-normal [this point _]
+    (shared/compute-normal this point))
   (compute-normal [this point]
-    normal)
+    ;;; TODO/FIXME adding a change-transform would allow to optimize here a lot!
+    (tuple/normalize
+     (shared/as-vector
+      (matrix/transform (:inverse-transposed-transform this) normal))))
   bounding-box/BoundingBox
   (get-corners [this]
     (bounding-box/extremes-from-points [p1 p2 p3]))
