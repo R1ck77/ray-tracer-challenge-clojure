@@ -29,10 +29,13 @@
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))
   shared/Surface
-  (compute-normal [this _]
-    (shared/as-vector
-     (matrix/transform (:inverse-transposed-transform this)
-                       (svector/svector 0 1 0))))
+  (compute-normal
+    ([this _ _]
+     (shared/compute-normal this nil))
+    ([this _]
+     (shared/as-vector
+      (matrix/transform (:inverse-transposed-transform this)
+                        (svector/svector 0 1 0)))))
     bounding-box/BoundingBox
     (get-corners [this]
       (vector (point/point const/neg-inf 0.0 const/neg-inf)

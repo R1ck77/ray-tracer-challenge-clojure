@@ -135,12 +135,15 @@
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
   shared/Surface
-  (compute-normal [this point]
-    (tuple/normalize
-     (shared/as-vector
-      (matrix/transform (:inverse-transposed-transform this)
-                        (compute-cone-normal this
-                                             (matrix/transform (:inverse-transform this) point))))))
+  (compute-normal
+    ([this point _]
+     (shared/compute-normal this point))
+    ([this point]
+     (tuple/normalize
+      (shared/as-vector
+       (matrix/transform (:inverse-transposed-transform this)
+                         (compute-cone-normal this
+                                              (matrix/transform (:inverse-transform this) point)))))))
   bounding-box/BoundingBox
   (get-corners [this]
     (compute-finite-corners this))

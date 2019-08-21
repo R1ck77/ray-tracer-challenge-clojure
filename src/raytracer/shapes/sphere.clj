@@ -49,8 +49,11 @@
   (local-intersect [this ray-in-sphere-space]
     (intersect-sphere-space this ray-in-sphere-space))
   shared/Surface
-  (compute-normal [this point]
-    (compute-normal this point))
+  (compute-normal
+    ([this point _]
+     (shared/compute-normal this point))
+   ([this point]
+    (compute-normal this point)))
   bounding-box/BoundingBox
   (get-corners [this]
     (vector (point/point -1 -1 -1)

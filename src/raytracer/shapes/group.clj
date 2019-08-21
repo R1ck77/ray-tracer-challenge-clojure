@@ -76,6 +76,8 @@
   shared/Surface
   (compute-normal [this point]
     (throw (UnsupportedOperationException. "Normal of group computed")))
+  (compute-normal [this point _]
+    (throw (UnsupportedOperationException. "Normal of group computed")))
   bounding-box/BoundingBox
   (hit [this ray]
     (let [result (aabb-intersection/hit aabb-extremes ray)]

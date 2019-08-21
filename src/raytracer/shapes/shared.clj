@@ -7,7 +7,7 @@
   (local-intersect [this ray]))
 
 (defprotocol Surface
-  (compute-normal [this point]))
+  (compute-normal [this point] [this point intersection]))
 
 (defprotocol Transformable
   (transform [this transform]))

@@ -73,8 +73,8 @@
 (defn- is-inside? [eye-v normal-v]
   (< (tuple/dot eye-v normal-v) 0))
 
-(defn- compute-surface-parameters [hierarchy ray object point eye-v]
-  (let [basic-normal-v (shared/compute-normal object point)
+(defn- compute-surface-parameters [hierarchy ray object point eye-v intersection]
+  (let [basic-normal-v (shared/compute-normal object point intersection)
         inside (is-inside? eye-v basic-normal-v)
         normal-v (if inside (tuple/neg basic-normal-v) basic-normal-v)]
     {:inside inside     
@@ -96,7 +96,7 @@
             :eye-v eye-v
             :t (:t intersection)}
            refractive-indices
-           (compute-surface-parameters hierarchy ray object point eye-v))))
+           (compute-surface-parameters hierarchy ray object point eye-v intersection))))
 
 (defn- filtered-transparencies [intersections light-distance]
   (map #(-> % :object :material :transparency)
