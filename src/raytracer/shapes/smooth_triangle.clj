@@ -27,6 +27,12 @@
                                                triangle
                                                u v)]))))))))
 
+(defn compute-interpolated-normal [triangle intersection]
+  (let [[u v] (intersection/getUV intersection)]
+    (tuple/add (tuple/mul (:n1 triangle) (- 1 u v))
+               (tuple/add (tuple/mul (:n2 triangle) u)
+                          (tuple/mul (:n3 triangle) v)))))
+
 (defrecord SmoothTriangle [p1 p2 p3 n1 n2 n3 e1 e2 material transform inverse-transform inverse-transposed-transform]
   shared/Transformable
   (transform [this transform-matrix]
@@ -36,7 +42,12 @@
     (local-intersect-triangle this ray-in-sphere-space))
   shared/Surface
   (compute-normal [this point]
-    (throw (UnsupportedOperationException. "Operation not yet supported")))
+    (throw (UnsupportedOperationException. "Operation not supported")))
+  (compute-normal [this _ intersection]
+    (tuple/normalize
+     (shared/as-vector
+      (matrix/transform (:inverse-transposed-transform this)
+       (compute-interpolated-normal this intersection)))))
   bounding-box/BoundingBox
   (get-corners [this]
     (bounding-box/extremes-from-points [p1 p2 p3]))
