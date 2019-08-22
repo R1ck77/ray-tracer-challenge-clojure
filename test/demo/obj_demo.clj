@@ -40,8 +40,8 @@
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                        (world/view-transform (point/point 0 2.0 -5)
-                                              (point/point 0 0 0)
+                        (world/view-transform (point/point 0 2.0 -10)
+                                              (point/point 0 0.5 0)
                                               (svector/svector 0 1 0))))
 
 (defn- load-astronaut []
