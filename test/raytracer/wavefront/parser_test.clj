@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [raytracer.test-utils :as tu]
             [raytracer.point :as point]
+            [raytracer.svector :as svector]
             [raytracer.shapes.triangle :as triangle]
             [raytracer.wavefront.parser :as parser]))
 
@@ -27,6 +28,16 @@ v 1 1 0")]
                  (get (:vertices result) 3)))
       (is (tu/t= (point/point 1 1 0)
                  (get (:vertices result) 4)))))
+  (testing "Vertex normal records"
+    (let [result (parser/parse "vn 0 0 1
+vn 0.707 0 -0.707
+vn 1 2 3")]
+      (is (tu/t= (svector/svector 0 0 1)
+                 (get (:normals result) 1)))
+      (is (tu/t= (svector/svector 0.707 0 -0.707)
+                 (get (:normals result) 2)))
+      (is (tu/t= (svector/svector 1 2 3)
+                 (get (:normals result) 3)))))  
   (testing "Parsing triangle faces"
     (let [result (parser/parse "v -1 1 0
 v -1 0 0
@@ -43,7 +54,7 @@ f 1 3 4")
       (is (= (triangle/triangle (get vertices 1)
                                 (get vertices 3)
                                 (get vertices 4))
-             (get default-group 2)))))
+             (get default-group 2)))))  
   (testing "Parsing polygon faces"
     (let [results (parser/parse "v -1 1 0
 v -1 0 0

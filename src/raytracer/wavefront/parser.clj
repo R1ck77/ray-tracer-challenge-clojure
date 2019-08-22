@@ -1,6 +1,7 @@
 (ns raytracer.wavefront.parser
   (:require [clojure.string :as string]
             [raytracer.point :as point]
+            [raytracer.svector :as svector]
             [raytracer.shapes.triangle :as triangle]))
 
 (defn- tokens [line]
@@ -14,6 +15,7 @@
 
 (defmulti parse-tokens #'parse-tokens-dispatch)
 
+;;; TODO/FIXME Just as vn, except for the normal part
 (defmethod parse-tokens "v"
   [acc line]
   (let [tokens (tokens line)]
@@ -22,6 +24,16 @@
             (fn [vertices]
               ;;; that "str" is bad
               (conj vertices (apply point/point (mapv #(Double/valueOf (str %)) (rest tokens))))))))
+
+;;; TODO/FIXME just as v, except for the point part
+(defmethod parse-tokens "vn"
+  [acc line]
+  (let [tokens (tokens line)]
+    (update acc
+            :normals
+            (fn [vertices]
+              ;;; that "str" is bad
+              (conj vertices (apply svector/svector (mapv #(Double/valueOf (str %)) (rest tokens))))))))
 
 (defn- triangles-from-vertices [grouped-vertices]
   (mapv #(apply triangle/triangle %) grouped-vertices))
@@ -76,6 +88,7 @@
           {:current-group :default-group
            :ignored []
            :vertices [nil]
+           :normals [nil]
            :groups {:default-group [nil]}}
           (string/split-lines text)))
 
