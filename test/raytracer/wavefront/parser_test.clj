@@ -4,10 +4,10 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.shapes.triangle :as triangle]
+            [raytracer.shapes.smooth-triangle :as smooth-triangle]
             [raytracer.wavefront.parser :as parser]))
 
-
-(deftest test-parser
+(deftest test-parse-vertex-data
   (testing "Ignoring unrecognized lines"
     (let [result (parser/parse "There was a young lady named Bright
 who traveled much faster than light.
@@ -37,7 +37,9 @@ vn 1 2 3")]
       (is (tu/t= (svector/svector 0.707 0 -0.707)
                  (get (:normals result) 2)))
       (is (tu/t= (svector/svector 1 2 3)
-                 (get (:normals result) 3)))))  
+                 (get (:normals result) 3))))))
+
+(deftest test-parse-faces
   (testing "Parsing triangle faces"
     (let [result (parser/parse "v -1 1 0
 v -1 0 0
@@ -76,6 +78,29 @@ f 1 2 3 4 5")
                                 (get vertices 4)
                                 (get vertices 5))
              (get default-group 3)))))
+  (testing "Faces with normals"
+    (let [result (parser/parse "v 0 1 0
+v -1 0 0
+v 1 0 0
+
+vn -1 0 0
+vn 1 0 0
+vn 0 1 0
+
+f 1//3 2//1 3//2
+f 1/0/3 2/102/1 3/14/2 ")
+          default-group (-> result :groups :default-group)
+          [_ t1 t2] default-group]
+      (is (= (smooth-triangle/smooth-triangle (point/point 0.0 1.0 0.0)
+                                              (point/point -1.0 0.0 0.0)
+                                              (point/point 1.0 0.0 0.0)
+                                              (svector/svector 0.0 1.0 0.0)
+                                              (svector/svector -1.0 0.0 0.0)
+                                              (svector/svector 1.0 0.0 0.0))
+             t1))
+      (is (= t1 t2)))))
+
+(deftest test-parse-groups
   (testing "Triangles in groups"
     (let [results (parser/parse "v -1 1 0 
 v -1 0 0 
@@ -102,4 +127,3 @@ f 1 3 4")
                                  (get vertices 3)
                                  (get vertices 4))]
              second-group)))))
-
