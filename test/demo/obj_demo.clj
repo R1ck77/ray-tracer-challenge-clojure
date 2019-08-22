@@ -40,7 +40,7 @@
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                        (world/view-transform (point/point 0 2.0 -10)
+                        (world/view-transform (point/point 0 1.0 -2)
                                               (point/point 0 0.5 0)
                                               (svector/svector 0 1 0))))
 
@@ -51,7 +51,9 @@
                   java.util.zip.GZIPInputStream.
                   obj/obj)]
     (println "Astronaut model loaded…")
-    model))
+    (shared/change-transform model (transform/translate -1/4 1/2 0
+                                                        (transform/scale 0.1 0.1 0.1
+                                                                         (transform/rotate-y (/ Math/PI 2)))))))
 
 (defn- load-teapot []
   (let [model (obj/obj (clojure.java.io/resource "obj/teapot.obj"))]
