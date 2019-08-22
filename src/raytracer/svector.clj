@@ -9,4 +9,4 @@
      max-error))
 
 (defn svector [x y z]
-  (tuple/tuple x y z 0))
+  (tuple/tuple x y z 0.0))
