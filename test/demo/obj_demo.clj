@@ -1,5 +1,6 @@
 (ns demo.obj-demo
-  (:require [raytracer.point :as point]
+  (:require [clojure.java.io :as io]
+            [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.tuple :as tuple]
             [raytracer.canvas :as canvas]            
@@ -22,6 +23,7 @@
 
 (def ^:dynamic *output-file* "obj-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
+(def ^:dynamic *wavefront-model* :astronaut) ; either astronaut or teapot
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -42,8 +44,24 @@
                                               (point/point 0 0 0)
                                               (svector/svector 0 1 0))))
 
-(defn load-wavefront []
-  (obj/obj (clojure.java.io/resource "obj/teapot.obj")))
+(defn- load-astronaut []
+  (let [model (-> "astronaut1/astronaut1.obj.gz"
+                  io/resource
+                  io/input-stream
+                  java.util.zip.GZIPInputStream.
+                  obj/obj)]
+    (println "Astronaut model loaded…")
+    model))
+
+(defn- load-teapot []
+  (let [model (obj/obj (clojure.java.io/resource "obj/teapot.obj"))]
+    (println "Teapot model loaded…")
+    model))
+
+(defn- load-wavefront []
+  (case *wavefront-model*
+    :astronaut (load-astronaut)
+    :teapot (load-teapot)))
 
 (defn render-demo
   ([] (apply render-demo *image-resolution*))
