@@ -8,7 +8,8 @@
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.intersection :as intersection]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (defn- check-cap [ray t]
   (let [point (tuple/add (:origin ray) (tuple/mul (:direction ray) t))
@@ -105,12 +106,12 @@
   (vector (point/point -1.0 (float (:minimum cone)) -1.0)
           (point/point 1.0 (float (:maximum cone)) 1.0)))
 
-(defrecord Cylinder [minimum maximum closed transform inverse-transform inverse-transposed-transform])
+(defrecord Cylinder [minimum maximum closed placement])
 
 (extend-type Cylinder
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
@@ -121,16 +122,16 @@
     ([this point]
      (tuple/normalize
       (shared/as-vector
-       (matrix/transform (:inverse-transposed-transform this)
+       (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
                          (compute-cylinder-normal this
-                                                  (matrix/transform (:inverse-transform this) point)))))))
+                                                  (matrix/transform (-> this :placement placement/get-inverse-transform) point)))))))
   bounding-box/BoundingBox
   (get-corners [this]
     (compute-finite-corners this))
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (-> this :placement placement/get-transform))))
 
 (defn cylinder 
   [& {:as args-map}]
@@ -138,11 +139,7 @@
                      :minimum const/neg-inf
                      :maximum const/inf}
                     args-map)]
-    (let [transform (:transform args)
-          inverse (matrix/invert transform 4)]
-      (->Cylinder (:minimum args)
-                  (:maximum args)
-                  (:closed args)
-                  transform
-                  inverse
-                  (matrix/transpose inverse)))))
+    (->Cylinder (:minimum args)
+                (:maximum args)
+                (:closed args)
+                (-> args :transform placement/placement))))

@@ -36,7 +36,7 @@
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.00001 0))))
+               (shared/change-transform (transform/translate 0 -0.00001 0))))
 
 (defn- create-marble [x z]
   (let [space 0.5
@@ -106,7 +106,7 @@
                 (vector x z)))))
 
 (defn- create-marble-floor []
-  (shared/transform
+  (shared/change-transform
    (time (partition-marbles (create-all-marbles *marbles-side*) *maximum-group-size*))
       (transform/translate 0 0 0)))
 

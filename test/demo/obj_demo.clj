@@ -36,7 +36,7 @@
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.00001 0))))
+               (shared/change-transform (transform/translate 0 -0.00001 0))))
 
 (defn create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))

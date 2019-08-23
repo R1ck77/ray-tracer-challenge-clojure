@@ -10,7 +10,8 @@
             [raytracer.ray :as ray]            
             [raytracer.shapes.cube :as cube]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (def a-cube (cube/cube))
 
@@ -18,8 +19,8 @@
   (testing "The courtesy construction function creates a cube with material, inverse transforms and inverse transposed transform set"
     (let [cube (cube/cube)]
       (is (:material cube))
-      (is (= matrix/identity-matrix (:inverse-transform cube)))
-      (is (v= matrix/identity-matrix (:inverse-transposed-transform cube))))))
+      (is (v= matrix/identity-matrix (-> cube :placement placement/get-inverse-transform)))
+      (is (v= matrix/identity-matrix (-> cube :placement placement/get-inverse-transposed-transform))))))
 
 (deftest test-bounding-box-protocol
   (testing "The cube is its own bounding box"
@@ -72,7 +73,7 @@
   (test-compute-normal "upper corner" [1 1 1] [1 0 0])
   (test-compute-normal "lower corner" [-1 -1 -1] [-1 0 0])
   (testing "normal is computed accounting for the cube transforms"
-    (let [transformed-cube (shared/transform a-cube
+    (let [transformed-cube (shared/change-transform a-cube
                                              (transform/rotate-y Math/PI))]
       (is (t= (svector/svector 0 0 -1)
               (shared/compute-normal transformed-cube (point/point 0.2 0.1 -0.5))))))) 

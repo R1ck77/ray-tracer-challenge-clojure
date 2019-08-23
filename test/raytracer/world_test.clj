@@ -40,8 +40,8 @@
                                                    (material/with-color (color/color 0.8 1.0 0.6)
                                                      :diffuse 0.7
                                                      :specular 0.2))
-          expected-sphere2 (sshared/transform (shapes/sphere)
-                                              (transform/scale 0.5 0.5 0.5))]
+          expected-sphere2 (sshared/change-transform (shapes/sphere)
+                                                     (transform/scale 0.5 0.5 0.5))]
       (is (contains? (apply hash-set (:light-sources default-world))
                      (light-sources/create-point-light (point/point -10 10 -10)
                                                        (color/color 1 1 1))))
@@ -96,8 +96,8 @@
   (testing "The hit should offset the point"
     (let [ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
-          sphere (sshared/transform (shapes/sphere)
-                                    (transform/translate 0 0 1))
+          sphere (sshared/change-transform (shapes/sphere)
+                                           (transform/translate 0 0 1))
           intersection (intersection/intersection 5 sphere)
           intermediate (world/prepare-computations (:hierarchy (world/world [sphere]))
                                                    ray
@@ -108,7 +108,7 @@
       (is (> (:z (:point intermediate))
              (:z (:over-point intermediate))))))
   (testing "The under point is offset below the surface"
-    (let [shape (sshared/transform (shapes-test/glass-sphere) (transform/translate 0 0 1))
+    (let [shape (sshared/change-transform (shapes-test/glass-sphere) (transform/translate 0 0 1))
           intersection (intersection/intersection 5 shape)
           intermediate-result (world/prepare-computations (:hierarchy (world/world [shape]))
                                                           (ray/ray (point/point 0 0 -5)
@@ -160,8 +160,8 @@
                                   intermediate 1)))))
   (testing "shade_hit() is given an intersection in shadow"
     (let [sphere1 (shapes/sphere)
-          sphere2 (sshared/transform (shapes/sphere)
-                                     (transform/translate 0 0 10))
+          sphere2 (sshared/change-transform (shapes/sphere)
+                                            (transform/translate 0 0 10))
           world (-> (world/world)
                     (world/set-light-sources (light-sources/create-point-light (point/point 0 0 -10) (color/color 1 1 1)))
                     (world/set-objects [sphere1 sphere2]))
@@ -174,8 +174,8 @@
                  color))))
   (testing "Lighting with reflection enabled"
     (let [template-shape (shapes/plane)
-          shape (shapes/change-material (sshared/transform template-shape
-                                                           (transform/translate 0 -1 0))
+          shape (shapes/change-material (sshared/change-transform template-shape
+                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                   :reflectivity 0.5))
           world (world/add-root-object default-world shape)
@@ -186,11 +186,11 @@
                  (world/shade-hit world (world/prepare-computations (:hierarchy world) ray intersection dummy-indices) 1)))))
   (testing "shade_hit() with a transparent material"
     (let [floor (-> (shapes/plane)
-                    (sshared/transform (transform/translate 0 -1 0))
+                    (sshared/change-transform (transform/translate 0 -1 0))
                     (shapes/change-material (material/material :transparency 0.5
                                                                :refractive-index 1.5)))
           ball (-> (shapes/sphere)
-                   (sshared/transform (transform/translate 0 -3.5 -0.5))
+                   (sshared/change-transform (transform/translate 0 -3.5 -0.5))
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                              :ambient 0.5)))
           world (-> default-world
@@ -213,12 +213,12 @@
     (let [ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))
           floor (-> (shapes/plane)
-                    (sshared/transform (transform/translate 0 -1 0))
+                    (sshared/change-transform (transform/translate 0 -1 0))
                     (shapes/change-material (material/material :reflectivity 0.5
                                                                :transparency 0.5
                                                                :refractive-index 1.5)))
           ball (-> (shapes/sphere)
-                   (sshared/transform (transform/translate 0 -3.5 -0.5))
+                   (sshared/change-transform (transform/translate 0 -3.5 -0.5))
                    (shapes/change-material (material/with-color (color/color 1 0 0)
                                              :ambient 0.5)))
           world (-> default-world
@@ -260,8 +260,8 @@
                                                   (color/color 1 1 1))
           reflective-plane (shapes/change-material (shapes/plane)
                                                    (material/material :reflectivity 1))
-          lower-plane (sshared/transform reflective-plane (transform/translate 0 -1 0))
-          upper-plane (sshared/transform reflective-plane (transform/translate 0 1 0))
+          lower-plane (sshared/change-transform reflective-plane (transform/translate 0 -1 0))
+          upper-plane (sshared/change-transform reflective-plane (transform/translate 0 1 0))
           world (-> default-world
                     (world/set-light-sources light)
                     (world/set-objects [lower-plane upper-plane]))]
@@ -302,13 +302,13 @@
                    (shapes/update-material (fn [_] (material/material :transparency 0.0))))
         floor1 (-> (shapes/plane)
                    (shapes/update-material (fn [_] (material/material :transparency 0.2)))
-                   (sshared/transform (transform/translate 0 10 0)))
+                   (sshared/change-transform (transform/translate 0 10 0)))
         floor2 (-> (shapes/plane)
                    (shapes/update-material (fn [_] (material/material :transparency 0.3)))
-                   (sshared/transform (transform/translate 0 20 0)))
+                   (sshared/change-transform (transform/translate 0 20 0)))
         floor3 (-> (shapes/plane)
                    (shapes/update-material (fn [_] (material/material :transparency 0.4)))
-                   (sshared/transform (transform/translate 0 30 0)))]
+                   (sshared/change-transform (transform/translate 0 30 0)))]
     (-> (world/world)
         (world/set-objects [floor0 floor1 floor2 floor3])
         (world/set-light-sources (light-sources/create-point-light (apply point/point light-position)
@@ -380,8 +380,8 @@
                                         1)))))
   (testing "The reflected color for a reflective material"
     (let [template-shape (shapes/plane)
-          shape (shapes/change-material (sshared/transform template-shape
-                                                           (transform/translate 0 -1 0))
+          shape (shapes/change-material (sshared/change-transform template-shape
+                                                                  (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                   :reflectivity 0.5))
           world (world/add-root-object default-world shape)
@@ -393,7 +393,7 @@
   (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
                     (shapes/change-material (material/material :reflectivity 0.5))
-                    (sshared/transform (transform/translate 0 -1 0)))
+                    (sshared/change-transform (transform/translate 0 -1 0)))
           world (world/set-objects default-world [plane])
           ray (ray/ray (point/point 0 0 -3)
                        (svector/svector 0 (- const/half√2) const/half√2))

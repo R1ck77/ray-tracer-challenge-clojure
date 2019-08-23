@@ -10,7 +10,8 @@
             [raytracer.transform :as transform]
             [raytracer.ray :as ray]
             [raytracer.shapes.plane :as plane]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (def a-plane (plane/plane))
 
@@ -23,8 +24,10 @@
 (deftest test-constructor
   (testing "The courtesy constructor function fills material, inverse transform and its transpose"
     (is (:material (plane/plane)))
-    (is (= matrix/identity-matrix (:inverse-transform (plane/plane))))
-    (is (v= matrix/identity-matrix (:inverse-transposed-transform (plane/plane))))))
+    (is (v= matrix/identity-matrix
+           (-> (plane/plane) :placement placement/get-inverse-transform)))
+    (is (v= matrix/identity-matrix
+            (-> (plane/plane) :placement placement/get-inverse-transposed-transform)))))
 
 (deftest test-plane-normal
   (let [expected-normal (svector/svector 0 1 0)]
@@ -36,7 +39,7 @@
       (is (t= expected-normal
               (shared/compute-normal a-plane (point/point 5 0 150)))))
     (testing "The normal of the plane is computed accounting for the transform"
-      (let [transformed-plane (shared/transform a-plane
+      (let [transformed-plane (shared/change-transform a-plane
                                                 (transform/rotate-x (/ Math/PI 2)))]
         (is (t= (svector/svector 0 0 1)
                 (shared/compute-normal transformed-plane

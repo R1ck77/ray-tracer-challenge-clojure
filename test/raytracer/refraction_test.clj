@@ -19,13 +19,13 @@
 (deftest test-compute-refractive-indices
     (testing "Finding n1 and n2 at various intersections"
     (let [sphere-a (-> (shapes-test/glass-sphere)
-                       (shared/transform (transform/scale 2 2 2))
+                       (shared/change-transform (transform/scale 2 2 2))
                        (shapes/update-material #(material/update-material % :refractive-index 1.5)))
           sphere-b (-> (shapes-test/glass-sphere)
-                       (shared/transform (transform/translate 0 0 -0.25))
+                       (shared/change-transform (transform/translate 0 0 -0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.0)))
           sphere-c (-> (shapes-test/glass-sphere)
-                       (shared/transform (transform/translate 0 0 0.25))
+                       (shared/change-transform (transform/translate 0 0 0.25))
                        (shapes/update-material #(material/update-material % :refractive-index 2.5)))
           ray (ray/ray (point/point 0 0 -4)
                        (svector/svector 0 0 1))

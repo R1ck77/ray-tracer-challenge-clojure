@@ -29,7 +29,7 @@
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.0001 0))))
+               (shared/change-transform (transform/translate 0 -0.0001 0))))
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
@@ -37,7 +37,7 @@
                                                                                                                    (color/color 1 1 1))
                                                                                                    (transform/scale 0.2 0.2 0.2
                                                                                                                     (transform/rotate-y (/ Math/PI 5))))))
-                     (shared/transform (->> (transform/scale 0.33 0.33 0.33)
+                     (shared/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                             (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
@@ -46,7 +46,7 @@
                                                                   :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
                                                                                                                        (color/color 0 0 1))
                                                                                                      (transform/rotate-x (/ Math/PI 2)))))
-                       (shared/transform (transform/translate -0.5 1 0.5))))
+                       (shared/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (material/material :diffuse 0.7
@@ -63,7 +63,7 @@
                                                                                                                                                                         (+ (:z point) noise))))))
                                                                                                     (transform/scale 0.5 0.125 0.125
                                                                                                                      (transform/rotate-z 0.23423)))))
-                      (shared/transform (->> (transform/scale 0.5 0.5 0.5)
+                      (shared/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                              (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (world/set-light-sources (world/set-objects (world/world) [floor left-sphere middle-sphere right-sphere])

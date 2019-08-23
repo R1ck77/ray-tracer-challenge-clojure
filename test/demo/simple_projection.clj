@@ -20,7 +20,7 @@
   The screen orientation is always parallel to XY"
   []
   {:camera (point/point 0 0 -10)
-   :object (shared/transform (shapes/sphere)
+   :object (shared/change-transform (shapes/sphere)
                              (transform/scale 5 5 5))
    :screen-z 0})
 

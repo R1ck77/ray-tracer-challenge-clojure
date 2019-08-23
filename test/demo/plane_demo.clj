@@ -25,16 +25,16 @@
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (material/material :color (color/color 1 0.8 0.1), :diffuse 0.7, :specular 0.3))
-                     (shared/transform (->> (transform/scale 0.33 0.33 0.33)
+                     (shared/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                                 (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
                        (shapes/change-material (material/material :color (color/color 0.1 1 0.5), :diffuse 0.7, :specular 0.3))
-                       (shared/transform (transform/translate -0.5 1 0.5))))
+                       (shared/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
                       (shapes/change-material (material/material :color (color/color 0.5 1 0.1), :diffuse 0.7, :specular 0.3))
-                      (shared/transform (->> (transform/scale 0.5 0.5 0.5)
+                      (shared/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                  (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (world/set-light-sources (world/set-objects (world/world) [floor left-sphere middle-sphere right-sphere])

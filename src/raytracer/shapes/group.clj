@@ -11,7 +11,8 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.optimizers.optimizer :as optimizer]
             [raytracer.material :as material]
-            [raytracer.intersection :as intersection]))
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes.placement :as placement]))
 
 (def ^:dynamic *use-bounding-boxes* true)
 (def ^:dynamic *statistics* false) ; whether sampling the number of aabb hits or not
@@ -21,10 +22,10 @@
 (def group)
 
 (defn- intersect [group ray-object-space]
-  (let [transformed-ray (ray/transform ray-object-space (:inverse-transform group))]
+  (let [transformed-ray (ray/transform ray-object-space (-> group :placement placement/get-inverse-transform))]
     (sort-by :t (apply concat
                         (map #(shared/local-intersect % (ray/transform transformed-ray
-                                                                       (:inverse-transform %)))
+                                                                       (-> % :placement placement/get-inverse-transform)))
                              (:children group))))))
 
 (defn compute-extremes
@@ -63,10 +64,10 @@
 
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
-(defrecord Group [children transform inverse-transform inverse-transposed-transform aabb-extremes] ;;; TODO/FIXME this is really effed up
+(defrecord Group [children placement aabb-extremes] ;;; TODO/FIXME this is really effed up
   shared/Transformable
-  (transform [this transform-matrix]
-    (assoc (shared/change-transform this transform-matrix)
+  (change-transform [this transform-matrix]
+    (assoc (placement/change-shape-transform this transform-matrix)
            :aabb-extremes (compute-extremes transform-matrix (:children this))))
   shared/Intersectable
   (local-intersect [this ray-object-space]
@@ -84,25 +85,25 @@
       (update-statistics result)
       result))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
-    (compute-extremes transform children))
+    (compute-extremes (-> this :placement placement/get-transform) children))
   (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this)))
+                                                        (-> this :placement placement/get-transform)))
   Parent
   (get-children [this]
     children)
   (is-empty? [this] false)
   (set-children [this new-children]
     (merge this {:children new-children
-                 :aabb-extremes (compute-extremes transform new-children)}))
+                 :aabb-extremes (compute-extremes (-> this :placement placement/get-transform) new-children)}))
   Optimizer
   (optimize [this optimizer]
     (optimizer/optimize optimizer this)))
 
-(defrecord EmptyGroup [transform inverse-transform inverse-transposed-transform]
+(defrecord EmptyGroup [placement]
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))  
   shared/Intersectable
   (local-intersect [this ray-object-space]
     [])
@@ -118,23 +119,16 @@
   (is-empty? [this] true)
   (set-children [this new-children]
     (->Group new-children
-             (:transform this)
-             (:inverse-transform this)
-             (:inverse-transposed-transform this)
-             (compute-extremes (:transform this) new-children)))
+             (:placement this)
+             (compute-extremes (-> this :placement placement/get-transform) new-children)))
   Optimizer
   (optimize [this optimizer] this))
 
 (defn group [children]
   (if (empty? children)
-    (->EmptyGroup matrix/identity-matrix
-                  matrix/identity-matrix
-                  matrix/identity-matrix)
+    (->EmptyGroup (placement/placement matrix/identity-matrix))
     (->Group children
-             matrix/identity-matrix
-             matrix/identity-matrix
-             matrix/identity-matrix
+             (placement/placement matrix/identity-matrix)
              (compute-extremes matrix/identity-matrix children))))
 
 (def empty-group (group []))
-

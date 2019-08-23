@@ -6,7 +6,8 @@
             [raytracer.point :as point]
             [raytracer.svector :as svector]
             [raytracer.matrix :as matrix]
-            [raytracer.material :as material]))
+            [raytracer.material :as material]
+            [raytracer.shapes.placement :as placement]))
 
 (defprotocol RayCaster
   (intersect [this direction]))
@@ -21,7 +22,7 @@
        (matrix/transform matrix (:direction input-ray))))
 
 (defn- ray-intersection [ray shape]
-  (shared/local-intersect shape (transform ray (:inverse-transform shape))))
+  (shared/local-intersect shape (transform ray (-> shape :placement placement/get-inverse-transform))))
 
 (extend-type Ray
   RayCaster

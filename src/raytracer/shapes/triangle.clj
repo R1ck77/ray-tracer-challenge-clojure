@@ -7,7 +7,8 @@
             [raytracer.intersection :as intersection]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (defn- local-intersect-triangle [{:keys [p1 e1 e2] :as triangle} {:keys [origin direction] :as ray}]
   (let [dir-cross-e2 (tuple/cross direction e2)
@@ -27,10 +28,10 @@
                                             triangle
                                             u v)]))))))))
 
-(defrecord Triangle [p1 p2 p3 e1 e2 normal material transform inverse-transform inverse-transposed-transform]
+(defrecord Triangle [p1 p2 p3 e1 e2 normal material placement]
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
@@ -41,14 +42,14 @@
     ;;; TODO/FIXME adding a change-transform would allow to optimize here a lot!
     (tuple/normalize
      (shared/as-vector
-      (matrix/transform (:inverse-transposed-transform this) normal))))
+      (matrix/transform (-> this :placement placement/get-inverse-transposed-transform) normal))))
   bounding-box/BoundingBox
   (get-corners [this]
     (bounding-box/extremes-from-points [p1 p2 p3]))
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (-> this :placement placement/get-transform))))
 
 (defn triangle [p1 p2 p3]
   (let [edge1 (tuple/sub p2 p1)
@@ -57,6 +58,4 @@
                 edge1 edge2
                 (tuple/normalize (tuple/cross edge2 edge1))
                 (material/material)
-                matrix/identity-matrix
-                matrix/identity-matrix
-                matrix/identity-matrix)))
+                (placement/placement))))

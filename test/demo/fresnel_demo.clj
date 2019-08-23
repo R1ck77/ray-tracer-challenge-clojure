@@ -29,7 +29,7 @@
                                                          :transparency 0.0
                                                          :pattern (pattern/checker (color/color 1 1 1)
                                                                                    (color/color 0 0 0))))
-              (shared/transform (transform/rotate-x (/ Math/PI 2)
+              (shared/change-transform (transform/rotate-x (/ Math/PI 2)
                                                     (transform/translate 0 40 0)))))
 
 
@@ -42,7 +42,7 @@
                                                                  :refractive-index 1.52
                                                                  :reflectivity 0.05
                                                                  :transparency 0.95))                       
-                      (shared/transform (transform/translate 0.0 0 0.0))))
+                      (shared/change-transform (transform/translate 0.0 0 0.0))))
 
 (def air-bubble (-> (shapes/sphere)
                     (shapes/change-material (material/material :diffuse 0.01
@@ -51,7 +51,7 @@
                                                                :reflectivity 0.1
                                                                :transparency 0.99))
                     
-                    (shared/transform (transform/scale 0.98 0.98 0.98))))
+                    (shared/change-transform (transform/scale 0.98 0.98 0.98))))
 
 
 (def world (-> (world/world)

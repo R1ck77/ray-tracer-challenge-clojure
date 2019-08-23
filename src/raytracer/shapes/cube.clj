@@ -6,10 +6,10 @@
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.aabb-intersection :as aabb-intersection]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
-(defrecord Cube [material transform inverse-transform inverse-transposed-transform])
-
+(defrecord Cube [material placement])
 
 (defn- sign [value]
   (if (< value 0) -1 1))
@@ -34,8 +34,8 @@
 
 (extend-type Cube
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (aabb-intersection/local-intersect this ray-object-space))
@@ -46,9 +46,9 @@
     ([this point]
      (tuple/normalize
       (shared/as-vector
-       (matrix/transform (:inverse-transposed-transform this)
+       (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
                          (compute-cube-normal this
-                                              (matrix/transform (:inverse-transform this) point)))))))
+                                              (matrix/transform (-> this :placement placement/get-inverse-transform) point)))))))
   bounding-box/BoundingBox
   (get-corners [this]
     (vector (point/point -1 -1 -1)
@@ -56,11 +56,8 @@
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (-> this :placement placement/get-transform))))
 
 (defn cube []
   (->Cube (material/material)
-          matrix/identity-matrix
-          matrix/identity-matrix
-          matrix/identity-matrix))
-
+          (placement/placement)))

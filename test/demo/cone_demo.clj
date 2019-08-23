@@ -32,7 +32,7 @@
                                                                             matrix/identity-matrix))
         floor (-> (shapes/plane)
                   (shapes/change-material room-material)
-                  (shared/transform (transform/translate 0 -0.0001 0)))
+                  (shared/change-transform (transform/translate 0 -0.0001 0)))
         left-cone (-> (shapes/cone :minimum -1
                                    :maximum 0)
                       (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
@@ -41,7 +41,7 @@
                                                                                                                     (color/color 1 1 1))
                                                                                                     (transform/scale 0.2 0.2 0.2
                                                                                                                      (transform/rotate-y (/ Math/PI 5))))))
-                      (shared/transform (->> (transform/scale 0.75 0.75 0.75)
+                      (shared/change-transform (->> (transform/scale 0.75 0.75 0.75)
                                              (transform/translate -1.5 0.75 -1.5))))
         middle-cylinder (-> (shapes/cylinder :minimum 0
                                              :maximum 0.6
@@ -54,7 +54,7 @@
                                                                        :transparency 0.0
                                                                        :refractive-index 2.0))
                          
-                            (shared/transform (transform/translate -0.5 0 0.5)))
+                            (shared/change-transform (transform/translate -0.5 0 0.5)))
         back-cylinder (-> (shapes/cylinder :closed true
                                            :maximum 1
                                            :minimum -1)
@@ -66,7 +66,7 @@
                                                                      :transparency 0.0
                                                                      :refractive-index 0.0))
                        
-                          (shared/transform (transform/translate 1.75 2 5.5
+                          (shared/change-transform (transform/translate 1.75 2 5.5
                                                                  (transform/scale 2 2 2))))
         right-cylinder (-> (shapes/cylinder :closed true
                                             :minimum -1
@@ -85,7 +85,7 @@
                                                                                                                                                                              (+ (:z point) noise))))))
                                                                                                          (transform/scale 0.5 0.125 0.125
                                                                                                                           (transform/rotate-z 0.23423)))))
-                           (shared/transform (->> (transform/scale 0.5 0.5 0.5)
+                           (shared/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                                   (transform/translate 1.5 0.5 -0.5))))]
     (-> (world/world)
         (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)

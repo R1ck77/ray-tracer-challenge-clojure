@@ -7,7 +7,8 @@
             [raytracer.intersection :as intersection]
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (defn- local-intersect-triangle [{:keys [p1 e1 e2] :as triangle} {:keys [origin direction] :as ray}]
   (let [dir-cross-e2 (tuple/cross direction e2)
@@ -33,10 +34,10 @@
                (tuple/add (tuple/mul (:n2 triangle) u)
                           (tuple/mul (:n3 triangle) v)))))
 
-(defrecord SmoothTriangle [p1 p2 p3 n1 n2 n3 e1 e2 material transform inverse-transform inverse-transposed-transform]
+(defrecord SmoothTriangle [p1 p2 p3 n1 n2 n3 e1 e2 material placement]
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
@@ -46,7 +47,7 @@
   (compute-normal [this _ intersection]
     (tuple/normalize
      (shared/as-vector
-      (matrix/transform (:inverse-transposed-transform this)
+      (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
        (compute-interpolated-normal this intersection)))))
   bounding-box/BoundingBox
   (get-corners [this]
@@ -54,7 +55,7 @@
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (-> this :placement placement/get-transform))))
 
 (defn smooth-triangle [p1 p2 p3 n1 n2 n3]
   (let [edge1 (tuple/sub p2 p1)
@@ -63,6 +64,4 @@
                       n1 n2 n3
                       edge1 edge2                
                       (material/material)
-                      matrix/identity-matrix
-                      matrix/identity-matrix
-                      matrix/identity-matrix)))
+                      (placement/placement))))

@@ -14,8 +14,8 @@
     (is (br/is-infinite? (shapes/cylinder))))
   (testing "a shape is infinite if scaled to infinity in any direction"
     (is (not (br/is-infinite? (shapes/sphere))))
-    (is (br/is-infinite? (shared/transform (shapes/sphere)
-                                           (transform/scale Double/POSITIVE_INFINITY 0 0))))))
+    (is (br/is-infinite? (shared/change-transform (shapes/sphere)
+                                                  (transform/scale Double/POSITIVE_INFINITY 0 0))))))
 
 (deftest test-sort-infinite-shapes
   (let [sort-infinite-shapes #'raytracer.shapes.optimizers.bisection-recursive/sort-infinite-shapes]

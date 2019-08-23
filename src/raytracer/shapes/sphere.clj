@@ -6,11 +6,12 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
 (def center (point/point 0 0 0))
 
-(defrecord Sphere [material transform inverse-transform inverse-transposed-transform])
+(defrecord Sphere [material placement])
 
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
@@ -37,14 +38,14 @@
 (defn compute-normal [shape point]
   (tuple/normalize
    (shared/as-vector
-    (matrix/transform (:inverse-transposed-transform shape)
-                      (tuple/sub (matrix/transform (:inverse-transform shape) point)
+    (matrix/transform (-> shape :placement placement/get-inverse-transposed-transform)
+                      (tuple/sub (matrix/transform (-> shape :placement placement/get-inverse-transform) point)
                                  (point/point 0 0 0))))))
 
 (extend-type Sphere
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-sphere-space]
     (intersect-sphere-space this ray-in-sphere-space))
@@ -61,7 +62,7 @@
   (hit [this ray] true)
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (:transform this))))
+                                                        (-> this :placement placement/get-transform))))
 ;;; TODO/FIXME This should go in a transform cache
 (defn- quick-invert [m]
   (if (= m matrix/identity-matrix)
@@ -74,12 +75,7 @@
     (matrix/transpose m)))
 
 (defn sphere [& {:as args-map}]
-  (let [transform (or (:transform args-map)
-                      matrix/identity-matrix)
-        inverse (or (:inverse-transform args-map) (quick-invert transform))
-        inverse-transposed (quick-transpose inverse)]
-    (map->Sphere 
-     {:material (or (:material args-map) (material/material))
-      :transform transform
-      :inverse-transform inverse
-      :inverse-transposed-transform inverse-transposed})))
+  (map->Sphere 
+   {:material (or (:material args-map) (material/material))
+    :placement (placement/placement  (or (:transform args-map)
+                                         matrix/identity-matrix))}))

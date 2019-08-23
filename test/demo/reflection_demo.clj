@@ -34,7 +34,7 @@
 
 (def floor (-> (shapes/plane)
                (shapes/change-material room-material)
-               (shared/transform (transform/translate 0 -0.0001 0))))
+               (shared/change-transform (transform/translate 0 -0.0001 0))))
 
 (def left-sphere (-> (shapes/sphere)
                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
@@ -43,7 +43,7 @@
                                                                                                                    (color/color 1 1 1))
                                                                                                    (transform/scale 0.2 0.2 0.2
                                                                                                                     (transform/rotate-y (/ Math/PI 5))))))
-                     (shared/transform (->> (transform/scale 0.33 0.33 0.33)
+                     (shared/change-transform (->> (transform/scale 0.33 0.33 0.33)
                                             (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
@@ -54,7 +54,7 @@
                                                                   :transparency 0.95
                                                                   :refractive-index 2.0))
                        
-                       (shared/transform (transform/translate -0.5 1 0.5))))
+                       (shared/change-transform (transform/translate -0.5 1 0.5))))
 
 (def air-sphere (-> (shapes/sphere)
                     (shapes/change-material (material/material :color (color/color 0 0 0)
@@ -64,7 +64,7 @@
                                                                :transparency 1.0
                                                                :refractive-index 1.0))
                     
-                    (shared/transform (transform/translate -0.5 1 0.5
+                    (shared/change-transform (transform/translate -0.5 1 0.5
                                                            (transform/scale 0.5 0.5 0.5)))))
 
 (def back-sphere (-> (shapes/sphere)
@@ -76,7 +76,7 @@
                                                                 :transparency 0.0
                                                                 :refractive-index 0.0))
                      
-                     (shared/transform (transform/translate 1.75 2 5.5
+                     (shared/change-transform (transform/translate 1.75 2 5.5
                                                             (transform/scale 2 2 2)))))
 
 (def right-sphere (-> (shapes/sphere)
@@ -94,7 +94,7 @@
                                                                                                                                                                         (+ (:z point) noise))))))
                                                                                                     (transform/scale 0.5 0.125 0.125
                                                                                                                      (transform/rotate-z 0.23423)))))
-                      (shared/transform (->> (transform/scale 0.5 0.5 0.5)
+                      (shared/change-transform (->> (transform/scale 0.5 0.5 0.5)
                                              (transform/translate 1.5 0.5 -0.5)))))
 
 (def world (-> (world/world [floor (shapes/group [left-sphere middle-sphere air-sphere back-sphere right-sphere])])

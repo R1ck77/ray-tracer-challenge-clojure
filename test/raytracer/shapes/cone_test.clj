@@ -42,7 +42,7 @@
   (testing "Two cones are equals if the share the same characteristics"
     (is (= (cone/cone)
            (cone/cone)))
-    (let [transformed-cone (shared/transform a-cone (transform/translate 1 2 3 ))]
+    (let [transformed-cone (shared/change-transform a-cone (transform/translate 1 2 3 ))]
       (is (= transformed-cone transformed-cone))
       (is (not= transformed-cone (cone/cone))))))
 

@@ -7,9 +7,10 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.placement :as placement]))
 
-(defrecord Plane [material transform inverse-transform inverse-transposed-transform])
+(defrecord Plane [material placement])
 
 (defn- xz-plane-intersection [ray]
   (- (/ (:y (:origin ray))
@@ -23,8 +24,8 @@
 
 (extend-type Plane
   shared/Transformable
-  (transform [this transform-matrix]
-    (shared/change-transform this transform-matrix))
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix))
   shared/Intersectable
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))
@@ -34,7 +35,7 @@
      (shared/compute-normal this nil))
     ([this _]
      (shared/as-vector
-      (matrix/transform (:inverse-transposed-transform this)
+      (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
                         (svector/svector 0 1 0)))))
     bounding-box/BoundingBox
     (get-corners [this]
@@ -43,10 +44,8 @@
     (hit [this ray] true)
     (get-transformed-points [this]
       (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                          (:transform this))))
+                                                          (-> this :placement placement/get-transform))))
 
 (defn plane []
   (map->Plane {:material (material/material)
-               :transform matrix/identity-matrix
-               :inverse-transform matrix/identity-matrix
-               :inverse-transposed-transform matrix/identity-matrix}))
+               :placement (placement/placement)}))

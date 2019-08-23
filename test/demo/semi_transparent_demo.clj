@@ -30,7 +30,7 @@
                                                           :reflectivity 0.8
                                                           :transparency 0.9 
                                                           :pattern nil))
-               (shared/transform (transform/translate 0 5 0))))
+               (shared/change-transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
                      (shapes/change-material (material/material :specular 0.1
@@ -38,7 +38,7 @@
                                                                 :reflectivity 0.0
                                                                 :transparency 0.0
                                                                 :pattern (pattern/checker [0 8 8] [0.01 0.01 0.01])))
-                     (shared/transform (transform/translate 0 1e-3 0))))
+                     (shared/change-transform (transform/translate 0 1e-3 0))))
 
 
 (def matte-sphere (-> (shapes/sphere)
@@ -50,7 +50,7 @@
                                                                  :refractive-index 1.52
                                                                  :reflectivity 0.1
                                                                  :transparency 0.01))                       
-                      (shared/transform (transform/translate -4 2 0 (transform/scale 4 4 4)))))
+                      (shared/change-transform (transform/translate -4 2 0 (transform/scale 4 4 4)))))
 
 (def world (-> (world/world)
                (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)

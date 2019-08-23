@@ -117,7 +117,7 @@
 
 (deftest test-color-at-object-version
   (testing "Stripes with an object transformation"
-    (let [object (shared/transform (shapes/sphere)
+    (let [object (shared/change-transform (shapes/sphere)
                                    (transform/scale 2 2 2))
           pattern (pattern/stripe white black)]
       (is-white? (pattern/color-at pattern
@@ -131,7 +131,7 @@
                                    object
                                    (point/point 1.5 0 0)))))
   (testing "Stripes with both an object and a pattern transformation"
-    (let [object (shared/transform (shapes/sphere)
+    (let [object (shared/change-transform (shapes/sphere)
                                    (transform/scale 2 2 2))
           pattern (pattern/change-transform (pattern/stripe white black)
                                             (transform/translate 0.5 0 0))]
