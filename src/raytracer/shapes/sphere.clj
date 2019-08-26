@@ -63,16 +63,6 @@
   (get-transformed-points [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (-> this :placement placement/get-transform))))
-;;; TODO/FIXME This should go in a transform cache
-(defn- quick-invert [m]
-  (if (= m matrix/identity-matrix)
-    matrix/identity-matrix
-    (matrix/invert m 4)))
-
-(defn- quick-transpose [m]
-  (if (= m matrix/identity-matrix)
-    matrix/identity-matrix
-    (matrix/transpose m)))
 
 (defn sphere [& {:as args-map}]
   (map->Sphere 

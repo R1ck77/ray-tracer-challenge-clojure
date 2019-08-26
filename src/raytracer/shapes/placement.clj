@@ -18,14 +18,29 @@
   (get-inverse-transform [this] inverse-transform)
   (get-inverse-transposed-transform [this] inverse-transposed-transform))
 
+(defn- quick-invert [m]
+  (if (= m matrix/identity-matrix)
+    matrix/identity-matrix
+    (matrix/invert m 4)))
+
+(defn- quick-transpose [m]
+  (if (= m matrix/identity-matrix)
+    matrix/identity-matrix
+    (matrix/transpose m)))
+
 (defn placement
   ([] (placement matrix/identity-matrix))
   ([transform-matrix]
-   (let [inverse (matrix/invert transform-matrix 4)]
-     (->Placement transform-matrix inverse (matrix/transpose inverse)))))
+   (let [inverse (quick-invert transform-matrix)]
+     (->Placement transform-matrix
+                  inverse
+                  (quick-transpose inverse)))))
 
-(defn basic-change-transform [_ new-transform]
-  (placement new-transform))
+(defn- basic-change-transform [a-placement new-transform]
+  (if (= (:transform a-placement)
+         new-transform)
+    a-placement
+    (placement new-transform)))
 
 (defn change-shape-transform [shape transform]
   (update shape :placement #(shared/change-transform % transform)))
