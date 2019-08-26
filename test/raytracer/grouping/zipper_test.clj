@@ -49,14 +49,15 @@
                                            (shapes/cube)
                                            (shapes/sphere)])])
           zipper (zipper/create-zipper root)
-          counter (atom 0)
-          names (atom #{})]
+          counter (ref 0)
+          names (ref #{})]
       (let [updated-zipper (shared/update-objects zipper (fn [node]
-                                                           (let [new-name (str "name-" @counter)
-                                                                 new-node (assoc node :name new-name)]
-                                                             (swap! counter inc) ; TODO a coordinated transaction could go here, but who cares…
-                                                             (swap! names #(conj % new-name))
-                                                             new-node)))
+                                                           (dosync
+                                                            (let [new-name (str "name-" @counter)
+                                                                  new-node (assoc node :name new-name)]                                                             
+                                                              (alter counter inc)
+                                                              (alter names #(conj % new-name))
+                                                              new-node))))
             new-objects (zipper/get-all-matching-objects (#'zipper/new-group-zipper (shared/get-root updated-zipper))
                                                          (constantly true)) 
             set-names (into #{} (map :name new-objects))]
