@@ -1,5 +1,6 @@
 (ns raytracer.shapes.bounding-box-test
   (:require [clojure.test :refer :all]
+            [raytracer.test-utils :as tu]
             [raytracer.const :as const]
             [raytracer.point :as point]
             [raytracer.tuple :as tuple]
@@ -79,3 +80,11 @@
                     (point/point 3 3 3)]]      
       (is (empty? (bounding-box/compute-filtered-transformed-extremes extremes
                                                                       (transform/scale 0 0 0)))))))
+
+(deftest test-transform-extremes
+  (testing "Accounts for transformed vertices"
+    (let [[actual-min actual-max] (bounding-box/transform-extremes [(point/point -1 -1 -1)
+                                                                    (point/point 1 1 1)]
+                                                                   (transform/rotate-y const/quarter𝛑))]
+      (is (tu/t= actual-min (point/point (- const/√2) -1 (- const/√2))))
+      (is (tu/t= actual-max (point/point const/√2 1 const/√2))))))
