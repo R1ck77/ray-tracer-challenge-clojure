@@ -18,7 +18,7 @@
 Infinites are not composed, so if any point of the shape is infinite, the shape will be"
   [shape]
   (not (empty?
-        (filter is-infinite-point? (bounding-box/get-transformed-points shape)))))
+        (filter is-infinite-point? (bounding-box/get-transformed-extremes shape)))))
 
 (defn- sort-shapes
   "sort shapes and put them in a dictionary depending how they are classified by the predicate

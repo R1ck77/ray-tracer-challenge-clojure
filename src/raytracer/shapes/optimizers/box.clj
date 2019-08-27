@@ -17,7 +17,7 @@
   (->Box min-point max-point))
 
 (defn- contains-shape [container shape]
-  (let [shape-box (apply box (bounding-box/get-transformed-points shape))]
+  (let [shape-box (apply box (bounding-box/get-transformed-extremes shape))]
     (and (compare-points <= (:min-point container) (:min-point shape-box))
          (compare-points >= (:max-point container) (:max-point shape-box)))))
 

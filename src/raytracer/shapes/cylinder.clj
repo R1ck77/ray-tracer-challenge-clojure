@@ -129,7 +129,7 @@
   (get-corners [this]
     (compute-finite-corners this))
   (hit [this ray] true)
-  (get-transformed-points [this]
+  (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (-> this :placement placement/get-transform))))
 

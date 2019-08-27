@@ -35,7 +35,7 @@
   [group-transform children]
   (let [corners (mapcat (fn [children]
                           (if (satisfies? bounding-box/BoundingBox children)
-                            (bounding-box/get-transformed-points children)
+                            (bounding-box/get-transformed-extremes children)
                             [])) children)]
     (if (empty? corners)
       [(point/point 0 0 0) (point/point 0 0 0)]
@@ -86,7 +86,7 @@
       result))
   (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
     (compute-extremes (-> this :placement placement/get-transform) children))
-  (get-transformed-points [this] ;;; TODO/FIXME and guess what? This too…
+  (get-transformed-extremes [this] ;;; TODO/FIXME and guess what? This too…
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (-> this :placement placement/get-transform)))
   Parent
@@ -111,7 +111,7 @@
   (hit [this ray] false)
   (get-corners [this]
     [(point/point 0 0 0) (point/point 0 0 0)])
-  (get-transformed-points [this]
+  (get-transformed-extremes [this]
     [(point/point 0 0 0) (point/point 0 0 0)])
   Parent
   (get-children [this]

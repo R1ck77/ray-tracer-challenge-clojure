@@ -60,7 +60,7 @@
     (vector (point/point -1 -1 -1)
             (point/point 1 1 1)))
   (hit [this ray] true)
-  (get-transformed-points [this]
+  (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
                                                         (-> this :placement placement/get-transform))))
 
