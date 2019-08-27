@@ -1,16 +1,11 @@
 (ns raytracer.shapes.group
-  ;;; TODO/FIXME check require
-  (:require [raytracer.const :as const]
-            [raytracer.point :as point]
-            [raytracer.tuple :as tuple]
-            [raytracer.svector :as svector]
+  (:require [raytracer.point :as point]
             [raytracer.matrix :as matrix]
             [raytracer.ray :as ray]
             [raytracer.shapes.bounding-box :as bounding-box]            
             [raytracer.shapes.aabb-intersection :as aabb-intersection]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.optimizers.optimizer :as optimizer]
-            [raytracer.material :as material]
             [raytracer.intersection :as intersection]
             [raytracer.shapes.placement :as placement]))
 
