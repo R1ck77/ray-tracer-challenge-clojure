@@ -43,6 +43,5 @@
   (not (empty? (local-intersect-t extremes ray))))
 
 (defn local-intersect [cube ray]
-  ;;; TODO/FIXME potentially slow. May be worth an "if"
   (mapv #(intersection/intersection % cube)
         (local-intersect-t unit-aabb-extremes ray)))
