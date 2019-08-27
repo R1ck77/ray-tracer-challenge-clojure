@@ -6,7 +6,7 @@
 
 (defprotocol ShapesContainer
   (get-root [this])
-  (get-all-objects [this])) ;;; TODO/FIXME not needed outside tests probably
+  (get-all-objects [this]))
 
 (defprotocol HierarchyEditor
   (add-root-object [this object])
