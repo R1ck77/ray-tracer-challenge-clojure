@@ -39,7 +39,6 @@
   (compute-normal [this point _]
     (shared/compute-normal this point))
   (compute-normal [this point]
-    ;;; TODO/FIXME adding a change-transform would allow to optimize here a lot!
     (tuple/normalize
      (shared/as-vector
       (matrix/transform (-> this :placement placement/get-inverse-transposed-transform) normal))))
