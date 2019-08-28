@@ -17,12 +17,12 @@
 
 (defmulti parse-tokens #'parse-tokens-dispatch)
 
+(defn- something-something [tokens obj-conv-f vertices]
+  (conj vertices
+        (apply obj-conv-f (mapv #(Double/valueOf ^String %) (rest tokens)))))
+
 (defn read-vertex-data [acc line key obj-conv-f]
-  (let [tokens (tokens line)]
-    (update acc
-            key
-            (fn [vertices]
-              (conj vertices (apply obj-conv-f (mapv #(Double/valueOf ^String %) (rest tokens))))))))
+  (update acc key (partial something-something (tokens line) obj-conv-f)))
 
 (defmethod parse-tokens "v"
   [acc line]
@@ -48,11 +48,13 @@
 (defn- extract-vertex-indices [triangle-indices]
   (map first triangle-indices))
 
+(defn- convert-to-vertices-for-single-triangle [all-vertices indices-group]
+           (map #(get all-vertices %)
+                indices-group))
+
 (defn- indices-to-points [all-vertices grouped-indices]
   (let [vertex-indices (map extract-vertex-indices grouped-indices)]
-    (map (fn convert-to-indices-for-single-triangle [indices-group]
-           (map #(get all-vertices %)
-                indices-group)) vertex-indices)))
+    (map (partial convert-to-vertices-for-single-triangle all-vertices) vertex-indices)))
 
 (defn- normals-present? [normal-indices]
   (not (some nil? normal-indices)))
@@ -60,12 +62,14 @@
 (defn- extract-normal-indices [triangle-indices]
   (map #(nth % 2) triangle-indices))
 
+(defn- convert-to-normals-for-single-triangle [all-normals triangle-normal-indices]
+  (when (normals-present? triangle-normal-indices)
+    (map #(get all-normals %)
+         triangle-normal-indices)))
+
 (defn- indices-to-normals [all-normals grouped-indices]
   (let [normal-indices (map extract-normal-indices grouped-indices)]
-    (map (fn convert-to-normals-for-single-triangle [triangle-normal-indices]
-           (when (normals-present? triangle-normal-indices)
-            (map #(get all-normals %)
-                 triangle-normal-indices))) normal-indices)))
+    (map (partial convert-to-normals-for-single-triangle all-normals) normal-indices)))
 
 (defn- group-vertex-elements
   "Given N elements, return a list with 3-tuples corresponding to a triangle fan decomposition.
@@ -103,6 +107,10 @@
   [string]
   (pad-token (map read-token (string/split string #"/"))))
 
+(defn- add-faces [faces new-faces]
+  (vec
+   (concat faces new-faces)))
+
 (defmethod parse-tokens "f"
   [acc line]
   (let [tokens (tokens line)
@@ -114,9 +122,7 @@
                    (indices-to-normals (:normals acc) grouped-tokens))]
     (update-in acc
                [:groups group]
-               (fn [faces]
-                 (vec
-                  (concat faces new-faces))))))
+               #(add-faces % new-faces))))
 
 (defmethod parse-tokens "g"
   [acc line]
