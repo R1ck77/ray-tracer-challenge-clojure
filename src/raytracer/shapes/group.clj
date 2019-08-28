@@ -57,12 +57,14 @@
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
 
-(defrecord Group [children placement aabb-extremes]
+(defrecord Group [children placement aabb-extremes transformed-extremes]
   shared/Transformable
   (change-transform [this transform-matrix]
-    (let [new-aabb-extremes (compute-extremes transform-matrix (:children this))]
-     (assoc (placement/change-shape-transform this transform-matrix)
-            :aabb-extremes new-aabb-extremes)))
+    (let [new-aabb-extremes (compute-extremes transform-matrix (:children this))
+          new-transformed-extremes (bounding-box/compute-filtered-transformed-extremes new-aabb-extremes transform-matrix)]
+     (merge (placement/change-shape-transform this transform-matrix)
+            {:aabb-extremes new-aabb-extremes
+             :transformed-extremes new-transformed-extremes})))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (if (bounding-box-check this ray-object-space)
@@ -78,11 +80,10 @@
     (let [result (aabb-intersection/hit aabb-extremes ray)]
       (update-statistics result)
       result))
-  (get-corners [this] ;;; TODO/FIXME this *has* to be cached at object creation
-    (compute-extremes (-> this :placement placement/get-transform) children))
-  (get-transformed-extremes [this] ;;; TODO/FIXME and guess what? This too…
-    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform)))
+  (get-corners [this]
+    aabb-extremes)
+  (get-transformed-extremes [this]
+    transformed-extremes)
   Parent
   (get-children [this]
     children)
@@ -112,17 +113,22 @@
     [])
   (is-empty? [this] true)
   (set-children [this new-children]
-    (->Group new-children
-             (:placement this)
-             (compute-extremes (-> this :placement placement/get-transform) new-children)))
+    (let [extremes (compute-extremes (-> this :placement placement/get-transform) new-children)]
+      (->Group new-children
+               (:placement this)
+               extremes
+               (bounding-box/compute-filtered-transformed-extremes extremes
+                                                                   (-> this :placement placement/get-transform)))))
   Optimizer
   (optimize [this optimizer] this))
 
 (defn group [children]
   (if (empty? children)
     (->EmptyGroup (placement/placement matrix/identity-matrix))
-    (->Group children
-             (placement/placement matrix/identity-matrix)
-             (compute-extremes matrix/identity-matrix children))))
+    (let [extremes (compute-extremes matrix/identity-matrix children)]
+      (->Group children
+                     (placement/placement matrix/identity-matrix)
+                     extremes
+                     (bounding-box/compute-filtered-transformed-extremes extremes matrix/identity-matrix)))))
 
 (def empty-group (group []))
