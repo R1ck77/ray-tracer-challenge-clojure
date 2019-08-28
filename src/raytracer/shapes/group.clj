@@ -57,13 +57,12 @@
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
 
-;;; TODO/FIXME the number of operations to do when you change the transform are
-;;; starting to pile up
 (defrecord Group [children placement aabb-extremes]
   shared/Transformable
   (change-transform [this transform-matrix]
-    (assoc (placement/change-shape-transform this transform-matrix)
-           :aabb-extremes (compute-extremes transform-matrix (:children this))))
+    (let [new-aabb-extremes (compute-extremes transform-matrix (:children this))]
+     (assoc (placement/change-shape-transform this transform-matrix)
+            :aabb-extremes new-aabb-extremes)))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (if (bounding-box-check this ray-object-space)
