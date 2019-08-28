@@ -59,7 +59,7 @@
 
 ;;; TODO/FIXME the number of operations to do when you change the transform are
 ;;; starting to pile up
-(defrecord Group [children placement aabb-extremes] ;;; TODO/FIXME this is really effed up
+(defrecord Group [children placement aabb-extremes]
   shared/Transformable
   (change-transform [this transform-matrix]
     (assoc (placement/change-shape-transform this transform-matrix)
