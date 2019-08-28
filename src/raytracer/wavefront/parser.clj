@@ -16,25 +16,20 @@
 
 (defmulti parse-tokens #'parse-tokens-dispatch)
 
-;;; TODO/FIXME Just as vn, except for the normal part
+(defn read-vertex-data [acc line key obj-conv-f]
+  (let [tokens (tokens line)]
+    (update acc
+            key
+            (fn [vertices]
+              (conj vertices (apply obj-conv-f (mapv #(Double/valueOf ^String %) (rest tokens))))))))
+
 (defmethod parse-tokens "v"
   [acc line]
-  (let [tokens (tokens line)]
-    (update acc
-            :vertices
-            (fn [vertices]
-              ;;; that "str" is bad
-              (conj vertices (apply point/point (mapv #(Double/valueOf (str %)) (rest tokens))))))))
+  (read-vertex-data acc line :vertices point/point))
 
-;;; TODO/FIXME just as v, except for the point part
 (defmethod parse-tokens "vn"
   [acc line]
-  (let [tokens (tokens line)]
-    (update acc
-            :normals
-            (fn [vertices]
-              ;;; that "str" is bad
-              (conj vertices (apply svector/svector (mapv #(Double/valueOf (str %)) (rest tokens))))))))
+  (read-vertex-data acc line :normals svector/svector))
 
 (defn- create-smooth-triangle [vertices normals]
   (apply smooth-triangle/smooth-triangle (concat vertices normals)))
@@ -151,4 +146,3 @@
           (map rest
                (map second
                     (:groups parsing-result))))) ;;; TODO/FIXME test this!
-
