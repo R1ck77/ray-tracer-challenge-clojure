@@ -146,4 +146,4 @@
   (filter (complement empty?)
           (map rest
                (map second
-                    (:groups parsing-result))))) ;;; TODO/FIXME test this!
+                    (:groups parsing-result)))))

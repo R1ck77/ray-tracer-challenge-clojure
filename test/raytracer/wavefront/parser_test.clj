@@ -127,3 +127,10 @@ f 1 3 4")
                                  (get vertices 3)
                                  (get vertices 4))]
              second-group)))))
+
+(deftest test-get-non-empty-groups
+  (testing "General case"
+    (is (= [[:a :b] [:c :d]]
+         (parser/get-non-empty-groups {:groups {:default-group [nil :a :b]
+                                                "other group" []
+                                                "third group" [nil :c :d]}})))))
