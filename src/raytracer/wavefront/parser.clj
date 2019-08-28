@@ -1,3 +1,4 @@
+; TODO/FIXME messy class: needs refactoring
 (ns raytracer.wavefront.parser
   (:require [clojure.string :as string]
             [raytracer.point :as point]
