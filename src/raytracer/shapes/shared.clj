@@ -12,6 +12,10 @@
 (defprotocol Surface
   (compute-normal [this point] [this point intersection]))
 
+(defprotocol Material
+  (change-material [this new-material] "Return a new object with the material changed")
+  (get-material [this] "Return the shape's current material"))
+
 (defn as-point [v]
   (point/point (:x v) (:y v) (:z v)))
 
