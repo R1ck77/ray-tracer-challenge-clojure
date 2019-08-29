@@ -110,18 +110,19 @@
   (vec
    (concat faces new-faces)))
 
+(defn- something-something [acc line]
+  (let [value-tokens (rest (tokens line))
+        grouped-tokens (group-vertex-elements
+                        (map parse-value-token value-tokens))]
+    (triangles-from-vertices
+     (indices-to-points (:vertices acc) grouped-tokens)
+     (indices-to-normals (:normals acc) grouped-tokens))))
+
 (defmethod parse-tokens "f"
   [acc line]
-  (let [tokens (tokens line)
-        group (:current-group acc)
-        grouped-tokens (group-vertex-elements
-                        (map parse-value-token (rest tokens)))        
-        new-faces (triangles-from-vertices
-                   (indices-to-points (:vertices acc) grouped-tokens)
-                   (indices-to-normals (:normals acc) grouped-tokens))]
-    (update-in acc
-               [:groups group]
-               #(add-faces % new-faces))))
+  (update-in acc
+             [:groups (:current-group acc)]
+             #(add-faces % (something-something acc line))))
 
 (defmethod parse-tokens "g"
   [acc line]
