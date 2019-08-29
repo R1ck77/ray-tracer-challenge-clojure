@@ -106,7 +106,7 @@
   (vector (point/point -1.0 (float (:minimum cone)) -1.0)
           (point/point 1.0 (float (:maximum cone)) 1.0)))
 
-(defrecord Cylinder [minimum maximum closed placement])
+(defrecord Cylinder [material minimum maximum closed placement])
 
 (extend-type Cylinder
   shared/Transformable
@@ -131,15 +131,22 @@
   (hit [this ray] true)
   (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform))))
+                                                        (-> this :placement placement/get-transform)))
+  shared/Material
+  (change-material [this new-material]
+    (assoc this :material new-material))
+  (get-material [this]
+    (:material this)))
 
 (defn cylinder 
   [& {:as args-map}]
   (let [args (merge {:transform matrix/identity-matrix
                      :minimum const/neg-inf
-                     :maximum const/inf}
+                     :maximum const/inf
+                     :material material/default-material}
                     args-map)]
-    (->Cylinder (:minimum args)
+    (->Cylinder (:material args)
+                (:minimum args)
                 (:maximum args)
                 (:closed args)
                 (-> args :transform placement/placement))))

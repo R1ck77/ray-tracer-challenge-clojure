@@ -1,7 +1,8 @@
 (ns raytracer.material
   (:require [raytracer.point :as point]
             [raytracer.color :as color]
-            [raytracer.pattern :as pattern]))
+            [raytracer.pattern :as pattern]
+            [raytracer.shapes.shared :as shared]))
 
 (defrecord Material
     [ambient diffuse specular shiness
@@ -35,8 +36,9 @@
   ([material]
    (pattern/color-at (-> material :pattern) some-point))
   ([object point]
-   (pattern/color-at (-> object :material :pattern) object point)))
+   (pattern/color-at (-> object shared/get-material :pattern) object point)))
 
 (defn update-material [material & {:as args}]
   (merge material args))
 
+(def default-material (material))

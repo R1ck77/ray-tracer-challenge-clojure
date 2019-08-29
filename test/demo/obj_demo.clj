@@ -35,7 +35,7 @@
                                                                          matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
-               (shapes/change-material room-material)
+               (shared/change-material room-material)
                (shared/change-transform (transform/translate 0 -0.00001 0))))
 
 (defn create-camera [width height]
@@ -73,14 +73,14 @@
                                                                               (color/color 1 1 1)))
                    (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0))))]
      (println "* Rendering…")
-     (spit *output-file*
-           (canvas/canvas-to-ppm (camera/render (create-camera width height)
-                                                world))))))
+     (time (spit *output-file*
+                 (canvas/canvas-to-ppm (camera/render (create-camera width height)
+                                                      world)))))))
 
 (defn quick-demo []
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
-  (with-redefs [*image-resolution* [300 300]
+  (with-redefs [*image-resolution* [320 200]
                 group/*statistics* true
                 world/*maximum-reflections* 0]
     (reset! group/hit-count-statistics [0 0])

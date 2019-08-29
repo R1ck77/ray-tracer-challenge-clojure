@@ -28,11 +28,11 @@
                                                                          matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
-               (shapes/change-material room-material)
+               (shared/change-material room-material)
                (shared/change-transform (transform/translate 0 -0.0001 0))))
 
 (def left-sphere (-> (shapes/sphere)
-                     (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
+                     (shared/change-material (material/material :diffuse 0.7, :specular 0.3
                                                                 :pattern (pattern/change-transform (pattern/stripe (color/color 1 0 0)
                                                                                                                    (color/color 1 1 1))
                                                                                                    (transform/scale 0.2 0.2 0.2
@@ -41,7 +41,7 @@
                                             (transform/translate -1.5 0.33 -0.75)))))
 
 (def middle-sphere (-> (shapes/sphere)
-                       (shapes/change-material (material/material :diffuse 0.7
+                       (shared/change-material (material/material :diffuse 0.7
                                                                   :specular 0.3
                                                                   :pattern (pattern/change-transform (pattern/gradient (color/color 1 0 0)
                                                                                                                        (color/color 0 0 1))
@@ -49,7 +49,7 @@
                        (shared/change-transform (transform/translate -0.5 1 0.5))))
 
 (def right-sphere (-> (shapes/sphere)
-                      (shapes/change-material (material/material :diffuse 0.7
+                      (shared/change-material (material/material :diffuse 0.7
                                                                  :specular 0.3
                                                                  :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)
                                                                                                                                            (color/color 0.0 0 0.0)) 

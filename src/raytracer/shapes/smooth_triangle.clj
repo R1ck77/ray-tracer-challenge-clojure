@@ -55,7 +55,12 @@
   (hit [this ray] true)
   (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform))))
+                                                        (-> this :placement placement/get-transform)))
+  shared/Material
+  (change-material [this new-material]
+    (assoc this :material new-material))
+  (get-material [this]
+    (:material this)))
 
 (defn smooth-triangle [p1 p2 p3 n1 n2 n3]
   (let [edge1 (tuple/sub p2 p1)

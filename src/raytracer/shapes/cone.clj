@@ -115,7 +115,7 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cone-side-normal point-object-space))))
 
-(defrecord Cone [minimum maximum closed placement])
+(defrecord Cone [material minimum maximum closed placement])
 
 (defn compute-finite-corners
   "Return the bounding box for a closed cone"
@@ -151,15 +151,22 @@
   (hit [this ray] true)
   (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform))))
+                                                        (-> this :placement placement/get-transform)))
+  shared/Material
+  (change-material [this new-material]
+    (assoc this :material new-material))
+  (get-material [this]
+    (:material this)))
 
 (defn cone 
   [& {:as args-map}]
   (let [args (merge {:transform matrix/identity-matrix
                      :minimum const/neg-inf
-                     :maximum const/inf}
+                     :maximum const/inf
+                     :material material/default-material}
                     args-map)]
-    (->Cone (:minimum args)
+    (->Cone (:material args)
+            (:minimum args)
             (:maximum args)
             (:closed args)
             (placement/placement (:transform args)))))

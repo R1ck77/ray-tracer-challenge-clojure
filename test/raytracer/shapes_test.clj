@@ -7,10 +7,11 @@
             [raytracer.shapes.cube :as cube-ns]
             [raytracer.shapes.cylinder :as cylinder-ns]
             [raytracer.shapes.cone :as cone-ns]
-            [raytracer.shapes.group :as group-ns]))
+            [raytracer.shapes.group :as group-ns]
+            [raytracer.shapes.shared :as shared]))
 
 (defn- glass-object [shape]
-  (shapes/change-material shape
+  (shared/change-material shape
                           (material/update-material (:material shape)
                                                     :transparency 1.0
                                                     :refractive-index 1.5)))

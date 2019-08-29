@@ -93,7 +93,12 @@
                  :aabb-extremes (compute-extremes (-> this :placement placement/get-transform) new-children)}))
   Optimizer
   (optimize [this optimizer]
-    (optimizer/optimize optimizer this)))
+    (optimizer/optimize optimizer this))
+  shared/Material
+  (change-material [this new-material]
+    (throw (UnsupportedOperationException. "Changing a group material is not (yet) supported")))
+  (get-material [this]
+    (throw (UnsupportedOperationException. "Group's material requested"))))
 
 (defrecord EmptyGroup [placement]
   shared/Transformable
@@ -120,7 +125,12 @@
                (bounding-box/compute-filtered-transformed-extremes extremes
                                                                    (-> this :placement placement/get-transform)))))
   Optimizer
-  (optimize [this optimizer] this))
+  (optimize [this optimizer] this)
+  shared/Material
+  (change-material [this new-material]
+    (throw (UnsupportedOperationException. "Changing a group material is not (yet) supported")))
+  (get-material [this]
+    (throw (UnsupportedOperationException. "Group's material requested"))) )
 
 (defn group [children]
   (if (empty? children)

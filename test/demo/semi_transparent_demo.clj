@@ -24,7 +24,7 @@
 
 ;;; Set the y to 5 and stranger things start happening
 (def water (-> (shapes/plane)
-               (shapes/change-material (material/material :color [0 0 0.01]
+               (shared/change-material (material/material :color [0 0 0.01]
                                                           :specular 1
                                                           :shiness 300
                                                           :reflectivity 0.8
@@ -33,7 +33,7 @@
                (shared/change-transform (transform/translate 0 5 0))))
 
 (def pool-bottom (-> (shapes/plane)
-                     (shapes/change-material (material/material :specular 0.1
+                     (shared/change-material (material/material :specular 0.1
                                                                 :ambient 0.05
                                                                 :reflectivity 0.0
                                                                 :transparency 0.0
@@ -42,7 +42,7 @@
 
 
 (def matte-sphere (-> (shapes/sphere)
-                      (shapes/change-material (material/material :color [0.9 0 0]
+                      (shared/change-material (material/material :color [0.9 0 0]
                                                                  :shiness 100
                                                                  :specular 0.8
                                                                  :diffuse 0.7

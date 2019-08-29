@@ -24,7 +24,7 @@
 (def partπ (/ Math/PI 4))
 
 (def wall (-> (shapes/plane)
-              (shapes/change-material (material/material :specular 0.0
+              (shared/change-material (material/material :specular 0.0
                                                          :reflectivity 0.0
                                                          :transparency 0.0
                                                          :pattern (pattern/checker (color/color 1 1 1)
@@ -34,7 +34,7 @@
 
 
 (def glass-sphere (-> (shapes/sphere)
-                      (shapes/change-material (material/material :color (color/color 0 0 0.002)
+                      (shared/change-material (material/material :color (color/color 0 0 0.002)
                                                                  :shiness 400
                                                                  :specular 0.999
                                                                  :diffuse 0.1
@@ -45,7 +45,7 @@
                       (shared/change-transform (transform/translate 0.0 0 0.0))))
 
 (def air-bubble (-> (shapes/sphere)
-                    (shapes/change-material (material/material :diffuse 0.01
+                    (shared/change-material (material/material :diffuse 0.01
                                                                :specular 0.3
                                                                :refractive-index 1.000290
                                                                :reflectivity 0.1

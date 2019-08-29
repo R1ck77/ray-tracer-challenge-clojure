@@ -62,10 +62,15 @@
   (hit [this ray] true)
   (get-transformed-extremes [this]
     (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform))))
+                                                        (-> this :placement placement/get-transform)))
+  shared/Material
+  (change-material [this new-material]
+    (assoc this :material new-material))
+  (get-material [this]
+    (:material this)))
 
 (defn sphere [& {:as args-map}]
   (map->Sphere 
-   {:material (or (:material args-map) (material/material))
+   {:material (or (:material args-map) material/default-material)
     :placement (placement/placement  (or (:transform args-map)
                                          matrix/identity-matrix))}))

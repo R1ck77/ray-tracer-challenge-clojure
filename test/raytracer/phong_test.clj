@@ -9,13 +9,14 @@
             [raytracer.shapes :as shapes]
             [raytracer.material :as material]
             [raytracer.pattern :as pattern]
-            [raytracer.light-sources :as light-sources]))
+            [raytracer.light-sources :as light-sources]
+            [raytracer.shapes.shared :as shared]))
 
 (def material (material/material))
 (def position (point/point 0 0 0))
 
 (defn test-object [material]
-  (shapes/change-material (shapes/sphere) material))
+  (shared/change-material (shapes/sphere) material))
 
 (deftest test-lighting
   (testing "Lighting without a light source"

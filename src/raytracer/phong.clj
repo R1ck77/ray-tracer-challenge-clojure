@@ -4,7 +4,8 @@
             [raytracer.svector :as svector]
             [raytracer.color :as color]
             [raytracer.material :as material]
-            [raytracer.ray :as ray]))
+            [raytracer.ray :as ray]
+            [raytracer.shapes.shared :as shared]))
 
 (defn- compute-if-positive [value function]
   (if (< value 0)
@@ -60,8 +61,15 @@
      color/black
      (let [effective-color (color/mul (material/get-color object position)
                                       (:intensity light-source))
-           ambient-color (compute-ambient effective-color (:material object))]
+           ambient-color (compute-ambient effective-color (shared/get-material object))]
        (if (< (Math/abs (float shadow-attenuation)) const/EPSILON)
          ambient-color
          (let [light-vector (tuple/normalize (tuple/sub (:position light-source) position))]
-           (full-phong-lighting ambient-color (:material object) effective-color light-source light-vector eye normal shadow-attenuation)))))))
+           (full-phong-lighting ambient-color
+                                (shared/get-material object)
+                                effective-color
+                                light-source
+                                light-vector
+                                eye
+                                normal
+                                shadow-attenuation)))))))

@@ -35,7 +35,7 @@
                                                                          matrix/identity-matrix)))
 
 (def floor (-> (shapes/plane)
-               (shapes/change-material room-material)
+               (shared/change-material room-material)
                (shared/change-transform (transform/translate 0 -0.00001 0))))
 
 (defn- create-marble [x z]

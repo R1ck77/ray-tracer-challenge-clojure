@@ -36,7 +36,7 @@
 (deftest test-default-world
   (testing "The default world"
     (let [objects (get-objects-by-name default-world)
-          expected-sphere1 (shapes/change-material (shapes/sphere)
+          expected-sphere1 (sshared/change-material (shapes/sphere)
                                                    (material/with-color (color/color 0.8 1.0 0.6)
                                                      :diffuse 0.7
                                                      :specular 0.2))
@@ -174,7 +174,7 @@
                  color))))
   (testing "Lighting with reflection enabled"
     (let [template-shape (shapes/plane)
-          shape (shapes/change-material (sshared/change-transform template-shape
+          shape (sshared/change-material (sshared/change-transform template-shape
                                                                   (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                   :reflectivity 0.5))
@@ -187,11 +187,11 @@
   (testing "shade_hit() with a transparent material"
     (let [floor (-> (shapes/plane)
                     (sshared/change-transform (transform/translate 0 -1 0))
-                    (shapes/change-material (material/material :transparency 0.5
+                    (sshared/change-material (material/material :transparency 0.5
                                                                :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (sshared/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (material/with-color (color/color 1 0 0)
+                   (sshared/change-material (material/with-color (color/color 1 0 0)
                                              :ambient 0.5)))
           world (-> default-world
                     (world/set-objects [floor ball]))
@@ -214,12 +214,12 @@
                        (svector/svector 0 (- const/half√2) const/half√2))
           floor (-> (shapes/plane)
                     (sshared/change-transform (transform/translate 0 -1 0))
-                    (shapes/change-material (material/material :reflectivity 0.5
+                    (sshared/change-material (material/material :reflectivity 0.5
                                                                :transparency 0.5
                                                                :refractive-index 1.5)))
           ball (-> (shapes/sphere)
                    (sshared/change-transform (transform/translate 0 -3.5 -0.5))
-                   (shapes/change-material (material/with-color (color/color 1 0 0)
+                   (sshared/change-material (material/with-color (color/color 1 0 0)
                                              :ambient 0.5)))
           world (-> default-world
                     (world/set-objects (concat [floor ball]
@@ -258,7 +258,7 @@
   (testing "color_at() with mutually reflective surfaces"
     (let [light (light-sources/create-point-light (point/point 0 0 0)
                                                   (color/color 1 1 1))
-          reflective-plane (shapes/change-material (shapes/plane)
+          reflective-plane (sshared/change-material (shapes/plane)
                                                    (material/material :reflectivity 1))
           lower-plane (sshared/change-transform reflective-plane (transform/translate 0 -1 0))
           upper-plane (sshared/change-transform reflective-plane (transform/translate 0 1 0))
@@ -354,7 +354,7 @@
                                                           (point/point 0 0 0)))))))
 
 (defn- update-ambient [shape]
-  (shapes/change-material shape
+  (sshared/change-material shape
                           (material/update-material (:material shape)
                                                     :ambient 1)))
 
@@ -380,7 +380,7 @@
                                         1)))))
   (testing "The reflected color for a reflective material"
     (let [template-shape (shapes/plane)
-          shape (shapes/change-material (sshared/change-transform template-shape
+          shape (sshared/change-material (sshared/change-transform template-shape
                                                                   (transform/translate 0 -1 0))
                                         (material/update-material (:material template-shape)
                                                                   :reflectivity 0.5))
@@ -392,7 +392,7 @@
                  (world/reflected-color world (world/prepare-computations (:hierarchy world) ray intersection dummy-indices) 1)))))
   (testing "The reflected color at the maximum recursive depth"
     (let [plane (-> (shapes/plane)
-                    (shapes/change-material (material/material :reflectivity 0.5))
+                    (sshared/change-material (material/material :reflectivity 0.5))
                     (sshared/change-transform (transform/translate 0 -1 0)))
           world (world/set-objects default-world [plane])
           ray (ray/ray (point/point 0 0 -3)
@@ -414,7 +414,7 @@
                                         (world/prepare-computations (:hierarchy world) ray (first intersections) dummy-indices)
                                         1)))))
   (testing "The refracted color at maximum recursive depth"
-    (let [shape (shapes/change-material (first (world/get-objects default-world))
+    (let [shape (sshared/change-material (first (world/get-objects default-world))
                                         (material/material :transparency 1.0
                                                            :refractive-index 1.5))
           world (world/set-objects default-world (vector shape))
@@ -427,7 +427,7 @@
                                         (world/prepare-computations (:hierarchy world) ray (first intersections) dummy-indices)
                                         0)))))
   (testing "The refracted color under total internal refraction"
-    (let [shape (shapes/change-material (first (world/get-objects default-world))
+    (let [shape (sshared/change-material (first (world/get-objects default-world))
                                         (material/material :refractive-index 1.5
                                                            :transparency 1.0))
           world (world/set-objects default-world [shape])
@@ -439,10 +439,10 @@
       (is (ta/c= (color/color 0 0 0) (world/refracted-color world intermediate-result 10)))))
   (testing "The refracted color with a refracted ray"
     (let [objects-by-name (get-objects-by-name default-world)
-          shape-a (shapes/change-material (:shape1 objects-by-name)
+          shape-a (sshared/change-material (:shape1 objects-by-name)
                                           (material/material :ambient 1.0
                                                              :pattern (pattern/test-pattern)))
-          shape-b (shapes/change-material (:shape2 objects-by-name)
+          shape-b (sshared/change-material (:shape2 objects-by-name)
                                           (material/material :transparency 1.0
                                                              :refractive-index 1.5))
           world (world/set-objects default-world [shape-a shape-b])

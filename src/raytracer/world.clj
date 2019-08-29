@@ -29,7 +29,7 @@
   ([root-objects]
    {:hierarchy (hierarchy/hierarchy (group/group root-objects))
     :light-sources #{}
-    :material material/void-material}))
+    :sky-material material/void-material}))
 
 (defn add-root-object
   "Add a new object to the root group"
@@ -52,10 +52,10 @@
   It kind of sucks conceptually that this function is here,
   but at least at the moment I will because \"The Book made me do it.\""
   []
-  (let [sphere1 (assoc (shapes/change-material (shapes/sphere)
-                                         (material/with-color (color/color 0.8 1.0 0.6)
-                                           :diffuse 0.7
-                                           :specular 0.2))
+  (let [sphere1 (assoc (shared/change-material (shapes/sphere)
+                                               (material/with-color (color/color 0.8 1.0 0.6)
+                                                 :diffuse 0.7
+                                                 :specular 0.2))
                        :name :shape1)
         sphere2 (assoc (shared/change-transform (shapes/sphere)
                                                 (transform/scale 0.5 0.5 0.5))
@@ -99,7 +99,7 @@
            (compute-surface-parameters hierarchy ray object point eye-v intersection))))
 
 (defn- filtered-transparencies [intersections light-distance]
-  (map #(-> % :object :material :transparency)
+  (map #(-> % :object shared/get-material :transparency)
        (filter (fn [{t :t}]
                  (and (< t light-distance)
                       (> t 0)))
@@ -151,7 +151,7 @@
 
 (defn combine-colors
   [intermediate-result surface reflected refracted]
-  (let [ material (-> intermediate-result :object :material)]
+  (let [ material (-> intermediate-result :object shared/get-material)]
     (if (and (> (:transparency material) 0)
              (> (:reflectivity material) 0))
       (let [reflectance (refraction/schlick intermediate-result)]
@@ -187,12 +187,12 @@
                                               intersection
                                               (refraction/compute-refractive-indices intersection
                                                                                      intersections
-                                                                                     (-> world :material :refractive-index)))
+                                                                                     (-> world :sky-material :refractive-index)))
                   remaining)
-       (-> world :material material/get-color)))))
+       (-> world :sky-material material/get-color)))))
 
 (defn- get-reflectivity [intermediate-result]
-  (:reflectivity (:material (:object intermediate-result))))
+  (:reflectivity (shared/get-material (:object intermediate-result))))
 
 (defn reflected-color [world intermediate-result remaining]
   (if (> remaining 0)
@@ -202,7 +202,7 @@
         (let [reflection (ray/ray (:over-point intermediate-result)
                                   (:reflection intermediate-result))]
           (color/scale (color-at world reflection (dec remaining)) reflectivity))))
-    (-> world :material material/get-color)))
+    (-> world :sky-material material/get-color)))
 
 (defn- compute-refracted-ray [intermediate-result n-ratio sin-t-squared cos-i]
   (let [cos-t (Math/sqrt (- 1 sin-t-squared))]
@@ -222,10 +222,10 @@
       (color/scale (color-at world
                              (compute-refracted-ray intermediate-result n-ratio sin-t-squared cos-i)
                              (dec remaining))
-                   (-> intermediate-result :object :material :transparency)))))
+                   (-> intermediate-result :object shared/get-material :transparency)))))
 
 (defn- get-transparency [intermediate-result]
-  (-> intermediate-result :object :material :transparency))
+  (-> intermediate-result :object shared/get-material :transparency))
 
 (defn refracted-color [world intermediate-result remaining]
   (if (> remaining 0)

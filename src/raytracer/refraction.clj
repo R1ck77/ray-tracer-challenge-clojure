@@ -1,10 +1,11 @@
 (ns raytracer.refraction
-  (:require [raytracer.tuple :as tuple]))
+  (:require [raytracer.tuple :as tuple]
+            [raytracer.shapes.shared :as shared]))
 
 (defn- convert-to-refractive-index [object-or-void world-refractive-index]
   (if (= object-or-void :void)
     world-refractive-index
-    (-> object-or-void :material :refractive-index)))
+    (-> object-or-void shared/get-material :refractive-index)))
 
 (defn- take-until-including [filter-f list]
   (persistent!

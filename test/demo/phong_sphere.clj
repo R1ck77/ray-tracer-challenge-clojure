@@ -17,7 +17,7 @@
 (def ^:dynamic canvas-size {:width 320, :height 200})
 (def ^:dynamic canvas-scale [0.1 0.1])
 (def color (color/color 255 0 0))
-(def sphere-template (shapes/change-material (shapes/sphere)
+(def sphere-template (shared/change-material (shapes/sphere)
                                              (assoc (material/material) :color (color/color 1 0.2 1))))
 
 (defn- create-simple-scene

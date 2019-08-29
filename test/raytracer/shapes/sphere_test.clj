@@ -26,16 +26,16 @@
     (testing "a sphere may be assigned a material"
       (let [new-material (assoc (material/material) :ambient 0.25)]
         (is (= new-material
-               (:material (shapes/change-material sphere new-material)))))))
+               (:material (shared/change-material sphere new-material)))))))
   (testing "create a sphere with a courtesy constructor"
     (let [transform (transform/translate 2 3 4)
           new-material (assoc (material/material) :ambient 0.25)]
       (is (= (shared/change-transform (sphere/sphere) transform)
              (sphere/sphere :transform transform)))
-      (is (= (shapes/change-material (sphere/sphere)
+      (is (= (shared/change-material (sphere/sphere)
                                      new-material)
              (sphere/sphere :material new-material)))
-      (is (= (shapes/change-material (shared/change-transform (sphere/sphere) transform) new-material)
+      (is (= (shared/change-material (shared/change-transform (sphere/sphere) transform) new-material)
              (sphere/sphere :material new-material :transform transform)))
       (is (instance? Sphere (sphere/sphere :material new-material))))))
 

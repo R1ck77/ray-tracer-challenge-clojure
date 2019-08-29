@@ -31,11 +31,11 @@
                                                                                              (color/color 0 0 1))
                                                                             matrix/identity-matrix))
         floor (-> (shapes/plane)
-                  (shapes/change-material room-material)
+                  (shared/change-material room-material)
                   (shared/change-transform (transform/translate 0 -0.0001 0)))
         left-cone (-> (shapes/cone :minimum -1
                                    :maximum 0)
-                      (shapes/change-material (material/material :diffuse 0.7, :specular 0.3
+                      (shared/change-material (material/material :diffuse 0.7, :specular 0.3
                                                                  :reflectivity 0.3
                                                                  :pattern (pattern/change-transform (pattern/stripe (color/color 0 1 0)
                                                                                                                     (color/color 1 1 1))
@@ -47,7 +47,7 @@
                                              :maximum 0.6
                                              :closed false
                                              )
-                            (shapes/change-material (material/material :color (color/color 0 0.05 0.1)
+                            (shared/change-material (material/material :color (color/color 0 0.05 0.1)
                                                                        :diffuse 0.1
                                                                        :specular 0.3
                                                                        :reflectivity 0.99
@@ -58,7 +58,7 @@
         back-cylinder (-> (shapes/cylinder :closed true
                                            :maximum 1
                                            :minimum -1)
-                          (shapes/change-material (material/material :color (apply color/color (map #(/ % 255) [200 110 200]))
+                          (shared/change-material (material/material :color (apply color/color (map #(/ % 255) [200 110 200]))
                                                                      :diffuse 0.4
                                                                      :specular 0.5
                                                                      :refractive-index 2.0
@@ -71,7 +71,7 @@
         right-cylinder (-> (shapes/cylinder :closed true
                                             :minimum -1
                                             :maximum 1)
-                           (shapes/change-material (material/material :diffuse 0.7
+                           (shared/change-material (material/material :diffuse 0.7
                                                                       :specular 0.3
                                                                       :reflectivity 0.2
                                                                       :pattern (pattern/change-transform (pattern/perturb-pattern (pattern/ring (color/color 1 1 1)

@@ -10,11 +10,9 @@
             [raytracer.shapes.cone :as cone-ns]
             [raytracer.shapes.group :as group-ns]))
 
-(defn change-material [shape new-material]
-  (assoc shape :material new-material))
-
 (defn update-material [shape material-update-f]
-  (change-material shape (material-update-f (:material shape))))
+  (shared/change-material shape
+                          (material-update-f (shared/get-material shape))))
 
 (defn sphere [& args]
   (apply sphere-ns/sphere args))
