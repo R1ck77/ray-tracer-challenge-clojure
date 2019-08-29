@@ -1,4 +1,3 @@
-; TODO/FIXME messy class: needs refactoring
 (ns raytracer.wavefront.parser
   (:require [clojure.string :as string]
             [raytracer.point :as point]
@@ -17,12 +16,12 @@
 
 (defmulti parse-tokens #'parse-tokens-dispatch)
 
-(defn- something-something [tokens obj-conv-f vertices]
+(defn- read-tokens-with-function [tokens obj-conv-f vertices]
   (conj vertices
         (apply obj-conv-f (mapv #(Double/valueOf ^String %) (rest tokens)))))
 
 (defn read-vertex-data [acc line key obj-conv-f]
-  (update acc key (partial something-something (tokens line) obj-conv-f)))
+  (update acc key (partial read-tokens-with-function (tokens line) obj-conv-f)))
 
 (defmethod parse-tokens "v"
   [acc line]
@@ -41,16 +40,16 @@
 (defn- triangles-from-vertices
   [grouped-vertices grouped-normals]
   (mapv #(if %2
-          (create-smooth-triangle % %2)
-          (create-triangle % %2))
+           (create-smooth-triangle % %2)
+           (create-triangle % %2))
         grouped-vertices grouped-normals))
 
 (defn- extract-vertex-indices [triangle-indices]
   (map first triangle-indices))
 
 (defn- convert-to-vertices-for-single-triangle [all-vertices indices-group]
-           (map #(get all-vertices %)
-                indices-group))
+  (map #(get all-vertices %)
+       indices-group))
 
 (defn- indices-to-points [all-vertices grouped-indices]
   (let [vertex-indices (map extract-vertex-indices grouped-indices)]
