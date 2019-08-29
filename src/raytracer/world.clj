@@ -65,7 +65,7 @@
                                                              (color/color 1 1 1))))))
 
 (defn- unsorted-intersections [world ray]
-  (ray/intersect ray (grouping-shared/get-root (:hierarchy world)))) ;; TODO/FIXME bogus
+  (ray/intersect ray (grouping-shared/get-root (:hierarchy world))))
 
 (defn intersect [world ray]
   (sort-by :t (unsorted-intersections world ray)))
@@ -105,7 +105,6 @@
                       (> t 0)))
                intersections)))
 
-;;; TODO/FIXME consider a more physics based shadowing model based on the distance traveled inside the material
 (defn- compute-shadow-attenuation
   "Slightly more complex shadow computation
   
