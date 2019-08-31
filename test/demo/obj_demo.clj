@@ -60,10 +60,16 @@
     (println "Teapot model loaded…")
     model))
 
+(defn- load-pyramid []
+  (let [model (obj/obj (clojure.java.io/resource "pyramid/pyramid.obj"))]
+    (println "pyramid model loaded…")
+    model))
+
 (defn- load-wavefront []
   (case *wavefront-model*
     :astronaut (load-astronaut)
-    :teapot (load-teapot)))
+    :teapot (load-teapot)
+    :pyramid (load-pyramid)))
 
 (defn render-demo
   ([] (apply render-demo *image-resolution*))
