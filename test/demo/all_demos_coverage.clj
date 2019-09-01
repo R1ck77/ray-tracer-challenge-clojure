@@ -12,7 +12,8 @@
             [demo.pattern-demo :as pattern-demo]
             [demo.reflection-demo :as reflections-demo]
             [demo.cubes-demo :as cubes-demo]
-            [demo.cone-demo :as cone-demo]))
+            [demo.cone-demo :as cone-demo]
+            [demo.obj-demo :as obj-demo]))
 
 
 (defmacro run-demo [name demo-code]
@@ -49,7 +50,11 @@
   (run-demo "tiny perlin demo"
             (do
               (perlin/render-demo 10 10)
-              (perlin/render-animation 10 10 3))))
+              (perlin/render-animation 10 10 3)))
+  (run-demo "obj demo"
+            (with-redefs [world/*maximum-reflections* 2
+                          obj-demo/*wavefront-model* :pyramid]
+              (obj-demo/render-demo 10 10))))
 
 (defn -main [& args]
   (run-all-demos)
