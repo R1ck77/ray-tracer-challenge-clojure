@@ -96,7 +96,7 @@
     (optimizer/optimize optimizer this))
   shared/Material
   (change-material [this new-material]
-    (throw (UnsupportedOperationException. "Changing a group material is not (yet) supported")))
+    (set-children this (map #(shared/change-material % new-material) children)))
   (get-material [this]
     (throw (UnsupportedOperationException. "Group's material requested"))))
 
@@ -127,8 +127,7 @@
   Optimizer
   (optimize [this optimizer] this)
   shared/Material
-  (change-material [this new-material]
-    (throw (UnsupportedOperationException. "Changing a group material is not (yet) supported")))
+  (change-material [this new-material] this)
   (get-material [this]
     (throw (UnsupportedOperationException. "Group's material requested"))) )
 
