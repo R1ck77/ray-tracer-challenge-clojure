@@ -23,7 +23,7 @@
 
 (def ^:dynamic *output-file* "obj-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
-(def ^:dynamic *wavefront-model* :astronaut) ; either astronaut or teapot
+(def ^:dynamic *wavefront-model* :astronaut) ; :astronaut, :teapot or :pyramid
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -38,12 +38,6 @@
                (shared/change-material room-material)
                (shared/change-transform (transform/translate 0 -0.00001 0))))
 
-(defn create-camera [width height]
-  (camera/set-transform (camera/camera width height (/ Math/PI 3))
-                        (world/view-transform (point/point 0 1.0 -2)
-                                              (point/point 0 0.5 0)
-                                              (svector/svector 0 1 0))))
-
 (defn- load-astronaut []
   (let [model (-> "astronaut1/astronaut1.obj.gz"
                   io/resource
@@ -51,19 +45,28 @@
                   java.util.zip.GZIPInputStream.
                   obj/obj)]
     (println "Astronaut model loaded…")
-    (shared/change-transform model (transform/translate -1/4 1/2 0
-                                                        (transform/scale 0.1 0.1 0.1
-                                                                         (transform/rotate-y (/ Math/PI 2)))))))
+    {:wavefront (shared/change-transform model (transform/translate -1/4 1/2 0
+                                                                    (transform/scale 0.1 0.1 0.1
+                                                                                     (transform/rotate-y (/ Math/PI 2)))))
+     :transform (world/view-transform (point/point 0 1.0 -2)
+                                      (point/point 0 0.5 0)
+                                      (svector/svector 0 1 0))}))
 
 (defn- load-teapot []
   (let [model (obj/obj (clojure.java.io/resource "obj/teapot.obj"))]
     (println "Teapot model loaded…")
-    model))
+    {:wavefront model
+     :transform (world/view-transform (point/point 0.2 1.5 -6)
+                                      (point/point 0 0.8 0)
+                                      (svector/svector 0 1 0))}))
 
 (defn- load-pyramid []
   (let [model (obj/obj (clojure.java.io/resource "pyramid/pyramid.obj"))]
     (println "pyramid model loaded…")
-    model))
+    {:wavefront model,
+     :transform (world/view-transform (point/point 0.35 1.27 -4)
+                                      (point/point 0 0.5 0)
+                                      (svector/svector 0 1 0))}))
 
 (defn- load-wavefront []
   (case *wavefront-model*
@@ -71,16 +74,21 @@
     :teapot (load-teapot)
     :pyramid (load-pyramid)))
 
+(defn create-camera [width height transform]
+  (camera/set-transform (camera/camera width height (/ Math/PI 3))
+                        transform))
+
 (defn render-demo
   ([] (apply render-demo *image-resolution*))
   ([width height]
-   (let [world (-> (world/world [(load-wavefront) floor])
+   (let [{wavefront :wavefront, transform :transform} (load-wavefront)
+         world (-> (world/world [wavefront floor])
                    (world/set-light-sources (light-sources/create-point-light (point/point -10 10 -10)
                                                                               (color/color 1 1 1)))
                    (update :material #(material/update-material % :color (color/color 0.0 0.0 0.0))))]
      (println "* Rendering…")
      (time (spit *output-file*
-                 (canvas/canvas-to-ppm (camera/render (create-camera width height)
+                 (canvas/canvas-to-ppm (camera/render (create-camera width height transform)
                                                       world)))))))
 
 (defn quick-demo []
