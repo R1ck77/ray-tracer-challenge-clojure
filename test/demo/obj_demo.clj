@@ -45,9 +45,15 @@
                   java.util.zip.GZIPInputStream.
                   obj/obj)]
     (println "Astronaut model loaded…")
-    {:wavefront (shared/change-transform model (transform/translate -1/4 1/2 0
-                                                                    (transform/scale 0.1 0.1 0.1
-                                                                                     (transform/rotate-y (/ Math/PI 2)))))
+    {:wavefront (shared/change-material (shared/change-transform model (transform/translate -1/4 1/2 0
+                                                                     (transform/scale 0.1 0.1 0.1
+                                                                                      (transform/rotate-y (/ Math/PI 2)))))
+                                        (material/material :specular 0.1
+                                                           :ambient 0.3
+                                                           :diffuse 0.6
+                                                           :reflectivity 0.03
+                                                           :transparency 0.0
+                                                           :pattern (pattern/solid (color/color 0.99 0.99 1.0))))
      :transform (world/view-transform (point/point 0 1.0 -2)
                                       (point/point 0 0.5 0)
                                       (svector/svector 0 1 0))}))
