@@ -3,7 +3,8 @@
             [raytracer.shapes.shared :as shared]))
 
 (defprotocol CSG
-  (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]))
+  (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
+  (filter-intersections [this xintersection]))
 
 (defrecord CSGUnion []
   CSG
