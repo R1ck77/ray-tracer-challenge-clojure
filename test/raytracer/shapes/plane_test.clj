@@ -68,3 +68,13 @@
       (is (= 1 (count intersections)))
       (is (eps= 1 (:t (first intersections))))
       (is (= a-plane (:object (first intersections)))))))
+
+(deftest test-includes?
+  (let [shape (plane/plane)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (plane/plane) (plane/plane))))
+      (is (not (shared/includes? shape (plane/plane)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/cube)))))))

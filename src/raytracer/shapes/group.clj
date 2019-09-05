@@ -98,7 +98,11 @@
   (change-material [this new-material]
     (set-children this (map #(shared/change-material % new-material) children)))
   (get-material [this]
-    (throw (UnsupportedOperationException. "Group's material requested"))))
+    (throw (UnsupportedOperationException. "Group's material requested")))
+  shared/Container
+  (includes? [this object]
+    (or (identical? this object)
+        (some #(shared/includes? % object) children))))
 
 (defrecord EmptyGroup [placement]
   shared/Transformable
@@ -129,7 +133,10 @@
   shared/Material
   (change-material [this new-material] this)
   (get-material [this]
-    (throw (UnsupportedOperationException. "Group's material requested"))) )
+    (throw (UnsupportedOperationException. "Group's material requested")))
+  shared/Container
+  (includes? [this object]
+    (identical? this object)))
 
 (defn group [children]
   (if (empty? children)

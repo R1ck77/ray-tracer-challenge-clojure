@@ -156,7 +156,9 @@
   (change-material [this new-material]
     (assoc this :material new-material))
   (get-material [this]
-    (:material this)))
+    (:material this))
+  shared/Container
+  (includes? [this object] (identical? this object)))
 
 (defn cone 
   [& {:as args-map}]

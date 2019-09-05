@@ -16,6 +16,9 @@
   (change-material [this new-material] "Return a new object with the material changed")
   (get-material [this] "Return the shape's current material"))
 
+(defprotocol Container
+  (includes? [this object]))
+
 (defn as-point [v]
   (point/point (:x v) (:y v) (:z v)))
 

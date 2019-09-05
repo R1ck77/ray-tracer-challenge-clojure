@@ -46,3 +46,30 @@
                                                 (ray/ray (point/point 10 0 -10)
                                                          (svector/svector 0 0 1))))))))))
 
+(deftest test-includes?
+  (let [empty-group (group/group [])]
+    (testing "An empty group includes itself"
+      (is (shared/includes? empty-group empty-group)))
+    (testing "An empty group does not include a copy of itself"
+      (is (not (identical? (group/group []) (group/group []))))
+      (is (not (shared/includes? empty-group (group/group [])))))
+    (testing "An empty group does not include a different object"
+      (is (not (shared/includes? empty-group (shapes/cube))))))
+  (let [cube (shapes/cube)
+        cylinder (shapes/cylinder)
+        cone (shapes/cone)
+        sphere1 (shapes/sphere)
+        sphere2 (shapes/sphere)
+        sub-group (shapes/group [sphere1 cone])
+        group (group/group [cube cylinder sub-group sphere2])]
+    (testing "A group includes itself"
+      (is (shared/includes? group group)))
+    (testing "A group includes all sub-elements"
+      (is (shared/includes? group cube))
+      (is (shared/includes? group cylinder))
+      (is (shared/includes? group cone))
+      (is (shared/includes? group sphere1))
+      (is (shared/includes? group sphere2))
+      (is (shared/includes? group sub-group)))
+    (testing "A group doesn't include a different one because it's equal"
+      (is (not (shared/includes? sub-group (shapes/group [sphere1 cone])))))))

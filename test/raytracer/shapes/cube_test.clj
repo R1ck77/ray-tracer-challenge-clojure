@@ -77,3 +77,13 @@
                                              (transform/rotate-y Math/PI))]
       (is (t= (svector/svector 0 0 -1)
               (shared/compute-normal transformed-cube (point/point 0.2 0.1 -0.5))))))) 
+
+(deftest test-includes?
+  (let [shape (cube/cube)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (cube/cube) (cube/cube))))
+      (is (not (shared/includes? shape (cube/cube)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/plane)))))))

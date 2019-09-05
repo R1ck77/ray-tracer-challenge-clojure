@@ -146,4 +146,12 @@
   (testing "Filled cylinders can be created"
     (is (:closed (cylinder/cylinder :closed true)))))
 
-
+(deftest test-includes?
+  (let [shape (cylinder/cylinder)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (cylinder/cylinder) (cylinder/cylinder))))
+      (is (not (shared/includes? shape (cylinder/cylinder)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/cube)))))))

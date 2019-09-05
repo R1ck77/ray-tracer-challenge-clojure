@@ -53,7 +53,9 @@
   (change-material [this new-material]
     (assoc this :material new-material))
   (get-material [this]
-    (:material this)))
+    (:material this))
+  shared/Container
+  (includes? [this object] (identical? this object)))
 
 (defn triangle [p1 p2 p3]
   (let [edge1 (tuple/sub p2 p1)

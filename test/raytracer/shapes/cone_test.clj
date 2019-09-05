@@ -112,3 +112,12 @@
     (test-compute-cone-normal [1 1 1] [1 (- (Math/sqrt 2)) 1])
     (test-compute-cone-normal [-1 -1 0] [-1 1 0])))
 
+(deftest test-includes?
+  (let [shape (cone/cone)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (cone/cone) (cone/cone))))
+      (is (not (shared/includes? shape (cone/cone)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/cube)))))))

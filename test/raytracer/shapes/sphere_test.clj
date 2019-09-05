@@ -138,3 +138,13 @@
         (is (t= (svector/svector 0 0.97014 -0.24254)
                 (shared/compute-normal transformed-sphere
                                        (point/point 0 half√2 (- half√2)))))))))
+
+(deftest test-includes?
+  (let [shape (sphere/sphere)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (sphere/sphere) (sphere/sphere))))
+      (is (not (shared/includes? shape (sphere/sphere)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/cube)))))))

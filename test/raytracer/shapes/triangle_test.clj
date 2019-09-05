@@ -3,6 +3,7 @@
             [raytracer.test-utils :as tu]
             [raytracer.point :as point]
             [raytracer.svector :as svector]
+            [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.triangle :as triangle]
             [raytracer.ray :as ray]))
@@ -61,3 +62,17 @@
                  (map :t (shared/local-intersect triangle
                                                  (ray/ray (point/point 0 0.5 -2)
                                                           (svector/svector 0 0 1)))))))))
+
+(deftest test-includes?
+  (let [p1 (point/point 0 1 2)
+        p2 (point/point 3 4 5)
+        p3 (point/point 0 0 0)
+        shape (triangle/triangle p1 p2 p3)]
+    (testing "The shape includes itself"
+      (is (shared/includes? shape shape)))
+    (testing "The shape does not include a copy of itself"
+      (is (not (identical? (triangle/triangle p1 p2 p3)
+                           (triangle/triangle  p1 p2 p3))))
+      (is (not (shared/includes? shape (triangle/triangle p1 p2 p3)))))
+    (testing "The shape does not include a different object"
+      (is (not (shared/includes? shape (shapes/cube)))))))

@@ -60,7 +60,9 @@
   (change-material [this new-material]
     (assoc this :material new-material))
   (get-material [this]
-    (:material this)))
+    (:material this))
+  shared/Container
+  (includes? [this object] (identical? this object)))
 
 (defn smooth-triangle [p1 p2 p3 n1 n2 n3]
   (let [edge1 (tuple/sub p2 p1)
