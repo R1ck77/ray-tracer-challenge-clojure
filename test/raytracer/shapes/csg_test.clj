@@ -3,8 +3,8 @@
             [raytracer.shapes :as shapes]            
             [raytracer.test-utils :as tu]
             [raytracer.intersection :as intersection]
+            [raytracer.shapes.shared :as shared]
             [raytracer.shapes.csg :as csg]))
-
 
 (deftest test-union-intersection-allowed?
   (testing "Rules for the CSG union operation"
@@ -53,3 +53,39 @@
              (csg/filter-intersections (csg/intersection sphere cube) intersections)))
       (is (= [int-0 int-1]
              (csg/filter-intersections (csg/difference sphere cube) intersections))))))
+
+(deftest test-union-includes?
+  (let [cube (shapes/cube)
+        sphere (shapes/sphere)
+        another-sphere (shapes/sphere)
+        csg-shape (csg/union cube sphere)]
+    (testing "An union CSG shape includes itself and its own objects"
+      (is (shared/includes? csg-shape csg-shape))
+      (is (shared/includes? csg-shape cube))
+      (is (shared/includes? csg-shape sphere)))
+    (testing "An union CSG shape does not include extra objects"
+      (is (not (shared/includes? csg-shape another-sphere))))))
+
+(deftest test-intersection-includes?
+  (let [cube (shapes/cube)
+        sphere (shapes/sphere)
+        another-sphere (shapes/sphere)
+        csg-shape (csg/intersection cube sphere)]
+    (testing "An intersection CSG shape includes itself and its own objects"
+      (is (shared/includes? csg-shape csg-shape))
+      (is (shared/includes? csg-shape cube))
+      (is (shared/includes? csg-shape sphere)))
+    (testing "An intersection CSG shape does not include extra objects"
+      (is (not (shared/includes? csg-shape another-sphere))))))
+
+(deftest test-difference-includes?
+  (let [cube (shapes/cube)
+        sphere (shapes/sphere)
+        another-sphere (shapes/sphere)
+        csg-shape (csg/difference cube sphere)]
+    (testing "A difference CSG shape includes itself and its own objects"
+      (is (shared/includes? csg-shape csg-shape))
+      (is (shared/includes? csg-shape cube))
+      (is (shared/includes? csg-shape sphere)))
+    (testing "A difference CSG shape does not include extra objects"
+      (is (not (shared/includes? csg-shape another-sphere))))))

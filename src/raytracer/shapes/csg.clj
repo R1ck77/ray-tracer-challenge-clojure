@@ -6,6 +6,11 @@
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
   (filter-intersections [this xintersection]))
 
+(defn- csg-includes? [csg-shape object]
+  (or (identical? object csg-shape)
+      (identical? object (:left-shape csg-shape))
+      (identical? object (:right-shape csg-shape))))
+
 (defn- create-intersection-data [intersection is-left-object inside-left inside-right]
   (list intersection
         is-left-object
@@ -49,7 +54,10 @@
     (or (and left-shape-hit (not inside-right-shape))
         (and (not left-shape-hit) (not inside-left-shape))))
   (filter-intersections [this intersections]
-    (discard-intersections this intersections)))
+    (discard-intersections this intersections))
+  shared/Container
+  (includes? [this object]
+    (csg-includes? this object)))
 
 (defn union [left-shape right-shape]
   (->CSGUnion left-shape right-shape))
@@ -60,7 +68,10 @@
     (or (and left-shape-hit inside-right-shape)
         (and (not left-shape-hit) inside-left-shape)))
   (filter-intersections [this intersections]
-    (discard-intersections this intersections)))
+    (discard-intersections this intersections))
+  shared/Container
+  (includes? [this object]
+    (csg-includes? this object)))
 
 (defn intersection [left-shape right-shape]
   (->CSGIntersection left-shape right-shape))
@@ -71,7 +82,10 @@
     (or (and left-shape-hit (not inside-right-shape))
         (and (not left-shape-hit) inside-left-shape)))
   (filter-intersections [this intersections]
-    (discard-intersections this intersections)))
+    (discard-intersections this intersections))
+  shared/Container
+  (includes? [this object]
+    (csg-includes? this object)))
 
 (defn difference [left-shape right-shape]
   (->CSGDifference left-shape right-shape))
