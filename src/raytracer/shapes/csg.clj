@@ -1,14 +1,24 @@
 (ns raytracer.shapes.csg
   (:require [raytracer.intersection :as intersection]
+            [raytracer.ray :as ray]
+            [raytracer.shapes.placement :as placement]
             [raytracer.shapes.shared :as shared]))
 
 (defprotocol CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
   (filter-intersections [this xintersection]))
 
+(defn- intersect-component [ray-object-space shape]
+  (shared/local-intersect shape
+                          (ray/transform ray-object-space
+                                         (-> shape :placement placement/get-inverse-transform))))
+
+
 (defn- local-intersect [csg-shape ray-object-space]
-  []
-  )
+  (let [intersect (partial intersect-component ray-object-space)]
+   (filter-intersections csg-shape
+                         (sort-by :t (concat (intersect (:left-shape csg-shape))
+                                             (intersect (:right-shape csg-shape)))))))
 
 (defn- csg-includes? [csg-shape object]
   (or (identical? object csg-shape)

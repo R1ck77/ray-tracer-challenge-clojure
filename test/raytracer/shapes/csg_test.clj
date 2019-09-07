@@ -109,6 +109,6 @@
           ray (ray/ray (point/point 0 0 -5)
                        (svector/svector 0 0 1))
           intersections (shared/local-intersect csg-shape ray)]
-      (is (= [(intersection/intersection 4 sphere)
+      (is (= [(intersection/intersection 4.0 sphere)
               (intersection/intersection 6.5 shifted-sphere)]
              intersections)))))
