@@ -1,6 +1,12 @@
 (ns raytracer.shapes.csg-test
   (:require [clojure.test :refer :all]
-            [raytracer.shapes :as shapes]            
+            [raytracer.point :as point]
+            [raytracer.svector :as svector]
+            [raytracer.ray :as ray]
+            [raytracer.transform :as transform]
+            [raytracer.intersection :as intersection]
+            [raytracer.shapes :as shapes]
+            [raytracer.shapes.placement :as placement]            
             [raytracer.test-utils :as tu]
             [raytracer.intersection :as intersection]
             [raytracer.shapes.shared :as shared]
@@ -89,3 +95,20 @@
       (is (shared/includes? csg-shape sphere)))
     (testing "A difference CSG shape does not include extra objects"
       (is (not (shared/includes? csg-shape another-sphere))))))
+
+(deftest test-local-intersect
+  (testing "A ray misses a CSG object"
+    (let [csg-shape (csg/union (shapes/sphere) (shapes/cube))
+          ray (ray/ray (point/point 0 2 -5)
+                       (svector/svector 0 0 1))]
+      (is (empty? (shared/local-intersect csg-shape ray)))))
+  (testing "A ray hits a CSG object"
+    (let [sphere (shapes/sphere)
+          shifted-sphere (placement/change-shape-transform sphere (transform/translate 0 0 0.5))
+          csg-shape (csg/union sphere shifted-sphere)
+          ray (ray/ray (point/point 0 0 -5)
+                       (svector/svector 0 0 1))
+          intersections (shared/local-intersect csg-shape ray)]
+      (is (= [(intersection/intersection 4 sphere)
+              (intersection/intersection 6.5 shifted-sphere)]
+             intersections)))))

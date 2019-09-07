@@ -6,6 +6,10 @@
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
   (filter-intersections [this xintersection]))
 
+(defn- local-intersect [csg-shape ray-object-space]
+  []
+  )
+
 (defn- csg-includes? [csg-shape object]
   (or (identical? object csg-shape)
       (identical? object (:left-shape csg-shape))
@@ -57,7 +61,10 @@
     (discard-intersections this intersections))
   shared/Container
   (includes? [this object]
-    (csg-includes? this object)))
+    (csg-includes? this object))
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    (local-intersect this ray-object-space)))
 
 (defn union [left-shape right-shape]
   (->CSGUnion left-shape right-shape))
@@ -71,7 +78,10 @@
     (discard-intersections this intersections))
   shared/Container
   (includes? [this object]
-    (csg-includes? this object)))
+    (csg-includes? this object))
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    (local-intersect this ray-object-space)))
 
 (defn intersection [left-shape right-shape]
   (->CSGIntersection left-shape right-shape))
@@ -85,7 +95,10 @@
     (discard-intersections this intersections))
   shared/Container
   (includes? [this object]
-    (csg-includes? this object)))
+    (csg-includes? this object))
+  shared/Intersectable
+  (local-intersect [this ray-object-space]
+    (local-intersect this ray-object-space)))
 
 (defn difference [left-shape right-shape]
   (->CSGDifference left-shape right-shape))
