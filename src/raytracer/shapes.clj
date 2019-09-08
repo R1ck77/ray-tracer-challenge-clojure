@@ -8,7 +8,8 @@
             [raytracer.shapes.cube :as cube-ns]
             [raytracer.shapes.cylinder :as cylinder-ns]
             [raytracer.shapes.cone :as cone-ns]
-            [raytracer.shapes.group :as group-ns]))
+            [raytracer.shapes.group :as group-ns]
+            [raytracer.shapes.csg :as csg]))
 
 (defn update-material [shape material-update-f]
   (shared/change-material shape
@@ -31,3 +32,10 @@
 
 (defn group [children]
   (group-ns/group children))
+
+(defn csg [operation left-shape right-shape]
+  (case operation
+    :union (csg/union left-shape right-shape)
+    :intersection (csg/intersection left-shape right-shape)
+    :difference (csg/difference left-shape right-shape)
+    (throw (IllegalArgumentException. "Wrong keyword"))))

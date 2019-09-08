@@ -8,7 +8,9 @@
             [raytracer.shapes.cylinder :as cylinder-ns]
             [raytracer.shapes.cone :as cone-ns]
             [raytracer.shapes.group :as group-ns]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.csg :as csg])
+)
 
 (defn- glass-object [shape]
   (shared/change-material shape
@@ -47,3 +49,24 @@
     (is (= (group-ns/group []) (shapes/group [])))
     (is (= (group-ns/group [(shapes/sphere)])
            (shapes/group [(shapes/sphere)])))))
+
+(deftest test-csg-courtsy-function
+  (testing "Intersection keyword"
+    (is (instance? raytracer.shapes.csg.CSGIntersection
+                   (shapes/csg :intersection
+                               (shapes/sphere)
+                               (shapes/sphere)))))
+  (testing "Difference keyword"
+    (is (instance? raytracer.shapes.csg.CSGDifference
+                   (shapes/csg :difference
+                               (shapes/sphere)
+                               (shapes/sphere)))))
+  (testing "Union keyword"
+    (is (instance? raytracer.shapes.csg.CSGUnion
+                   (shapes/csg :union
+                               (shapes/sphere)
+                               (shapes/sphere)))))
+  (testing "Unsupported keyword"
+    (is (thrown? IllegalArgumentException (shapes/csg :unsupported
+                                                      (shapes/sphere)
+                                                      (shapes/sphere))))))
