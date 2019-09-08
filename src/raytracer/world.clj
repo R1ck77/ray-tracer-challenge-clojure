@@ -162,15 +162,19 @@
           (color/add reflected)
           (color/add refracted)))))
 
-(defn shade-hit
-  [world intermediate-result remaining]
-  (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))
-        surface (phong/lighting (:object intermediate-result)
-                                (first (:light-sources world)) ;;; first light source, for now
+(defn- compute-surface [intermediate-result light-sources shadow-attenuation]
+  (reduce color/add (color/color 0 0 0)
+          (map #(phong/lighting (:object intermediate-result)
+                                % 
                                 (:point intermediate-result)
                                 (:eye-v intermediate-result)
                                 (:normal-v intermediate-result)
                                 shadow-attenuation)
+               light-sources)))
+
+(defn shade-hit
+  [world intermediate-result remaining]  (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))
+        surface (compute-surface intermediate-result (:light-sources world) shadow-attenuation)
         reflected (reflected-color world intermediate-result remaining)
         refracted (refracted-color world intermediate-result remaining)]
     (combine-colors intermediate-result surface reflected refracted)))
