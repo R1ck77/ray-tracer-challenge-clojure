@@ -62,7 +62,7 @@
                  (is-intersection-allowed? this is-left-object inside-left inside-right))
                (categorize-intersections intersections (:left-shape this) (:right-shape this)))))
 
-(defrecord CSGUnion [left-shape right-shape]
+(defrecord CSGUnion [left-shape right-shape placement]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit (not inside-right-shape))
@@ -74,12 +74,15 @@
     (csg-includes? this object))
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    (local-intersect this ray-object-space)))
+    (local-intersect this ray-object-space))
+  shared/Transformable
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix)))
 
 (defn union [left-shape right-shape]
-  (->CSGUnion left-shape right-shape))
+  (->CSGUnion left-shape right-shape (placement/placement)))
 
-(defrecord CSGIntersection [left-shape right-shape]
+(defrecord CSGIntersection [left-shape right-shape placement]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit inside-right-shape)
@@ -91,12 +94,15 @@
     (csg-includes? this object))
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    (local-intersect this ray-object-space)))
+    (local-intersect this ray-object-space))
+  shared/Transformable
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix)))
 
 (defn intersection [left-shape right-shape]
-  (->CSGIntersection left-shape right-shape))
+  (->CSGIntersection left-shape right-shape (placement/placement)))
 
-(defrecord CSGDifference [left-shape right-shape]
+(defrecord CSGDifference [left-shape right-shape placement]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit (not inside-right-shape))
@@ -108,7 +114,10 @@
     (csg-includes? this object))
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    (local-intersect this ray-object-space)))
+    (local-intersect this ray-object-space))
+  shared/Transformable
+  (change-transform [this transform-matrix]
+    (placement/change-shape-transform this transform-matrix)))
 
 (defn difference [left-shape right-shape]
-  (->CSGDifference left-shape right-shape))
+  (->CSGDifference left-shape right-shape (placement/placement)))
