@@ -9,8 +9,7 @@
             [raytracer.shapes.cone :as cone-ns]
             [raytracer.shapes.group :as group-ns]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.csg :as csg])
-)
+            [raytracer.shapes.csg :as csg]))
 
 (defn- glass-object [shape]
   (shared/change-material shape

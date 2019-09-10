@@ -149,12 +149,11 @@
 
 (defn select-shadow-attenuation
   [world point]
-  (second
-   (first
-    ((if *basic-shade-detection*
-                   basic-attenuations
-                   semi-transparent-attenuations)
-                 world point))))
+  (into {}
+        ((if *basic-shade-detection*
+           basic-attenuations
+           semi-transparent-attenuations)
+         world point)))
 
 (def reflected-color)
 (def refracted-color)
@@ -172,19 +171,20 @@
           (color/add reflected)
           (color/add refracted)))))
 
-(defn- compute-surface [intermediate-result light-sources shadow-attenuation]
+(defn- compute-surface [intermediate-result light-sources shadow-attenuations]
   (reduce color/add (color/color 0 0 0)
           (map #(phong/lighting (:object intermediate-result)
                                 % 
                                 (:point intermediate-result)
                                 (:eye-v intermediate-result)
                                 (:normal-v intermediate-result)
-                                shadow-attenuation)
+                                (get shadow-attenuations %))
                light-sources)))
 
 (defn shade-hit
-  [world intermediate-result remaining]  (let [shadow-attenuation (select-shadow-attenuation world (:over-point intermediate-result))
-        surface (compute-surface intermediate-result (:light-sources world) shadow-attenuation)
+  [world intermediate-result remaining]
+  (let [shadow-attenuations (select-shadow-attenuation world (:over-point intermediate-result))
+        surface (compute-surface intermediate-result (:light-sources world) shadow-attenuations)
         reflected (reflected-color world intermediate-result remaining)
         refracted (refracted-color world intermediate-result remaining)]
     (combine-colors intermediate-result surface reflected refracted)))

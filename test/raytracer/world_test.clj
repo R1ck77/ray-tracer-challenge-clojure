@@ -317,41 +317,49 @@
 (deftest test-select-shadow-attenuation-basic
   (with-redefs [world/*basic-shade-detection* true]
     (testing "BASIC There is no shadow when nothing is collinear with point and light"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point 0 10 0)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point 0 10 0)) first second))))
     (testing "BASIC The shadow when an object is between the point and the light"
-      (is (ta/eps= 0 (world/select-shadow-attenuation default-world (point/point 10 -10 10)))))
+      (is (ta/eps= 0 (-> (world/select-shadow-attenuation default-world (point/point 10 -10 10)) first second))))
     (testing "BASIC There is no shadow when an object is behind the light"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point -20 20 -20)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point -20 20 -20)) first second))))
     (testing "BASIC There is no shadow when an object is behind the point"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point -2 2 -2)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point -2 2 -2)) first second))))
     (testing "BASIC any object between the light source and the point casts a shadow"
-      (is (ta/eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
-                                                        (point/point 0 0.0001 0))))
-      (is (ta/eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
-                                                        (point/point 0 0 0))))
-      (is (ta/eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
-                                                        (point/point 0 0 0))))
-      (is (ta/eps= 0.0 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
-                                                        (point/point 0 0 0)))))))
+      (is (ta/eps= 1.0 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
+                                                         (point/point 0 0.0001 0)) first second)))
+      (is (ta/eps= 0.0 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
+                                                         (point/point 0 0 0)) first second)))
+      (is (ta/eps= 0.0 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
+                                                         (point/point 0 0 0)) first second)))
+      (is (ta/eps= 0.0 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
+                                                         (point/point 0 0 0)) first second))))))
 (deftest test-select-shadow-attenuation
   (with-redefs [world/*basic-shade-detection* false]
     (testing "CUSTOM There is no shadow when nothing is collinear with point and light"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point 0 10 0)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point 0 10 0)) first second))))
     (testing "CUSTOM The shadow when an object is between the point and the light"
-      (is (ta/eps= 0 (world/select-shadow-attenuation default-world (point/point 10 -10 10)))))
+      (is (ta/eps= 0 (-> (world/select-shadow-attenuation default-world (point/point 10 -10 10)) first second))))
     (testing "CUSTOM There is no shadow when an object is behind the light"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point -20 20 -20)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point -20 20 -20)) first second))))
     (testing "CUSTOM There is no shadow when an object is behind the point"
-      (is (ta/eps= 1 (world/select-shadow-attenuation default-world (point/point -2 2 -2)))))
+      (is (ta/eps= 1 (-> (world/select-shadow-attenuation default-world (point/point -2 2 -2)) first second))))
     (testing "CUSTOM objects between the light and the point are attenuated by the transparency"
-      (is (ta/eps= 1.0 (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
-                                                        (point/point 0 0.0001 0))))
-      (is (ta/eps= 0.2 (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
-                                                        (point/point 0 0 0))))
-      (is (ta/eps= 0.06 (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
-                                                         (point/point 0 0 0))))
-      (is (ta/eps= 0.024 (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
-                                                          (point/point 0 0 0)))))))
+      (is (ta/eps= 1.0 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 5 0])
+                                                            (point/point 0 0.0001 0))
+                           first
+                           second)))
+      (is (ta/eps= 0.2 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 15 0])
+                                                            (point/point 0 0 0))
+                           first
+                           second)))
+      (is (ta/eps= 0.06 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 25 0])
+                                                             (point/point 0 0 0))
+                            first
+                            second)))
+      (is (ta/eps= 0.024 (-> (world/select-shadow-attenuation (create-shadow-test-world [0 35 0])
+                                                              (point/point 0 0 0))
+                             first
+                             second))))))
 
 (defn- update-ambient [shape]
   (sshared/change-material shape
