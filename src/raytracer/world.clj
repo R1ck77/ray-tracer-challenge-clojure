@@ -105,7 +105,14 @@
                       (> t 0)))
                intersections)))
 
-(defn- compute-shadow-attenuation
+(defn- semi-transparent-attenuation-for-light-source [world point light-source]
+  (let [pos->light (tuple/sub (:position light-source) point)
+        transparencies (filtered-transparencies (intersect world (ray/ray point (tuple/normalize pos->light)))
+                                                (tuple/mag pos->light))]
+    (apply * (conj transparencies 1))))
+
+;;; TODO/FIXME light-sources
+(defn- semi-transparent-attenuations
   "Slightly more complex shadow computation
   
   This function is an improvement over the basic shadowed/lit model in
@@ -123,28 +130,31 @@
   through the material. Using intersection points to compute how deep
   an object goes into a material could make an interesting upgrade."
   [world point]
-  (let [light-source (first (:light-sources world)) ;;; first light source only
-        pos->light (tuple/sub (:position light-source) point)
-        transparencies (filtered-transparencies (intersect world (ray/ray point (tuple/normalize pos->light)))
-                                                (tuple/mag pos->light))]
-    (apply * (conj transparencies 1))))
+  (mapv #(vector % (semi-transparent-attenuation-for-light-source world point %))
+        (:light-sources world)))
 
-(defn- basic-is-shadowed?
+(defn- basic-attenuation-for-light-source [world point light-source]
+  (let [pos->light (tuple/sub (:position light-source) point)]
+    (if (intersection/hit
+         (filter (fn is-between-light? [light-source] (< (:t light-source) (tuple/mag pos->light)))
+                 (intersect world (ray/ray point
+                                           (tuple/normalize pos->light)))))
+      0.0
+      1.0)))
+
+(defn- basic-attenuations
   [world point]
-  (let [light-source (first (:light-sources world)) ;;; first light source only
-        pos->light (tuple/sub (:position light-source) point)
-        intersection (intersection/hit (filter #(< (:t %)
-                                                   (tuple/mag pos->light))
-                                               (intersect world (ray/ray point (tuple/normalize pos->light)))))]
-    intersection))
+  (mapv #(vector % (basic-attenuation-for-light-source world point %))
+        (:light-sources world)))
 
 (defn select-shadow-attenuation
   [world point]
-  (if *basic-shade-detection*
-    (if (basic-is-shadowed? world point)
-      0.0
-      1.0)
-    (compute-shadow-attenuation world point)))
+  (second
+   (first
+    ((if *basic-shade-detection*
+                   basic-attenuations
+                   semi-transparent-attenuations)
+                 world point))))
 
 (def reflected-color)
 (def refracted-color)
