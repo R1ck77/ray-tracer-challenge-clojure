@@ -80,7 +80,9 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (shared/change-transform sub-group transform-matrix))
+    (->CSGUnion left-shape
+                right-shape
+                (shared/change-transform sub-group transform-matrix)))
   (get-placement [this] (:placement sub-group))
   bounding-box/BoundingBox
   (get-corners [this]
@@ -108,7 +110,9 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (shared/change-transform sub-group transform-matrix)) 
+    (->CSGIntersection left-shape
+                       right-shape
+                       (shared/change-transform sub-group transform-matrix))) 
   (get-placement [this] (:placement sub-group))
   bounding-box/BoundingBox
   (get-corners [this]
@@ -136,7 +140,9 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (shared/change-transform sub-group transform-matrix))
+    (->CSGDifference left-shape
+                     right-shape
+                     (shared/change-transform sub-group transform-matrix)))
   (get-placement [this] (:placement sub-group))
   bounding-box/BoundingBox
   (get-corners [this]
