@@ -1,8 +1,11 @@
 (ns raytracer.shapes.csg
   (:require [raytracer.intersection :as intersection]
             [raytracer.ray :as ray]
+            [raytracer.point :as point]
             [raytracer.shapes.placement :as placement]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.group :as group]
+            [raytracer.shapes.bounding-box :as bounding-box]))
 
 (defprotocol CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
@@ -11,7 +14,7 @@
 (defn- intersect-component [ray-object-space shape]
   (shared/local-intersect shape
                           (ray/transform ray-object-space
-                                         (-> shape :placement placement/get-inverse-transform))))
+                                         (-> shape shared/get-placement placement/get-inverse-transform))))
 
 
 (defn- local-intersect [csg-shape ray-object-space]
@@ -62,7 +65,7 @@
                  (is-intersection-allowed? this is-left-object inside-left inside-right))
                (categorize-intersections intersections (:left-shape this) (:right-shape this)))))
 
-(defrecord CSGUnion [left-shape right-shape placement]
+(defrecord CSGUnion [left-shape right-shape sub-group]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit (not inside-right-shape))
@@ -77,12 +80,20 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (placement/change-shape-transform this transform-matrix)))
+    (shared/change-transform sub-group transform-matrix))
+  (get-placement [this] (:placement sub-group))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (bounding-box/get-corners sub-group))
+  (get-transformed-extremes [this]
+    (bounding-box/get-transformed-extremes sub-group))
+  (hit [this ray]
+    (bounding-box/hit sub-group ray)))
 
 (defn union [left-shape right-shape]
-  (->CSGUnion left-shape right-shape (placement/placement)))
+  (->CSGUnion left-shape right-shape (group/group [left-shape right-shape])))
 
-(defrecord CSGIntersection [left-shape right-shape placement]
+(defrecord CSGIntersection [left-shape right-shape sub-group]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit inside-right-shape)
@@ -97,12 +108,20 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (placement/change-shape-transform this transform-matrix)))
+    (shared/change-transform sub-group transform-matrix)) 
+  (get-placement [this] (:placement sub-group))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (bounding-box/get-corners sub-group))
+  (get-transformed-extremes [this]
+    (bounding-box/get-transformed-extremes sub-group))
+  (hit [this ray]
+    (bounding-box/hit sub-group ray)))
 
 (defn intersection [left-shape right-shape]
-  (->CSGIntersection left-shape right-shape (placement/placement)))
+  (->CSGIntersection left-shape right-shape (group/group [left-shape right-shape])))
 
-(defrecord CSGDifference [left-shape right-shape placement]
+(defrecord CSGDifference [left-shape right-shape sub-group]
   CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape]
     (or (and left-shape-hit (not inside-right-shape))
@@ -117,7 +136,15 @@
     (local-intersect this ray-object-space))
   shared/Transformable
   (change-transform [this transform-matrix]
-    (placement/change-shape-transform this transform-matrix)))
+    (shared/change-transform sub-group transform-matrix))
+  (get-placement [this] (:placement sub-group))
+  bounding-box/BoundingBox
+  (get-corners [this]
+    (bounding-box/get-corners sub-group))
+  (get-transformed-extremes [this]
+    (bounding-box/get-transformed-extremes sub-group))
+  (hit [this ray]
+    (bounding-box/hit sub-group ray)))
 
 (defn difference [left-shape right-shape]
-  (->CSGDifference left-shape right-shape (placement/placement)))
+  (->CSGDifference left-shape right-shape (group/group [left-shape right-shape])))

@@ -1,6 +1,7 @@
 (ns raytracer.pattern
   (:require [raytracer.color :as color]
             [raytracer.matrix :as matrix]
+            [raytracer.shapes.shared :as shared]
             [raytracer.shapes.placement :as placement]))
 
 (defprotocol ColorFunction
@@ -8,7 +9,7 @@
 
 (defn- point-in-pattern-space [pattern object point]
   (->> point
-       (matrix/transform (-> object :placement placement/get-inverse-transform))
+       (matrix/transform (-> object shared/get-placement placement/get-inverse-transform))
        (matrix/transform (:inverse-transform pattern))))
 
 (defrecord Pattern [inverse-transform function function-data]

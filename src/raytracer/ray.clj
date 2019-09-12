@@ -22,7 +22,7 @@
        (matrix/transform matrix (:direction input-ray))))
 
 (defn- ray-intersection [ray shape]
-  (shared/local-intersect shape (transform ray (-> shape :placement placement/get-inverse-transform))))
+  (shared/local-intersect shape (transform ray (-> shape shared/get-placement placement/get-inverse-transform))))
 
 (extend-type Ray
   RayCaster

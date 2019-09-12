@@ -36,6 +36,7 @@
   shared/Transformable
   (change-transform [this transform-matrix]
     (placement/change-shape-transform this transform-matrix))
+  (get-placement [this] (:placement this))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (aabb-intersection/local-intersect this ray-object-space))

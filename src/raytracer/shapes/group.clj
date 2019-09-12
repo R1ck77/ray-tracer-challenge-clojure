@@ -20,7 +20,7 @@
   (let [transformed-ray (ray/transform ray-object-space (-> group :placement placement/get-inverse-transform))]
     (sort-by :t (apply concat
                         (map #(shared/local-intersect % (ray/transform transformed-ray
-                                                                       (-> % :placement placement/get-inverse-transform)))
+                                                                       (-> % shared/get-placement  placement/get-inverse-transform)))
                              (:children group))))))
 
 (defn compute-extremes
@@ -65,6 +65,7 @@
      (merge (placement/change-shape-transform this transform-matrix)
             {:aabb-extremes new-aabb-extremes
              :transformed-extremes new-transformed-extremes})))
+  (get-placement [this] (:placement this))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (if (bounding-box-check this ray-object-space)
@@ -108,6 +109,7 @@
   shared/Transformable
   (change-transform [this transform-matrix]
     (placement/change-shape-transform this transform-matrix))  
+  (get-placement [this] (:placement this))
   shared/Intersectable
   (local-intersect [this ray-object-space]
     [])
