@@ -2,6 +2,7 @@
   (:require [clojure.zip :as z]
             [raytracer.matrix :as matrix]
             [raytracer.grouping.shared :as shared]
+            [raytracer.shapes.shared :as shapes-shared]
             [raytracer.shapes.group :as group]
             [raytracer.shapes.placement :as placement])
   (:import [raytracer.shapes.group Parent Group EmptyGroup]))
@@ -40,13 +41,17 @@
 (defn- do-compute-local-to-world-transform  [zipper shape]
   (reduce #(matrix/mul4 %2 %)
           (reverse
-           (map #(-> % :placement placement/get-inverse-transposed-transform)
+           (map #(-> %
+                     shapes-shared/get-placement
+                     placement/get-inverse-transposed-transform)
                 (conj (z/path (do-find-node zipper #(= shape %)))
                       shape)))))
 
 (defn- do-compute-world-to-local-transform  [zipper shape]
   (reduce #(matrix/mul4 %2 %)
-          (map #(-> % :placement placement/get-inverse-transform)
+          (map #(-> %
+                    shapes-shared/get-placement
+                    placement/get-inverse-transform)
                (conj (z/path (do-find-node zipper #(= shape %)))
                      shape))))
 
