@@ -10,6 +10,7 @@
             [raytracer.pattern :as pattern]
             [raytracer.shapes :as shapes]
             [raytracer.transform :as transform]
+            [raytracer.matrix :as matrix]
             [raytracer.light-sources :as light-sources]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.placement :as placement]))
@@ -50,24 +51,36 @@
                                       :reflectivity 0.001
                                       :ambient 0.05
                                       :diffuse 0.05
-                                      :transparency 0.99
+                                      :transparency 0.9999
                                       :refractive-index 1.01
-                                      :pattern (pattern/solid (color/color 0.8 0.8 1))))
+                                      :pattern (pattern/solid (color/color 1 1 1))))
 
-(defn- create-lens []
-  (shared/change-transform
-   (shapes/csg :intersection
-               (shared/change-material (shapes/sphere)
-                                       lens-material)
-               (shared/change-material (shared/change-transform (shapes/sphere)
-                                                                (transform/translate 0.5 0 0))
-                                       lens-material))
-                           (transform/rotate-y const/half𝛑)))
+(defn- create-lens2 []
+  (-> (shapes/csg :intersection
+                  (shared/change-material (shared/change-transform (shapes/sphere)
+                                                                   (transform/translate -0.5 0 0)) lens-material)
+                  (shared/change-material (shared/change-transform (shapes/sphere)
+                                                                   (transform/translate 0.5 0 0)) lens-material))
+      (shared/change-transform (transform/translate 0 2.0 0
+                                                    (transform/rotate-y const/half𝛑)))))
+
+(defn- create-lens1 []
+  (-> (shapes/csg :intersection
+                  (shared/change-material (shared/change-transform (shapes/sphere)
+                                                                   (transform/translate 0 2 -0.5)) lens-material)
+                  (shared/change-material (shared/change-transform (shapes/sphere)
+                                                                   (transform/translate 0 2 0.5)) lens-material))))
 
 (defn- create-world []
-  (world/set-light-sources (world/world [(create-floor) (create-wall) (create-lens)])
-                           (light-sources/create-point-light (point/point 0 10 -10)
-                                                             (color/color 1 1 1))))
+  (assoc (world/set-light-sources (world/world [(create-lens2)
+                                          (create-floor)
+                                          (create-wall)])
+                            (light-sources/create-point-light (point/point 0 100 -100)
+                                                              (color/color 1 1 1)))
+         :sky-material (material/material :specular 0
+                                          :reflectivity 0
+                                          :transparency 0
+                                          :pattern (pattern/solid (color/color 1 0 0)))))
 
 (defn- create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
