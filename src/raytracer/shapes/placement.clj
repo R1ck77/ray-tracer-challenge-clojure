@@ -42,5 +42,5 @@
     a-placement
     (placement new-transform)))
 
-(defn change-shape-transform [shape transform]
+(defn change-shape-transform [shape transform]  
   (update shape :placement #(shared/change-transform % transform)))
