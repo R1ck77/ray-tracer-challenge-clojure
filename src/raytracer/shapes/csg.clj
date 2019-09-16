@@ -5,7 +5,8 @@
             [raytracer.shapes.placement :as placement]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.group :as group]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.shapes.parent :as parent]))
 
 (defprotocol CSG
   (is-intersection-allowed? [this left-shape-hit inside-left-shape inside-right-shape])
@@ -91,7 +92,13 @@
   (get-transformed-extremes [this]
     (bounding-box/get-transformed-extremes sub-group))
   (hit [this ray]
-    (bounding-box/hit sub-group ray)))
+    (bounding-box/hit sub-group ray))
+  parent/Parent
+  (get-children [this]
+    (parent/get-children sub-group))
+  (is-empty? [this] false)
+  (set-children [this _]
+    (throw (UnsupportedOperationException. "Setting a CSG object children is unsupported"))))
 
 (defn union [left-shape right-shape]
   (->CSGUnion left-shape right-shape (group/group [left-shape right-shape])))
@@ -112,7 +119,7 @@
   shared/Transformable
   (change-transform [this transform-matrix]
     (let [new-group (shared/change-transform sub-group transform-matrix)
-          children (group/get-children new-group)]
+          children (parent/get-children new-group)]
       (->CSGIntersection (first children)
                          (second children)
                          new-group
@@ -125,7 +132,13 @@
   (get-transformed-extremes [this]
     (bounding-box/get-transformed-extremes sub-group))
   (hit [this ray]
-    (bounding-box/hit sub-group ray)))
+    (bounding-box/hit sub-group ray))
+  parent/Parent
+  (get-children [this]
+    (parent/get-children sub-group))
+  (is-empty? [this] false)
+  (set-children [this _]
+    (throw (UnsupportedOperationException. "Setting a CSG object children is unsupported"))))
 
 (defn intersection [left-shape right-shape]
   (->CSGIntersection left-shape right-shape (group/group [left-shape right-shape])))
@@ -156,7 +169,13 @@
   (get-transformed-extremes [this]
     (bounding-box/get-transformed-extremes sub-group))
   (hit [this ray]
-    (bounding-box/hit sub-group ray)))
+    (bounding-box/hit sub-group ray))
+  parent/Parent
+  (get-children [this]
+    (parent/get-children sub-group))
+  (is-empty? [this] false)
+  (set-children [this _]
+    (throw (UnsupportedOperationException. "Setting a CSG object children is unsupported"))))
 
 (defn difference [left-shape right-shape]
   (->CSGDifference left-shape right-shape (group/group [left-shape right-shape])))

@@ -74,7 +74,7 @@
   (< (tuple/dot eye-v normal-v) 0))
 
 (defn- compute-surface-parameters [hierarchy ray object point eye-v intersection]
-  (let [basic-normal-v (shared/compute-normal object point intersection)
+  (let [basic-normal-v (shared/compute-normal object point intersection hierarchy)
         inside (is-inside? eye-v basic-normal-v)
         normal-v (if inside (tuple/neg basic-normal-v) basic-normal-v)]
     {:inside inside     

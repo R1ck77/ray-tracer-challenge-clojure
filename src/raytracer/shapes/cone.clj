@@ -138,14 +138,13 @@
     (local-intersect this ray-object-space))
   shared/Surface
   (compute-normal
-    ([this point _]
-     (shared/compute-normal this point))
-    ([this point]
-     (tuple/normalize
-      (shared/as-vector
-       (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
-                         (compute-cone-normal this
-                                              (matrix/transform (-> this :placement placement/get-inverse-transform) point)))))))
+    ([this point _ hierarchy]
+     (shared/compute-normal this point hierarchy))
+    ([this point hierarchy]
+     (shared/decorated-compute-normal compute-cone-normal
+                                      this
+                                      point
+                                      hierarchy)))
   bounding-box/BoundingBox
   (get-corners [this]
     (compute-finite-corners this))

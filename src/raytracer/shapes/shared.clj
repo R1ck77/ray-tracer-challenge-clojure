@@ -1,7 +1,8 @@
 (ns raytracer.shapes.shared
   (:require [raytracer.point :as point]
             [raytracer.matrix :as matrix]
-            [raytracer.svector :as svector]))
+            [raytracer.svector :as svector]
+            [raytracer.grouping.shared :as gshared]))
 
 (defprotocol Intersectable
   (local-intersect [this ray]))
@@ -11,7 +12,7 @@
   (get-placement [this]))
 
 (defprotocol Surface
-  (compute-normal [this point] [this point intersection]))
+  (compute-normal [this point hierarchy] [this point intersection hierarchy]))
 
 (defprotocol Material
   (change-material [this new-material] "Return a new object with the material changed")
@@ -25,3 +26,9 @@
 
 (defn as-vector [p]
   (svector/svector (:x p) (:y p) (:z p)))
+
+;;; TODO/FIXME this shold go in a class (not clear which one)
+(defn decorated-compute-normal [local-compute-normal shape point hierarchy]
+  (let [local-normal-vector (local-compute-normal shape
+                                                  (if point (gshared/world-to-local-coordinates hierarchy shape point) nil))]
+    (gshared/local-to-world-coordinates hierarchy shape local-normal-vector)))

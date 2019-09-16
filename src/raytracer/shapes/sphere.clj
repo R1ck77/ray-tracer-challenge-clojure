@@ -35,12 +35,12 @@
                                      (* 2 a))
                                   this-sphere)])))
 
-(defn compute-normal [shape point]
-  (tuple/normalize
-   (shared/as-vector
-    (matrix/transform (-> shape :placement placement/get-inverse-transposed-transform)
-                      (tuple/sub (matrix/transform (-> shape :placement placement/get-inverse-transform) point)
-                                 (point/point 0 0 0))))))
+(defn compute-normal [shape point hierarchy]
+  (shared/decorated-compute-normal (fn [_ point]
+                                     (tuple/sub point (point/point 0 0 0)))
+                                   shape
+                                   point
+                                   hierarchy))
 
 (extend-type Sphere
   shared/Transformable
@@ -52,10 +52,10 @@
     (intersect-sphere-space this ray-in-sphere-space))
   shared/Surface
   (compute-normal
-    ([this point _]
-     (shared/compute-normal this point))
-   ([this point]
-    (compute-normal this point)))
+    ([this point _ hierarchy]
+     (shared/compute-normal this point hierarchy))
+   ([this point hierarchy]
+    (compute-normal this point hierarchy)))
   bounding-box/BoundingBox
   (get-corners [this]
     (vector (point/point -1 -1 -1)

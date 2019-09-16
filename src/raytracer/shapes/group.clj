@@ -7,7 +7,8 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.optimizers.optimizer :as optimizer]
             [raytracer.intersection :as intersection]
-            [raytracer.shapes.placement :as placement]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.shapes.parent :as parent]))
 
 (def ^:dynamic *use-bounding-boxes* true)
 (def ^:dynamic *statistics* false) ; whether sampling the number of aabb hits or not
@@ -17,11 +18,10 @@
 (def group)
 
 (defn- intersect [group ray-object-space]
-  (let [transformed-ray (ray/transform ray-object-space (-> group :placement placement/get-inverse-transform))]
-    (sort-by :t (apply concat
-                        (map #(shared/local-intersect % (ray/transform transformed-ray
-                                                                       (-> % shared/get-placement  placement/get-inverse-transform)))
-                             (:children group))))))
+  (sort-by :t (apply concat
+                     (map #(shared/local-intersect % (ray/transform ray-object-space
+                                                                    (-> % shared/get-placement placement/get-inverse-transform)))
+                          (:children group)))))
 
 (defn compute-extremes
   "This method makes testing a mess. I'm wiring something to accept non BoundingBox objects too
@@ -37,11 +37,6 @@
       (bounding-box/transform-extremes (bounding-box/extremes-from-points corners)
                                        group-transform))))
 
-(defprotocol Parent
-  (get-children [this])
-  (is-empty? [this])
-  (set-children [this children]))
-
 (defn- update-statistics
   "Only used to debug the aabb statistics"
   [hit]
@@ -51,8 +46,8 @@
                     (inc (second %))))))
 
 (defn- bounding-box-check [group ray]
-  (or (not *use-bounding-boxes*)
-      (bounding-box/hit group ray)))
+  (or true (not *use-bounding-boxes*) ;;; TODO/FIXE this needs to be re-enabled and made to work
+      (bounding-box/hit group (ray/transform ray (-> group shared/get-placement placement/get-inverse-transform)))))
 
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
@@ -72,9 +67,9 @@
       (intersect this ray-object-space)
       []))
   shared/Surface
-  (compute-normal [this point]
+  (compute-normal [this point hierarchy]
     (throw (UnsupportedOperationException. "Normal of group computed")))
-  (compute-normal [this point _]
+  (compute-normal [this point _ hierarchy]
     (throw (UnsupportedOperationException. "Normal of group computed")))
   bounding-box/BoundingBox
   (hit [this ray]
@@ -85,7 +80,7 @@
     aabb-extremes)
   (get-transformed-extremes [this]
     transformed-extremes)
-  Parent
+  parent/Parent
   (get-children [this]
     children)
   (is-empty? [this] false)
@@ -97,7 +92,7 @@
     (optimizer/optimize optimizer this))
   shared/Material
   (change-material [this new-material]
-    (set-children this (map #(shared/change-material % new-material) children)))
+    (parent/set-children this (map #(shared/change-material % new-material) children)))
   (get-material [this]
     (throw (UnsupportedOperationException. "Group's material requested")))
   shared/Container
@@ -119,7 +114,7 @@
     [(point/point 0 0 0) (point/point 0 0 0)])
   (get-transformed-extremes [this]
     [(point/point 0 0 0) (point/point 0 0 0)])
-  Parent
+  parent/Parent
   (get-children [this]
     [])
   (is-empty? [this] true)

@@ -8,7 +8,8 @@
             [raytracer.material :as material]
             [raytracer.intersection :as intersection]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.placement :as placement]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.grouping.shared :as grshared]))
 
 (defrecord Plane [material placement])
 
@@ -32,12 +33,10 @@
     (intersect-plane-space this ray-in-plane-space))
   shared/Surface
   (compute-normal
-    ([this _ _]
-     (shared/compute-normal this nil))
-    ([this _]
-     (shared/as-vector
-      (matrix/transform (-> this :placement placement/get-inverse-transposed-transform)
-                        (svector/svector 0 1 0)))))
+    ([this _ _ hierarchy]
+     (shared/compute-normal this nil hierarchy))
+    ([this _ hierarchy] ;;; TODO/FIXME does computing this every time make sense????
+     (grshared/local-to-world-coordinates hierarchy this (svector/svector 0 1 0))))
     bounding-box/BoundingBox
     (get-corners [this]
       (vector (point/point const/neg-inf 0.0 const/neg-inf)

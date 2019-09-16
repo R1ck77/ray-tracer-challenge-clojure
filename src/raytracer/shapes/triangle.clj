@@ -8,7 +8,8 @@
             [raytracer.material :as material]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.placement :as placement]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.grouping.shared :as gshared]))
 
 (defn- local-intersect-triangle [{:keys [p1 e1 e2] :as triangle} {:keys [origin direction] :as ray}]
   (let [dir-cross-e2 (tuple/cross direction e2)
@@ -37,12 +38,12 @@
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
   shared/Surface
-  (compute-normal [this point _]
-    (shared/compute-normal this point))
-  (compute-normal [this point]
-    (tuple/normalize
-     (shared/as-vector
-      (matrix/transform (-> this :placement placement/get-inverse-transposed-transform) normal))))
+  (compute-normal [this point _ hierarchy]
+    (shared/compute-normal this point hierarchy))
+  (compute-normal [this point hierarchy] ;;; TODO/FIXME doing this every time is INSANE!
+        (gshared/local-to-world-coordinates hierarchy
+                                        this
+                                        normal))
   bounding-box/BoundingBox
   (get-corners [this]
     (bounding-box/extremes-from-points [p1 p2 p3]))

@@ -4,8 +4,9 @@
             [raytracer.grouping.shared :as shared]
             [raytracer.shapes.shared :as shapes-shared]
             [raytracer.shapes.group :as group]
-            [raytracer.shapes.placement :as placement])
-  (:import [raytracer.shapes.group Parent Group EmptyGroup]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.shapes.parent :as parent])
+  (:import [raytracer.shapes.group Group EmptyGroup]))
 
 (defn- next-step [zipper]
   (let [current-node (z/node zipper)
@@ -26,7 +27,7 @@
 (defn- get-all-non-group-objects [zipper]
   (get-all-matching-objects zipper
                             (complement
-                             #(satisfies? group/Parent %))))
+                             #(satisfies? parent/Parent %))))
 
 (defn- do-find-node
   ([zipper predicate]
@@ -56,13 +57,13 @@
                      shape))))
 
 (defn- branch? [node]
-  (satisfies? group/Parent node))
+  (satisfies? parent/Parent node))
 
 (defn- get-children [node]
-  (seq (group/get-children node)))
+  (seq (parent/get-children node)))
 
 (defn- new-node [node children]
-  (group/set-children node (vec children)))
+  (parent/set-children node (vec children)))
 
 (defprotocol GroupZipper
   (compute-local-to-world-transform [this shape])
