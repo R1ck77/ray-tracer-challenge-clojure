@@ -70,17 +70,33 @@
                                                                    (transform/translate 0 2 -0.5)) lens-material)
                   (shared/change-material (shared/change-transform (shapes/sphere)
                                                                    (transform/translate 0 2 0.5)) lens-material))))
+(def reflective-material   (material/material :specular 0.3
+                     :reflectivity 0.999
+                     :transparency 0.0
+                     :ambient 0.1
+                     :diffuse 0.2
+                     :pattern (pattern/solid (color/color 0 1 0))))
+
+(defn- create-sphere []
+  (-> (shapes/group [(shapes/sphere)])
+      (shared/change-transform (transform/translate 0 1 0)))
+#_  (-> (shapes/group [(-> (shapes/sphere)
+                         (shared/change-transform (transform/translate 0 1.0 0)))])
+      (shared/change-transform (transform/translate 0 0.0 0)))
+#_  (-> (shapes/sphere)
+      (shared/change-material material/default-material)
+      (shared/change-transform (transform/translate 0 1 0))))
 
 (defn- create-world []
-  (assoc (world/set-light-sources (world/world [(create-lens2)
+  (assoc (world/set-light-sources (world/world [ #_(create-sphere)  (create-lens1)
                                           (create-floor)
                                           (create-wall)])
-                            (light-sources/create-point-light (point/point 0 100 -100)
+                            (light-sources/create-point-light (point/point -30 80 -110)
                                                               (color/color 1 1 1)))
          :sky-material (material/material :specular 0
                                           :reflectivity 0
                                           :transparency 0
-                                          :pattern (pattern/solid (color/color 1 0 0)))))
+                                          :pattern (pattern/solid (color/color 0 0 0)))))
 
 (defn- create-camera [width height]
   (camera/set-transform (camera/camera width height (/ Math/PI 3))
