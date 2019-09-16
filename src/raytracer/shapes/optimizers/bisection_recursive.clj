@@ -3,7 +3,8 @@
             [raytracer.shapes.optimizers.box :as box]
             [raytracer.const :as const]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.group :as group]))
+            [raytracer.shapes.group :as group]
+            [raytracer.shapes.parent :as parent]))
 
 (def ^:dynamic *debug-logs* false)
 
@@ -92,7 +93,7 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
 (defn- partition-children
   "Split the children in sub-groups if the "
   [shapes max-size]
-  (map #(if (satisfies? group/Parent %)
+  (map #(if (satisfies? parent/Parent %)
           (bisect-recursively % max-size)
           %) shapes))
 
@@ -101,12 +102,12 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
 
   Infinite shapes are ignored and kept in a special group, the other are split in some way"
   [group max-size]
-  {:pre [(satisfies? group/Parent group)]}
+  {:pre [(satisfies? parent/Parent group)]}
   (if *debug-logs* (println (format "Group of %d children" (count (:children group)))))
-  (group/set-children group (-> group
-                                :children
-                                (partition-children max-size)
-                                (partition-shapes max-size))))
+  (parent/set-children group (-> group
+                                 :children
+                                 (partition-children max-size)
+                                 (partition-shapes max-size))))
 
 (defn create [max-size]
   (reify optimizer/GroupOptimizer
