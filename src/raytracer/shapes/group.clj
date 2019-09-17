@@ -46,7 +46,7 @@
                     (inc (second %))))))
 
 (defn- bounding-box-check [group ray]
-  (or true (not *use-bounding-boxes*) ;;; TODO/FIXE this needs to be re-enabled and made to work
+  (or (not *use-bounding-boxes*) ;;; TODO/FIXE this needs to be re-enabled and made to work
       (bounding-box/hit group (ray/transform ray (-> group shared/get-placement placement/get-inverse-transform)))))
 
 (defprotocol Optimizer
