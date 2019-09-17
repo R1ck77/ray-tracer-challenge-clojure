@@ -6,7 +6,8 @@
             [raytracer.ray :as ray]
             [raytracer.shapes.group :as group]
             [raytracer.shapes.obj :as obj]
-            [raytracer.shapes.shared :as shared]))
+            [raytracer.shapes.shared :as shared]
+            [raytracer.shapes.parent :as parent]))
 
 (defn- load-wavefront []
   (obj/obj (clojure.java.io/resource "obj/teapot.obj")))
@@ -26,7 +27,7 @@
 (deftest test-local-intersect-on-large-group-no-bounding-box
   (testing "Intersection with a large group doesn't throw (no bounding box)"
     (with-redefs [group/*use-bounding-boxes* false]
-      (let [big-group (first (group/get-children (load-wavefront)))
+      (let [big-group (first (parent/get-children (load-wavefront)))
             ray (ray/ray (point/point 0 0.5 0)
                          (svector/svector 0 0 -1))]
         (is (= [-1.8516431924882633          

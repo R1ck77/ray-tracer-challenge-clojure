@@ -135,7 +135,7 @@
   (with-redefs [*image-resolution* [300 300]
                 group/*statistics* true
                 world/*maximum-reflections* 0
-                *marbles-side* 20]
+                *marbles-side* 4]
     (reset! group/hit-count-statistics [0 0])
     (time (render-demo))
     (println @group/hit-count-statistics)))

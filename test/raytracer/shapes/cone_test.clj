@@ -10,7 +10,8 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.cone :as cone]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (def a-cone (cone/cone))
 
@@ -67,11 +68,6 @@
   (testing "Filled cones can be created"
     (is (:closed (cone/cone :closed true)))))
 
-(defmacro test-compute-cone-normal [point expected-normal]
-  `(is
-    (t= (tuple/normalize (apply svector/svector ~expected-normal))
-        (shared/compute-normal a-cone (apply point/point ~point)))))
-
 (defmacro test-intersecting-cone-with-end-caps [origin direction expected-count]
   `(let [cone# (cone/cone :closed true
                           :minimum -0.5
@@ -105,6 +101,11 @@
         (vec (map :t (shared/local-intersect a-cone
                                              (ray/ray (point/point 0 0 -1)
                                                       (tuple/normalize (svector/svector 0 1 1)))))))))
+
+(defmacro test-compute-cone-normal [point expected-normal]
+  `(is
+    (t= (tuple/normalize (apply svector/svector ~expected-normal))
+        (shared/compute-normal a-cone (apply point/point ~point) (hierarchy/hierarchy a-cone)))))
 
 (deftest test-compute-normal
   (testing "Computing the normal vector on a cone"

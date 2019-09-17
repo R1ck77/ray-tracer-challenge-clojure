@@ -7,7 +7,8 @@
             [raytracer.intersection :as intersection]
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
-            [raytracer.shapes.smooth-triangle :as st]))
+            [raytracer.shapes.smooth-triangle :as st]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (deftest test-smooth-triangle
   (let [tri (st/smooth-triangle (point/point -1 0 0)
@@ -39,7 +40,10 @@
     (testing "A smooth triangle uses u/v to interpolate the normal"
       (let [intersection (intersection/uv-intersection 1 tri 0.45 0.25)]
         (is (tu/t= (svector/svector -0.5547 0.83205 0)
-                   (shared/compute-normal tri (point/point 0 0 0) intersection)))))))
+                   (shared/compute-normal tri
+                                          (point/point 0 0 0)
+                                          intersection
+                                          (hierarchy/hierarchy tri))))))))
 
 (deftest test-includes?
   (let [p1 (point/point 0 1 2)

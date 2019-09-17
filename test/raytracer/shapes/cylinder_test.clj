@@ -10,7 +10,8 @@
             [raytracer.shapes.cylinder :as cylinder]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes :as shapes]
-            [raytracer.shapes.bounding-box :as bounding-box]))
+            [raytracer.shapes.bounding-box :as bounding-box]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (def a-cylinder (cylinder/cylinder))
 
@@ -92,28 +93,40 @@
 (deftest test-compute-normal
   (testing "Normal vector on a cylinder"
     (is (t= (svector/svector 1 0 0)
-            (shared/compute-normal a-cylinder (point/point 1 0 0))))
+            (shared/compute-normal a-cylinder (point/point 1 0 0) (hierarchy/hierarchy a-cylinder))))
     (is (t= (svector/svector 0 0 -1)
-            (shared/compute-normal a-cylinder (point/point 0 5 -1))))
+            (shared/compute-normal a-cylinder (point/point 0 5 -1) (hierarchy/hierarchy a-cylinder))))
     (is (t= (svector/svector 0 0 1)
-            (shared/compute-normal a-cylinder (point/point 0 -2 1))))
+            (shared/compute-normal a-cylinder (point/point 0 -2 1) (hierarchy/hierarchy a-cylinder))))
     (is (t= (svector/svector -1 0 0)
-            (shared/compute-normal a-cylinder (point/point -1 1 0)))))
+            (shared/compute-normal a-cylinder (point/point -1 1 0) (hierarchy/hierarchy a-cylinder)))))
   (testing "Extra normal tests not in the book"
     (is (t= (svector/svector 0 0 -1)
-            (shared/compute-normal a-cylinder (point/point 0 5 -1.1))))
+            (shared/compute-normal a-cylinder (point/point 0 5 -1.1) (hierarchy/hierarchy a-cylinder))))
     (is (t= (svector/svector const/half√2 0 (- const/half√2))
-            (shared/compute-normal a-cylinder (point/point const/half√2 100 (- const/half√2))))))
+            (shared/compute-normal a-cylinder (point/point const/half√2 100 (- const/half√2)) (hierarchy/hierarchy a-cylinder)))))
   (testing "The normal vector on a cylinder's end caps"
     (let [cylinder (cylinder/cylinder :minimum 1
                                       :maximum 2
                                       :closed true)]
-      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0 1 0))))
-      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0.5 1 0))))
-      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder (point/point 0 1 0.5))))
-      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0 2 0))))
-      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0.5 2 0))))
-      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder (point/point 0 2 0.5)))))))
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder
+                                                              (point/point 0 1 0)
+                                                              (hierarchy/hierarchy cylinder))))
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder
+                                                              (point/point 0.5 1 0)
+                                                              (hierarchy/hierarchy cylinder))))
+      (is (t= (svector/svector 0 -1 0) (shared/compute-normal cylinder
+                                                              (point/point 0 1 0.5)
+                                                              (hierarchy/hierarchy cylinder))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder
+                                                             (point/point 0 2 0)
+                                                             (hierarchy/hierarchy cylinder))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder
+                                                             (point/point 0.5 2 0)
+                                                             (hierarchy/hierarchy cylinder))))
+      (is (t= (svector/svector 0 1 0) (shared/compute-normal cylinder
+                                                             (point/point 0 2 0.5)
+                                                             (hierarchy/hierarchy cylinder)))))))
 
 
 (deftest test-equality

@@ -11,7 +11,8 @@
             [raytracer.shapes.cube :as cube]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.placement :as placement]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (def a-cube (cube/cube))
 
@@ -61,7 +62,9 @@
 (defmacro test-compute-normal [id point expected-normal]
   `(testing ~(format "The normal on the surface of a cube (%s)" id)
      (is (t= (apply svector/svector ~expected-normal)
-             (shared/compute-normal a-cube (apply point/point ~point))))))
+             (shared/compute-normal a-cube
+                                    (apply point/point ~point)
+                                    (hierarchy/hierarchy a-cube))))))
 
 (deftest test-cube-compute-normal
   (test-compute-normal "+x" [1 0.5 -0.8] [1 0 0])
@@ -76,7 +79,9 @@
     (let [transformed-cube (shared/change-transform a-cube
                                              (transform/rotate-y Math/PI))]
       (is (t= (svector/svector 0 0 -1)
-              (shared/compute-normal transformed-cube (point/point 0.2 0.1 -0.5))))))) 
+              (shared/compute-normal transformed-cube
+                                     (point/point 0.2 0.1 -0.5)
+                                     (hierarchy/hierarchy transformed-cube))))))) 
 
 (deftest test-includes?
   (let [shape (cube/cube)]

@@ -6,7 +6,8 @@
             [raytracer.shapes :as shapes]
             [raytracer.shapes.shared :as shared]
             [raytracer.shapes.triangle :as triangle]
-            [raytracer.ray :as ray]))
+            [raytracer.ray :as ray]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (deftest test-constructor
   (let [triangle (triangle/triangle (point/point 0 1 0)
@@ -29,9 +30,15 @@
                                       (point/point -1 0 0)
                                       (point/point 1 0 0))
           normal (:normal triangle)]
-      (is (tu/t= normal (shared/compute-normal triangle (point/point 0 0.5 0))))
-      (is (tu/t= normal (shared/compute-normal triangle (point/point -0.5 0.75 0))))
-      (is (tu/t= normal (shared/compute-normal triangle (point/point 0.5 0.25 0)))))))
+      (is (tu/t= normal (shared/compute-normal triangle
+                                               (point/point 0 0.5 0)
+                                               (hierarchy/hierarchy triangle))))
+      (is (tu/t= normal (shared/compute-normal triangle
+                                               (point/point -0.5 0.75 0)
+                                               (hierarchy/hierarchy triangle))))
+      (is (tu/t= normal (shared/compute-normal triangle
+                                               (point/point 0.5 0.25 0)
+                                               (hierarchy/hierarchy triangle)))))))
 
 (deftest test-local-intersect
   (let [triangle (triangle/triangle (point/point 0 1 0)

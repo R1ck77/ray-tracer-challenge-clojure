@@ -12,8 +12,10 @@
             [raytracer.shapes.shared :as shared]
             [raytracer.material :as material]
             [raytracer.light-sources :as light-sources]
-            [raytracer.phong :as phong]))
+            [raytracer.phong :as phong]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
+;;; TODO/FIXME earmuffs
 (def ^:dynamic canvas-size {:width 320, :height 200})
 (def ^:dynamic canvas-scale [0.1 0.1])
 (def color (color/color 255 0 0))
@@ -49,7 +51,7 @@
                                     (tuple/sub (pixel-to-coord-f i j)
                                                (:camera scene))))})))
 
-(defn- compute-pixel [object light-source canvas {pixel :pixel, ray :ray}]
+(defn- compute-pixel [object light-source hierarchy canvas {pixel :pixel, ray :ray}]
   (let [hit (intersection/hit (ray/intersect ray object))]
     (if hit
       (let [point (ray/position ray (:t hit))
@@ -57,19 +59,20 @@
                                   light-source
                                   point
                                   (tuple/neg (:direction ray))
-                                  (shared/compute-normal object point))]
+                                  (shared/compute-normal object point hierarchy))]
        (canvas/write canvas (first pixel) (second pixel) color))
       canvas)))
 
 (defn render-scene [scene]
   (spit "phong-sphere.ppm"
-        (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene) (:light-source scene))
-                                      (canvas/create-canvas (:width canvas-size)
-                                                            (:height canvas-size))
-                                      (seq-ray scene)))))
+        (let [hierarchy (hierarchy/hierarchy (:object scene))]
+          (canvas/canvas-to-ppm (reduce (partial compute-pixel (:object scene) (:light-source scene) hierarchy)
+                                        (canvas/create-canvas (:width canvas-size) (:height canvas-size))
+                                        (seq-ray scene))))))
 
 (defn render-demo
   ([width height]
+   ;;; TODO/FIXME WTF?
    (let [width-ratio (/ (:width canvas-size) width)
          height-ratio (/ (:height canvas-size) height)]
      (binding [canvas-size {:width width, :height height}

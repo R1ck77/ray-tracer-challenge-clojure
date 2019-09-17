@@ -16,6 +16,7 @@
             [raytracer.refraction :as refraction]
             [raytracer.phong :as phong]
             [raytracer.grouping.hierarchy :as hierarchy]
+            [raytracer.grouping.caching-hierarchy :as caching-hierarchy]
             [raytracer.grouping.shared :as grouping-shared]))
 
 (def ^:dynamic *maximum-reflections* 4)
@@ -27,7 +28,7 @@
   ([]
    (world []))
   ([root-objects]
-   {:hierarchy (hierarchy/hierarchy (group/group root-objects))
+   {:hierarchy (caching-hierarchy/caching-hierarchy (group/group root-objects))
     :light-sources #{}
     :sky-material material/void-material}))
 
@@ -38,7 +39,7 @@
     (assoc world :hierarchy (grouping-shared/add-root-object old-hierarchy object))))
 
 (defn set-objects [world objects]
-  (assoc world :hierarchy (hierarchy/hierarchy (group/group objects))))
+  (assoc world :hierarchy (caching-hierarchy/caching-hierarchy (group/group objects))))
 
 (defn get-objects [world]
   (grouping-shared/get-all-objects (:hierarchy world)))

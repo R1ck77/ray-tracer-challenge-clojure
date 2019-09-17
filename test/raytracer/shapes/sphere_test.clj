@@ -11,7 +11,8 @@
             [raytracer.material :as material]
             [raytracer.shapes.sphere :as sphere]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.placement :as placement])
+            [raytracer.shapes.placement :as placement]
+            [raytracer.grouping.hierarchy :as hierarchy])
   (:import [raytracer.shapes.sphere Sphere]))
 
 (deftest test-sphere
@@ -114,30 +115,36 @@
     (testing "The normal on a sphere at a point on the x axis"
       (is (t= (svector/svector 1 0 0)
               (shared/compute-normal sphere
-                                     (point/point 1 0 0)))))
+                                     (point/point 1 0 0)
+                                     (hierarchy/hierarchy sphere)))))
     (testing "The normal on a sphere at a point on the y axis"
       (is (t= (svector/svector 0 1 0)
               (shared/compute-normal sphere
-                                     (point/point 0 1 0)))))
+                                     (point/point 0 1 0)
+                                     (hierarchy/hierarchy sphere)))))
     (testing "The normal on a sphere at a point on the z axis"
       (is (t= (svector/svector 0 0 1)
               (shared/compute-normal sphere
-                                     (point/point 0 0 1)))))
+                                     (point/point 0 0 1)
+                                     (hierarchy/hierarchy sphere)))))
     (testing "The normal on a sphere at a nonaxial point"
       (is (t= (svector/svector third√3 third√3 third√3)
               (shared/compute-normal sphere
-                                     (point/point third√3 third√3 third√3)))))
+                                     (point/point third√3 third√3 third√3)
+                                     (hierarchy/hierarchy sphere)))))
     (testing "Computing the normal on a translated sphere"
       (let [transformed-sphere (shared/change-transform sphere (transform/translate 0 1 0))]
         (is (t= (svector/svector 0 0.70711 -0.70711)
                 (shared/compute-normal transformed-sphere
-                                       (point/point 0 1.70711 -0.70711))))))
+                                       (point/point 0 1.70711 -0.70711)
+                                       (hierarchy/hierarchy transformed-sphere))))))
     (testing "Computing the normal on a transformed sphere"
       (let [new-transform (transform/scale 1 0.5 1 (transform/rotate-z (/ Math/PI 5)))
             transformed-sphere (shared/change-transform sphere new-transform)]
         (is (t= (svector/svector 0 0.97014 -0.24254)
                 (shared/compute-normal transformed-sphere
-                                       (point/point 0 half√2 (- half√2)))))))))
+                                       (point/point 0 half√2 (- half√2))
+                                       (hierarchy/hierarchy transformed-sphere))))))))
 
 (deftest test-includes?
   (let [shape (sphere/sphere)]

@@ -11,7 +11,8 @@
             [raytracer.ray :as ray]
             [raytracer.shapes.plane :as plane]
             [raytracer.shapes.bounding-box :as bounding-box]
-            [raytracer.shapes.placement :as placement]))
+            [raytracer.shapes.placement :as placement]
+            [raytracer.grouping.hierarchy :as hierarchy]))
 
 (def a-plane (plane/plane))
 
@@ -33,17 +34,24 @@
   (let [expected-normal (svector/svector 0 1 0)]
     (testing "The normal of a plane is constant everywhere"
       (is (t= expected-normal
-              (shared/compute-normal a-plane (point/point 0 0 0))))
+              (shared/compute-normal a-plane
+                                     (point/point 0 0 0)
+                                     (hierarchy/hierarchy a-plane))))
       (is (t= expected-normal
-              (shared/compute-normal a-plane (point/point 10 0 -10))))
+              (shared/compute-normal a-plane
+                                     (point/point 10 0 -10)
+                                     (hierarchy/hierarchy a-plane))))
       (is (t= expected-normal
-              (shared/compute-normal a-plane (point/point 5 0 150)))))
+              (shared/compute-normal a-plane
+                                     (point/point 5 0 150)
+                                     (hierarchy/hierarchy a-plane)))))
     (testing "The normal of the plane is computed accounting for the transform"
       (let [transformed-plane (shared/change-transform a-plane
                                                 (transform/rotate-x (/ Math/PI 2)))]
         (is (t= (svector/svector 0 0 1)
                 (shared/compute-normal transformed-plane
-                                       (point/point 1000 1000 0))))))))
+                                       (point/point 1000 1000 0)
+                                       (hierarchy/hierarchy transformed-plane))))))))
 
 (deftest test-ray-plane-intersect
   (testing "Intersect with a ray parallel to the plane"
