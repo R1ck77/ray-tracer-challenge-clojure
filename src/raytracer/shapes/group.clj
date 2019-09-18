@@ -45,9 +45,14 @@
            #(vector (if hit (inc (first %)) (first %))
                     (inc (second %))))))
 
+;;; TODO/FIXE this needs to be re-enabled and made to work
 (defn- bounding-box-check [group ray]
-  (or (not *use-bounding-boxes*) ;;; TODO/FIXE this needs to be re-enabled and made to work
-      (bounding-box/hit group (ray/transform ray (-> group shared/get-placement placement/get-inverse-transform)))))
+  (or (not *use-bounding-boxes*) 
+      (let [group-inverse-transform (-> group
+                                        shared/get-placement
+                                        placement/get-inverse-transform)
+            transformed-ray (ray/transform ray group-inverse-transform)]
+        (bounding-box/hit group transformed-ray))))
 
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
