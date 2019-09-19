@@ -23,7 +23,7 @@
 
 (def ^:dynamic *output-file* "obj-demo.ppm")
 (def ^:dynamic *image-resolution* [800 600])
-(def ^:dynamic *wavefront-model* :astronaut) ; :astronaut, :teapot or :pyramid
+(def ^:dynamic *wavefront-model* :pyramid) ; :astronaut, :teapot or :pyramid
 
 (def halfπ (/ Math/PI 2))
 (def partπ (/ Math/PI 4))
@@ -69,7 +69,8 @@
 (defn- load-pyramid []
   (let [model (obj/obj (clojure.java.io/resource "pyramid/pyramid.obj"))]
     (println "pyramid model loaded…")
-    {:wavefront model,
+    {:wavefront (shared/change-transform (shapes/group [(shapes/sphere)])
+                                         (transform/translate 1.5 1 3)),
      :transform (world/view-transform (point/point 0.35 1.27 -4)
                                       (point/point 0 0.5 0)
                                       (svector/svector 0 1 0))}))
