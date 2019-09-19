@@ -1,7 +1,48 @@
 (ns raytracer.shapes.bounding-box
   (:require [raytracer.const :as const]
             [raytracer.point :as point]
-            [raytracer.matrix :as matrix]))
+            [raytracer.matrix :as matrix]
+            [raytracer.shapes.aabb-intersection :as aabb-intersection]))
+
+(defprotocol BoundingBox
+  (transform [this matrix])
+  (infinite? [this] "Return true if the box is infinite in any direction")
+  (invisible? [this] "Return true if the box is 0 in all dimensions")
+  (get-extremes [this] "Return the minimum and maximum corners of the box")
+  (hit [this ray] "Returns true if the ray hits the box"))
+
+(defrecord InvisibleBox []
+  BoundingBox
+  (transform [this matrix] this)
+  (infinite? [this] false)
+  (invisible? [this] true)
+  (get-extremes [this]
+    (throw (UnsupportedOperationException. "Extremes of an invisible box requested")))
+  (hit [this ray] false))
+
+(defrecord InfiniteBox []
+  BoundingBox
+  (transform [this matrix] this) ;;; TODO/FIXME oversimplification
+  (infinite? [this] true)
+  (invisible? [this] false)
+  (get-extremes [this]
+    {:min (point/point const/neg-inf const/neg-inf const/neg-inf)
+     :max (point/point const/inf const/inf const/inf)})
+  (hit [this ray] true)) ;;; TODO/FIXME this is an oversimplification. We can do better
+
+(defrecord DefaultBox [min-corner max-corner]
+  BoundingBox
+  (transform [this matrix])
+  (infinite? [this] false)
+  (invisible? [this] false)
+  (get-extremes [this] min-corner max-corner)
+  (hit [this ray]
+    (aabb-intersection/hit [min-corner max-corner] ray)))
+
+(defn create-box [min-corner max-corner]
+  ;;; TODO/FIXME logic for box creation here. Is a factory
+  )
+
 
 (defprotocol BoundingBox
   (get-corners [this] "Return the two extremes vertices of the box")
