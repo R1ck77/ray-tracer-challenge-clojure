@@ -74,3 +74,10 @@
             (tuple/op (tuple/tuple 1 1000 3 1)
                       (tuple/tuple 100 2 3.5 1)
                       min)))))
+
+(deftest test-any-c?
+  (testing "filtering by component"
+    (is (tuple/any-c? (tuple/tuple 1 0 0 0) #(> % 0)))
+    (is (tuple/any-c? (tuple/tuple 0 1 0 0) #(> % 0)))
+    (is (tuple/any-c? (tuple/tuple 0 0 1 0) #(> % 0)))
+    (is (not (tuple/any-c? (tuple/tuple 0 0 0 1) #(> % 0))))))
