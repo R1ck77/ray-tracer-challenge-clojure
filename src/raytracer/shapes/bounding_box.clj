@@ -1,19 +1,36 @@
 (ns raytracer.shapes.bounding-box
   (:require [raytracer.const :as const]
+            [raytracer.tuple :as tuple]
             [raytracer.point :as point]
             [raytracer.matrix :as matrix]
             [raytracer.shapes.aabb-intersection :as aabb-intersection]))
 
 (defprotocol BoundingBox
   (transform [this matrix])
+  (merge [this other] "Merge the two boxes and return a box that's the sum of both")
   (infinite? [this] "Return true if the box is infinite in any direction")
   (invisible? [this] "Return true if the box is 0 in all dimensions")
   (get-extremes [this] "Return the minimum and maximum corners of the box")
   (hit [this ray] "Returns true if the ray hits the box"))
 
+(def create-box)
+
+(defn- generic-merge [box-a box-b]
+  (let [extremes-a (get-extremes box-a)
+        extremes-b (get-extremes box-b)]
+    (create-box  (tuple/op (:min extremes-a) (:min extremes-b) min)
+                 (tuple/op (:max extremes-a) (:max extremes-b) max))))
+
+(defn- merge-boxes [box-a box-b]
+  (cond
+    (infinite? box-b) box-b
+    (invisible? box-b) box-a
+    :default (generic-merge box-a box-b)))
+
 (defrecord InvisibleBox []
   BoundingBox
   (transform [this matrix] this)
+  (merge [this other] other)
   (infinite? [this] false)
   (invisible? [this] true)
   (get-extremes [this]
@@ -22,7 +39,8 @@
 
 (defrecord InfiniteBox []
   BoundingBox
-  (transform [this matrix] this) ;;; TODO/FIXME oversimplification
+  (transform [this matrix] this) ; TODO/FIXME oversimplified
+  (merge [this other] this)      ; TODO/FIXME oversimplified
   (infinite? [this] true)
   (invisible? [this] false)
   (get-extremes [this]
@@ -33,15 +51,33 @@
 (defrecord DefaultBox [min-corner max-corner]
   BoundingBox
   (transform [this matrix])
+  (merge [this other]
+    (merge-boxes this other))
   (infinite? [this] false)
   (invisible? [this] false)
   (get-extremes [this] min-corner max-corner)
   (hit [this ray]
     (aabb-intersection/hit [min-corner max-corner] ray)))
 
+(defn- is-infinite? [x]
+  (>= (Math/abs ^double x) const/inf))
+
+(defn- infinite-corners [min-corner max-corner]
+  (or (tuple/any-c? min-corner is-infinite?)
+      (tuple/any-c? max-corner is-infinite?)))
+
+(defn- is-very-small? [x]
+  (<= (Math/abs ^double x) const/EPSILON))
+
+(defn- very-small-corners [min-corner max-corner]
+  (or (tuple/any-c? min-corner is-very-small?)
+        (tuple/any-c? max-corner is-very-small?)))
+
 (defn create-box [min-corner max-corner]
-  ;;; TODO/FIXME logic for box creation here. Is a factory
-  )
+  (cond 
+    (infinite-corners min-corner max-corner) (->InfiniteBox)
+    (very-small-corners min-corner max-corner) (->InvisibleBox)
+    :default (->DefaultBox min-corner max-corner)))
 
 
 (defprotocol BoundingBox
