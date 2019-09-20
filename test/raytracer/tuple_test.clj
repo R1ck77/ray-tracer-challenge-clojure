@@ -67,3 +67,10 @@
   (testing "normalizing a very small vector"
     (is (t= (tuple/tuple 0 0 0 0)
             (tuple/normalize (tuple/tuple 1e-8 0 3e-7 0))))))
+
+(deftest test-op
+  (testing "applying a generic operator"
+    (is (t= (tuple/tuple 1 2 3 1)
+            (tuple/op (tuple/tuple 1 1000 3 1)
+                      (tuple/tuple 100 2 3.5 1)
+                      min)))))

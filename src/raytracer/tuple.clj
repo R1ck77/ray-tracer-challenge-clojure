@@ -11,6 +11,9 @@
   (mul [this value])
   (div [this value]))
 
+(defprotocol Generic
+  (op [this that operator]))
+
 (defprotocol VectorOperations
   (mag [this])
   (normalize [this])
@@ -70,7 +73,10 @@
              (- (* (:x this) (:y that)) (* (:y this) (:x that)))
              0))
   (reflect [this normal]
-    (.sub this (mul normal (* 2 (dot normal this))))))
+    (.sub this (mul normal (* 2 (dot normal this)))))
+  Generic
+  (op [this that operator]
+    (binary-tuple-operation operator this that)))
 
 (defn tuple [x y z w]
   (->Tuple x y z w))
