@@ -13,7 +13,8 @@
 
 (defprotocol Generic
   (op [this that operator])
-  (any-c? [this predicate]))
+  (any-c? [this predicate])
+  (all-c? [this predicate]))
 
 (defprotocol VectorOperations
   (mag [this])
@@ -81,7 +82,11 @@
   (any-c? [this predicate]
     (or (predicate (:x this))
         (predicate (:y this))
-        (predicate (:z this)))))
+        (predicate (:z this))))
+  (all-c? [this predicate]
+    (and (predicate (:x this))
+         (predicate (:y this))
+         (predicate (:z this)))))
 
 (defn tuple [x y z w]
   (->Tuple x y z w))

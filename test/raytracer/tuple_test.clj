@@ -81,3 +81,11 @@
     (is (tuple/any-c? (tuple/tuple 0 1 0 0) #(> % 0)))
     (is (tuple/any-c? (tuple/tuple 0 0 1 0) #(> % 0)))
     (is (not (tuple/any-c? (tuple/tuple 0 0 0 1) #(> % 0))))))
+
+(deftest test-all-c?
+  (testing "filtering by component"
+    (is (tuple/all-c? (tuple/tuple 1 2 3 0) #(> % 0)))
+    (is (tuple/all-c? (tuple/tuple 1 2 3 4) #(> % 0)))
+    (is (not (tuple/all-c? (tuple/tuple 0 1 1 0) #(> % 0))))
+    (is (not (tuple/all-c? (tuple/tuple 1 0 1 0) #(> % 0))))
+    (is (not (tuple/all-c? (tuple/tuple 1 1 0 1) #(> % 0))))))
