@@ -55,7 +55,7 @@
   {:pre [(not (empty? points))]}
   (reduce #(tuple/op % %2 f) points))
 
-(defn- extremes-from-points [points]
+(defn extremes-from-points [points]
   {:pre [(not (empty? points))]}  
   (vector (filter-points points min)
           (filter-points points max)))
@@ -92,7 +92,7 @@
     (aabb-intersection/hit [min-corner max-corner] ray)))
 
 (defn- is-infinite? [x]
-  (>= (Math/abs ^double x) const/inf))
+  (>= (Math/abs ^double x) (/ const/inf 2)))
 
 (defn- infinite-corners? [min-corner max-corner]
   (tuple/any-c? (tuple/sub max-corner min-corner) is-infinite?))

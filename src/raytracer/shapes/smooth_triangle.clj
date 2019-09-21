@@ -35,7 +35,11 @@
                (tuple/add (tuple/mul (:n2 triangle) u)
                           (tuple/mul (:n3 triangle) v)))))
 
-(defrecord SmoothTriangle [p1 p2 p3 n1 n2 n3 e1 e2 material placement]
+(defrecord SmoothTriangle [p1 p2 p3
+                           n1 n2 n3
+                           e1 e2
+                           material placement
+                           bounding-box]
   shared/Transformable
   (change-transform [this transform-matrix]
     (placement/change-shape-transform this transform-matrix))
@@ -43,6 +47,8 @@
   shared/Intersectable
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
+  (get-bounding-box [this]
+    (:bounding-box this))
   shared/Surface
   (compute-normal [this point hierarchy]
     (throw (UnsupportedOperationException. "Operation not supported")))
@@ -50,13 +56,6 @@
     (gshared/local-to-world-coordinates hierarchy
                                         this
                                         (compute-interpolated-normal this intersection)))
-  bounding-box/BoundingBox
-  (get-corners [this]
-    (bounding-box/extremes-from-points [p1 p2 p3]))
-  (hit [this ray] true)
-  (get-transformed-extremes [this]
-    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform)))
   shared/Material
   (change-material [this new-material]
     (assoc this :material new-material))
@@ -65,6 +64,10 @@
   shared/Container
   (includes? [this object] (identical? this object)))
 
+(defn- bounding-box-from-points [ & args]
+  (apply bounding-box/create-box
+         (bounding-box/extremes-from-points args)))
+
 (defn smooth-triangle [p1 p2 p3 n1 n2 n3]
   (let [edge1 (tuple/sub p2 p1)
         edge2 (tuple/sub p3 p1)]
@@ -72,4 +75,5 @@
                       n1 n2 n3
                       edge1 edge2                
                       (material/material)
-                      (placement/placement))))
+                      (placement/placement)
+                      (bounding-box-from-points p1 p2 p3))))

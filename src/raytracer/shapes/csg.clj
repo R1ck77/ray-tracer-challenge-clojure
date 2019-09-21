@@ -79,6 +79,8 @@
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
+  (get-bounding-box [this]
+    (shared/get-bounding-box sub-group))
   shared/Transformable
   (change-transform [this transform-matrix]
     (->CSGUnion left-shape
@@ -86,13 +88,6 @@
                 (shared/change-transform sub-group transform-matrix)))
   (get-placement [this]
     (shared/get-placement sub-group))
-  bounding-box/BoundingBox
-  (get-corners [this]
-    (bounding-box/get-corners sub-group))
-  (get-transformed-extremes [this]
-    (bounding-box/get-transformed-extremes sub-group))
-  (hit [this ray]
-    (bounding-box/hit sub-group ray))
   parent/Parent
   (get-children [this]
     (parent/get-children sub-group))

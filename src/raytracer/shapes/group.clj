@@ -23,20 +23,6 @@
                                                                     (-> % shared/get-placement placement/get-inverse-transform)))
                           (:children group)))))
 
-(defn compute-extremes
-  "This method makes testing a mess. I'm wiring something to accept non BoundingBox objects too
-
-  (otherwise I get the worst of two world, strictly typed execution in a weakly typed language…)"
-  [group-transform children]
-  (let [corners (mapcat (fn [children]
-                          (if (satisfies? bounding-box/BoundingBox children)
-                            (bounding-box/get-transformed-extremes children)
-                            [])) children)]
-    (if (empty? corners)
-      [(point/point 0 0 0) (point/point 0 0 0)]
-      (bounding-box/transform-extremes (bounding-box/extremes-from-points corners)
-                                       group-transform))))
-
 (defn- update-statistics
   "Only used to debug the aabb statistics"
   [hit]
@@ -45,21 +31,13 @@
            #(vector (if hit (inc (first %)) (first %))
                     (inc (second %))))))
 
-;;; TODO/FIXE this needs to be re-enabled and made to work
-(defn- bounding-box-check [group ray]
-  (or (not *use-bounding-boxes*) 
-      (let [group-inverse-transform (-> group
-                                        shared/get-placement
-                                        placement/get-inverse-transform)
-            transformed-ray (ray/transform ray group-inverse-transform)]
-        (bounding-box/hit group transformed-ray))))
-
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
 
-(defrecord Group [children placement aabb-extremes transformed-extremes]
+(defrecord Group [children placement transformed-extremes bounding-box]
   shared/Transformable
   (change-transform [this transform-matrix]
+    (throw (UnsupportedOperationException. "Not done yet"))
     (let [new-aabb-extremes (compute-extremes transform-matrix (:children this))
           new-transformed-extremes (bounding-box/compute-filtered-transformed-extremes new-aabb-extremes transform-matrix)]
      (merge (placement/change-shape-transform this transform-matrix)
@@ -71,20 +49,13 @@
     (if (bounding-box-check this ray-object-space)
       (intersect this ray-object-space)
       []))
+  (get-bounding-box [this]
+    bounding-box)
   shared/Surface
   (compute-normal [this point hierarchy]
     (throw (UnsupportedOperationException. "Normal of group computed")))
   (compute-normal [this point _ hierarchy]
     (throw (UnsupportedOperationException. "Normal of group computed")))
-  bounding-box/BoundingBox
-  (hit [this ray]
-    (let [result (aabb-intersection/hit aabb-extremes ray)]
-      (update-statistics result)
-      result))
-  (get-corners [this]
-    aabb-extremes)
-  (get-transformed-extremes [this]
-    transformed-extremes)
   parent/Parent
   (get-children [this]
     children)
@@ -113,12 +84,8 @@
   shared/Intersectable
   (local-intersect [this ray-object-space]
     [])
-  bounding-box/BoundingBox
-  (hit [this ray] false)
-  (get-corners [this]
-    [(point/point 0 0 0) (point/point 0 0 0)])
-  (get-transformed-extremes [this]
-    [(point/point 0 0 0) (point/point 0 0 0)])
+  (get-bounding-box [this]
+    (bounding-box/->InvisibleBox)) ;; this should be a singleton reference
   parent/Parent
   (get-children [this]
     [])

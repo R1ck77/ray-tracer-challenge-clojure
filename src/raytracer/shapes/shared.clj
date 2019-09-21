@@ -5,7 +5,8 @@
             [raytracer.grouping.shared :as gshared]))
 
 (defprotocol Intersectable
-  (local-intersect [this ray]))
+  (local-intersect [this ray])
+  (get-bounding-box [this]))
 
 (defprotocol Transformable
   (change-transform [this new-transform])

@@ -29,7 +29,10 @@
                                             triangle
                                             u v)]))))))))
 
-(defrecord Triangle [p1 p2 p3 e1 e2 normal material placement]
+(defrecord Triangle [p1 p2 p3
+                     e1 e2
+                     normal
+                     material placement bounding-box]
   shared/Transformable
   (change-transform [this transform-matrix]
     (placement/change-shape-transform this transform-matrix))
@@ -37,6 +40,8 @@
   shared/Intersectable
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
+  (get-bounding-box [this]
+    (:bounding-box this))
   shared/Surface
   (compute-normal [this point _ hierarchy]
     (shared/compute-normal this point hierarchy))
@@ -44,13 +49,6 @@
         (gshared/local-to-world-coordinates hierarchy
                                         this
                                         normal))
-  bounding-box/BoundingBox
-  (get-corners [this]
-    (bounding-box/extremes-from-points [p1 p2 p3]))
-  (hit [this ray] true)
-  (get-transformed-extremes [this]
-    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform)))
   shared/Material
   (change-material [this new-material]
     (assoc this :material new-material))
@@ -59,6 +57,10 @@
   shared/Container
   (includes? [this object] (identical? this object)))
 
+(defn- bounding-box-from-points [ & args]
+  (apply bounding-box/create-box
+         (bounding-box/extremes-from-points args)))
+
 (defn triangle [p1 p2 p3]
   (let [edge1 (tuple/sub p2 p1)
         edge2 (tuple/sub p3 p1)]
@@ -66,4 +68,5 @@
                 edge1 edge2
                 (tuple/normalize (tuple/cross edge2 edge1))
                 (material/material)
-                (placement/placement))))
+                (placement/placement)
+                (bounding-box-from-points p1 p2 p3))))

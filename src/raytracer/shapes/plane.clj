@@ -13,6 +13,8 @@
 
 (defrecord Plane [material placement])
 
+(def plane-bounding-box (bounding-box/->InfiniteBox))
+
 (defn- xz-plane-intersection [ray]
   (- (/ (:y (:origin ray))
         (:y (:direction ray)))))
@@ -31,20 +33,14 @@
   shared/Intersectable
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))
+  (get-bounding-box [this]
+    plane-bounding-box)
   shared/Surface
   (compute-normal
     ([this _ _ hierarchy]
      (shared/compute-normal this nil hierarchy))
     ([this _ hierarchy] ;;; TODO/FIXME does computing this every time make sense????
      (grshared/local-to-world-coordinates hierarchy this (svector/svector 0 1 0))))
-    bounding-box/BoundingBox
-    (get-corners [this]
-      (vector (point/point const/neg-inf 0.0 const/neg-inf)
-              (point/point const/inf 0.0 const/inf)))
-    (hit [this ray] true)
-    (get-transformed-extremes [this]
-      (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                          (-> this :placement placement/get-transform)))
   shared/Material
   (change-material [this new-material]
     (assoc this :material new-material))

@@ -117,17 +117,6 @@
 
 (defrecord Cone [material minimum maximum closed placement])
 
-(defn compute-finite-corners
-  "Return the bounding box for a closed cone"
-  [cone]
-  (:pre [(<= (:minimum cone) (:maximum cone))])
-  (let [minimum (:minimum cone)
-        maximum (:maximum cone)
-        size (max (Math/abs (float minimum))
-                  (Math/abs (float maximum)))]
-    (vector (point/point (- size) (float minimum) (- size))
-            (point/point size (float maximum) size))))
-
 (extend-type Cone
   shared/Transformable
   (change-transform [this transform-matrix]
@@ -136,6 +125,8 @@
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
+  (get-bounding-box [this]
+    (:bounding-box this))
   shared/Surface
   (compute-normal
     ([this point _ hierarchy]
@@ -145,13 +136,6 @@
                                       this
                                       point
                                       hierarchy)))
-  bounding-box/BoundingBox
-  (get-corners [this]
-    (compute-finite-corners this))
-  (hit [this ray] true)
-  (get-transformed-extremes [this]
-    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform)))
   shared/Material
   (change-material [this new-material]
     (assoc this :material new-material))
@@ -160,15 +144,22 @@
   shared/Container
   (includes? [this object] (identical? this object)))
 
+(defn- compute-bounding-box [min max]
+  (bounding-box/create-box (point/point -1 min -1)
+                           (point/point 1 max 1)))
+
 (defn cone 
   [& {:as args-map}]
   (let [args (merge {:transform matrix/identity-matrix
                      :minimum const/neg-inf
                      :maximum const/inf
                      :material material/default-material}
-                    args-map)]
+                    args-map)
+        minimum (:minimum args)
+        maximum (:maxiimum args)]
     (->Cone (:material args)
             (:minimum args)
             (:maximum args)
             (:closed args)
-            (placement/placement (:transform args)))))
+            (placement/placement (:transform args))
+            (compute-bounding-box minimum maximum))))

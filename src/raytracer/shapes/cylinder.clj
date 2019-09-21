@@ -99,14 +99,7 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cylinder-side-normal point-object-space))))
 
-(defn compute-finite-corners
-  "Return the bounding box for a closed cylinder"
-  [cone]
-  (:pre [(<= (:minimum cone) (:maximum cone))])
-  (vector (point/point -1.0 (float (:minimum cone)) -1.0)
-          (point/point 1.0 (float (:maximum cone)) 1.0)))
-
-(defrecord Cylinder [material minimum maximum closed placement])
+(defrecord Cylinder [material minimum maximum closed placement bounding-box])
 
 (extend-type Cylinder
   shared/Transformable
@@ -116,6 +109,8 @@
   shared/Intersectable
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
+  (get-bounding-box [this]
+    (:bounding-box this))
   shared/Surface
   (compute-normal
     ([this point _ hierarchy]
@@ -125,13 +120,6 @@
                                       this
                                       point
                                       hierarchy)))
-  bounding-box/BoundingBox
-  (get-corners [this]
-    (compute-finite-corners this))
-  (hit [this ray] true)
-  (get-transformed-extremes [this]
-    (bounding-box/compute-filtered-transformed-extremes (bounding-box/get-corners this)
-                                                        (-> this :placement placement/get-transform)))
   shared/Material
   (change-material [this new-material]
     (assoc this :material new-material))
@@ -146,9 +134,13 @@
                      :minimum const/neg-inf
                      :maximum const/inf
                      :material material/default-material}
-                    args-map)]
+                    args-map)
+        min (:minimum args)
+        max (:maximum args)]
     (->Cylinder (:material args)
                 (:minimum args)
                 (:maximum args)
                 (:closed args)
-                (-> args :transform placement/placement))))
+                (-> args :transform placement/placement)
+                (bounding-box/create-box (point/point -1 min -1)
+                                         (point/point 1 max 1)))))
