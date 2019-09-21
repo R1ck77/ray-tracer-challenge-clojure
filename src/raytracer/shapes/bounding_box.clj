@@ -46,8 +46,6 @@
   (infinite? [this] true)
   (invisible? [this] false)
   (get-extremes [this]
-    #_{:min (point/point const/neg-inf const/neg-inf const/neg-inf)
-       :max (point/point const/inf const/inf const/inf)}
     (throw (UnsupportedOperationException. "Extremes of an infinite box requested")))
   (hit [this ray] true)) ;;; TODO/FIXME this is an oversimplification. We can do better
 
@@ -58,28 +56,27 @@
     (merge-boxes this other))
   (infinite? [this] false)
   (invisible? [this] false)
-  (get-extremes [this] min-corner max-corner)
+  (get-extremes [this] {:min min-corner
+                        :max max-corner})
   (hit [this ray]
     (aabb-intersection/hit [min-corner max-corner] ray)))
 
 (defn- is-infinite? [x]
   (>= (Math/abs ^double x) const/inf))
 
-(defn- infinite-corners [min-corner max-corner]
-  (or (tuple/any-c? min-corner is-infinite?)
-      (tuple/any-c? max-corner is-infinite?)))
+(defn- infinite-corners? [min-corner max-corner]
+  (tuple/any-c? (tuple/sub max-corner min-corner) is-infinite?))
 
 (defn- is-very-small? [x]
   (<= (Math/abs ^double x) const/EPSILON))
 
-(defn- very-small-corners [min-corner max-corner]
-  (or (tuple/any-c? min-corner is-very-small?)
-        (tuple/any-c? max-corner is-very-small?)))
+(defn- very-small-corners? [min-corner max-corner]
+  (tuple/all-c? (tuple/sub max-corner min-corner) is-very-small?))
 
 (defn create-box [min-corner max-corner]
   (cond 
-    (infinite-corners min-corner max-corner) (->InfiniteBox)
-    (very-small-corners min-corner max-corner) (->InvisibleBox)
+    (infinite-corners? min-corner max-corner) (->InfiniteBox)
+    (very-small-corners? min-corner max-corner) (->InvisibleBox)
     :default (->DefaultBox min-corner max-corner)))
 
 (comment 
