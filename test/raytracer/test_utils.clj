@@ -55,6 +55,10 @@
        (eps= (:g c1) (:g c2))
        (eps= (:b c1) (:b c2))))
 
+(defn bb= [bb1 bb2]
+  (and (t= (:min-corner bb1) (:min-corner bb2))
+       (t= (:max-corner bb1) (:max-corner bb2))))
+
 (defmacro with-temp-file [name & forms]
   `(let [~name (java.io.File/createTempFile "pre" ".suff")]
      (try 
