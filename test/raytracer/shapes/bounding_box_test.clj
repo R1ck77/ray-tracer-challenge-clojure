@@ -4,11 +4,65 @@
             [raytracer.const :as const]
             [raytracer.point :as point]
             [raytracer.tuple :as tuple]
+            [raytracer.svector :as svector]
             [raytracer.ray :as ray]
             [raytracer.transform :as transform]
             [raytracer.shapes.bounding-box :as bounding-box]))
 
 (def small-value (/ const/EPSILON 100))
+
+(def an-invisible-box (bounding-box/->InvisibleBox))
+(def an-infinite-box (bounding-box/->InfiniteBox))
+(def a-bounding-box (bounding-box/->DefaultBox (point/point -3 -1 -7)
+                                               (point/point 10 17 13)))
+
+(deftest test-invisible-box
+  (testing "Invisible boxes are trasformed to themselves"
+    (is (identical? an-invisible-box
+                    (bounding-box/transform an-invisible-box
+                                            (transform/scale 1000 1000 1000)))))
+  (testing "Merging with an invisible box always returns the other box"
+    (is (identical? an-invisible-box
+                    (bounding-box/merge (bounding-box/->InvisibleBox)
+                                            an-invisible-box)))
+    (is (identical? an-infinite-box
+                    (bounding-box/merge an-invisible-box
+                                            an-infinite-box)))
+    (is (identical? a-bounding-box
+                (bounding-box/merge an-invisible-box
+                                    a-bounding-box))))
+  (testing "Invisible boxes are invisible and not infinite"
+    (is (bounding-box/invisible? an-invisible-box))
+    (is (not (bounding-box/infinite? an-invisible-box))))
+  (testing "You can't get the extremes of an invisible box"
+    (is (thrown? UnsupportedOperationException (bounding-box/get-extremes an-invisible-box))))
+  (testing "You can't hit an invisible box, no matter how hard you try"
+    (is (not (bounding-box/hit an-invisible-box (ray/ray (point/point 0 0 0)
+                                                         (svector/svector 1 0 0)))))))
+
+(deftest test-infinite-box
+  (testing "Infinite boxes are trasformed to themselves"
+    (is (identical? an-infinite-box
+                    (bounding-box/transform an-infinite-box
+                                            (transform/scale 1000 1000 1000)))))
+  (testing "Merging with an infinite box always returns itself"
+    (is (identical? an-infinite-box
+                    (bounding-box/merge an-infinite-box
+                                        (bounding-box/->InfiniteBox))))
+    (is (identical? an-infinite-box
+                    (bounding-box/merge an-infinite-box
+                                        an-invisible-box)))
+    (is (identical? an-infinite-box
+                    (bounding-box/merge an-infinite-box
+                                        a-bounding-box))))
+  (testing "Infinite boxes are infinite and not invisible"
+    (is (bounding-box/infinite? an-infinite-box))
+    (is (not (bounding-box/invisible? an-infinite-box))))
+  (testing "You can't get the extremes of an infinite box"
+    (is (thrown? UnsupportedOperationException (bounding-box/get-extremes an-infinite-box))))
+  (testing "You can't avoid an invisible box, no matter how hard you try"
+    (is (bounding-box/hit an-infinite-box (ray/ray (point/point 0 0 0)
+                                                   (svector/svector 1 0 0))))))
 
 (deftest test-extremes-for-points
   (testing "Returns the unmodified point if there is only one"
