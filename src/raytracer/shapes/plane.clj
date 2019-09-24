@@ -34,7 +34,8 @@
   (local-intersect [this ray-in-plane-space]
     (intersect-plane-space this ray-in-plane-space))
   (get-bounding-box [this]
-    plane-bounding-box)
+    (bounding-box/transform plane-bounding-box
+                            (placement/get-transform (:placement this))))
   shared/Surface
   (compute-normal
     ([this _ _ hierarchy]

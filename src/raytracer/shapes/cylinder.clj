@@ -128,6 +128,10 @@
   shared/Container
   (includes? [this object] (identical? this object)))
 
+(defn- create-bounding-box [minimum maximum]
+  (bounding-box/create-box (point/point -1 minimum -1)
+                           (point/point 1 maximum 1)))
+
 (defn cylinder 
   [& {:as args-map}]
   (let [args (merge {:transform matrix/identity-matrix
@@ -142,5 +146,5 @@
                 (:maximum args)
                 (:closed args)
                 (-> args :transform placement/placement)
-                (bounding-box/create-box (point/point -1 min -1)
-                                         (point/point 1 max 1)))))
+                (create-bounding-box (:minimum args)
+                                     (:maximum args)))))

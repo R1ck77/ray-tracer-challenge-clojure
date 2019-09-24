@@ -14,7 +14,7 @@
 (def sphere-bounding-box (bounding-box/create-box (point/point -1 -1 -1)
                                                   (point/point 1 1 1)))
 
-(defrecord Sphere [material placement bounding-box])
+(defrecord Sphere [material placement])
 
 (defn- ray-sphere-discriminant [this-sphere ray]
   (let [sphere-to-ray (tuple/sub (:origin ray)
@@ -54,7 +54,8 @@
   (local-intersect [this ray-in-sphere-space]
     (intersect-sphere-space this ray-in-sphere-space))
   (get-bounding-box [this]
-    (:bounding-box this))
+    (bounding-box/transform sphere-bounding-box
+                            (placement/get-transform (:placement this))))
   shared/Surface
   (compute-normal
     ([this point _ hierarchy]
@@ -71,8 +72,6 @@
 
 (defn sphere [& {:as args-map}]
   (let [transform (or (:transform args-map)
-                      matrix/identity-matrix)
-        bounding-box (bounding-box/transform sphere-bounding-box transform)]
+                      matrix/identity-matrix)]
     (->Sphere (or (:material args-map) material/default-material)
-              (placement/placement transform)
-              bounding-box)))
+              (placement/placement transform))))

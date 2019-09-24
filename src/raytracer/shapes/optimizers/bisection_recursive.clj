@@ -1,6 +1,7 @@
 (ns raytracer.shapes.optimizers.bisection-recursive
   (:require [raytracer.shapes.optimizers.optimizer :as optimizer]
             [raytracer.shapes.optimizers.box :as box]
+            [raytracer.shapes.shared :as shared]
             [raytracer.const :as const]
             [raytracer.shapes.bounding-box :as bounding-box]
             [raytracer.shapes.group :as group]
@@ -18,8 +19,7 @@
 
 Infinites are not composed, so if any point of the shape is infinite, the shape will be"
   [shape]
-  (not (empty?
-        (filter is-infinite-point? (bounding-box/get-transformed-extremes shape)))))
+  (bounding-box/infinite? (shared/get-bounding-box shape)))
 
 (defn- sort-shapes
   "sort shapes and put them in a dictionary depending how they are classified by the predicate
@@ -54,7 +54,7 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
 
 (defn- assign-shape [{:keys [sub-boxes, outliers]} shape]
   (let [boxes (keys sub-boxes)
-        assigned (first (filter #(box/contains % shape) boxes))]
+        assigned (first (filter #(box/contains-shape? % shape) boxes))]
     (if assigned
       ;; hic sunt leones. Assign the shape to the right box
       {:outliers outliers, :sub-boxes (update sub-boxes assigned #(conj % shape))}
@@ -65,13 +65,9 @@ Infinites are not composed, so if any point of the shape is infinite, the shape 
   [set]
   (into {} (map #(vector % []) set)))
 
-(defn- compute-extremes
-  "Return the size of a bounding box containing all shapes"
-  [shapes]
-  (bounding-box/get-corners (group/group shapes)))
-
 (defn- split-shapes [shapes max-size]
-  (let [main-box (apply box/box (compute-extremes shapes))
+  (let [main-box (reduce bounding-box/merge
+                         (map shared/get-bounding-box shapes))
         sub-boxes (box/bisect main-box)]
     (create-groups
      (reduce assign-shape {:sub-boxes (groups-to-map sub-boxes)

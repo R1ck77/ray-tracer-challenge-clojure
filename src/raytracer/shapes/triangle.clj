@@ -41,7 +41,8 @@
   (local-intersect [this ray-in-sphere-space]
     (local-intersect-triangle this ray-in-sphere-space))
   (get-bounding-box [this]
-    (:bounding-box this))
+    (bounding-box/transform (:bounding-box this)
+                            (placement/get-transform (:placement this))))
   shared/Surface
   (compute-normal [this point _ hierarchy]
     (shared/compute-normal this point hierarchy))

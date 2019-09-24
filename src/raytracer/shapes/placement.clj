@@ -41,3 +41,6 @@
          new-transform)
     a-placement
     (placement new-transform)))
+
+(defn change-shape-transform [shape transform-matrix]
+  (assoc shape :placement (placement transform-matrix)))

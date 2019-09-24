@@ -40,12 +40,6 @@
              (sphere/sphere :material new-material :transform transform)))
       (is (instance? Sphere (sphere/sphere :material new-material))))))
 
-(deftest test-bounding-box-protocol
-  (testing "a sphere's bounding box is a AABB of side 2"
-    (is (= [(point/point -1 -1 -1)
-            (point/point 1 1 1)]
-           (bounding-box/get-corners (sphere/sphere))))))
-
 (deftest test-sphere-intersection
   (let [sphere (shapes/sphere)]
     (testing "a ray intersects a sphere at two points"

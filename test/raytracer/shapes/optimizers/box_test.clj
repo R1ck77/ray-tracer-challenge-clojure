@@ -5,10 +5,6 @@
             [raytracer.shapes.optimizers.box :as box]))
 
 (deftest test-constructor
-  (testing "a box can be created from two points"
-    (is (= (box/->Box (point/point -1 -2 -3)
-                      (point/point 1 2 3))
-           (box/box (point/point -1 -2 -3) (point/point 1 2 3)))))
   (testing "degenerate boxes are acceptable"
     (is (box/box (point/point 1 -2 -3) (point/point 1 2 3)))
     (is (box/box (point/point -1 2 -3) (point/point 1 2 3)))
@@ -22,30 +18,30 @@
 
 (deftest test-contains
   (testing "positive cases"
-    (is (box/contains (box/box (point/point -1 -1 -1)
-                               (point/point 1 1 1))
-                      (shapes/sphere)))
-    (is (box/contains (box/box (point/point -1.5 -1.1 -1.3)
+    (is (box/contains-shape? (box/box (point/point -1 -1 -1)
+                                      (point/point 1 1 1))
+                             (shapes/sphere)))
+    (is (box/contains-shape? (box/box (point/point -1.5 -1.1 -1.3)
                                (point/point 1.3 1.2 1.1))
                       (shapes/sphere))))
   (testing "negative cases"
-    (is (not (box/contains (box/box (point/point -0.999 -1 -1)
+    (is (not (box/contains-shape? (box/box (point/point -0.999 -1 -1)
                                     (point/point 1 1 1))
                            (shapes/sphere))))
 
-    (is (not (box/contains (box/box (point/point -1 -0.999 -1)
+    (is (not (box/contains-shape? (box/box (point/point -1 -0.999 -1)
                                     (point/point 1 1 1))
                            (shapes/sphere))))
-    (is (not (box/contains (box/box (point/point -1 -1 -0.999)
+    (is (not (box/contains-shape? (box/box (point/point -1 -1 -0.999)
                                     (point/point 1 1 1))
                            (shapes/sphere))))
-    (is (not (box/contains (box/box (point/point -1 -1 -1)
+    (is (not (box/contains-shape? (box/box (point/point -1 -1 -1)
                                     (point/point 0.999 1 1))
                            (shapes/sphere))))
-    (is (not (box/contains (box/box (point/point -1 -1 -1)
+    (is (not (box/contains-shape? (box/box (point/point -1 -1 -1)
                                     (point/point 1 0.999 1))
                            (shapes/sphere))))
-    (is (not (box/contains (box/box (point/point -1 -1 -1)
+    (is (not (box/contains-shape? (box/box (point/point -1 -1 -1)
                                     (point/point 1 1 0.999))
                            (shapes/sphere))))))
 
@@ -55,7 +51,7 @@
                                          (point/point 1 1 1)))]
       (is (= 8 (count result)))
       (is (set? result))))
-  (testing "partition works on degenerate boxes, but returns less elements"
+  (testing "partition works on degenerate boxes, but returns the original box without changes"
     (is (= 1 (count (box/bisect (box/box (point/point 0 0 0)
                                          (point/point 0 0 0))))))
     (is (= 2 (count (box/bisect (box/box (point/point 0 2 0)

@@ -16,12 +16,6 @@
 
 (def a-plane (plane/plane))
 
-(deftest test-bounding-box
-  (testing "The plane is its own bounding box"
-    (is (= [(point/point const/neg-inf 0.0 const/neg-inf)
-            (point/point const/inf 0.0 const/inf)]
-           (bounding-box/get-corners (plane/plane))))))
-
 (deftest test-constructor
   (testing "The courtesy constructor function fills material, inverse transform and its transpose"
     (is (:material (plane/plane)))

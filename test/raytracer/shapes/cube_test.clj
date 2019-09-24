@@ -23,12 +23,6 @@
       (is (v= matrix/identity-matrix (-> cube :placement placement/get-inverse-transform)))
       (is (v= matrix/identity-matrix (-> cube :placement placement/get-inverse-transposed-transform))))))
 
-(deftest test-bounding-box-protocol
-  (testing "The cube is its own bounding box"
-    (is (= [(point/point -1 -1 -1)
-            (point/point 1 1 1)]
-           (bounding-box/get-corners (cube/cube))))))
-
 (defmacro test-no-intersection [name origin direction]
  `(testing ~(format "A ray misses a cube (%s)" name)
    (let [ray# (ray/ray (apply point/point ~origin) (apply svector/svector ~direction))]

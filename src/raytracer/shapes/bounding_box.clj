@@ -6,6 +6,8 @@
             [raytracer.shapes.aabb-intersection :as aabb-intersection]))
 
                                         ; TODO/FIXME use singletons for infinite and invisible boxes to spare memory
+(def invisible-box)
+(def infinite-box)
 
 (defprotocol BoundingBox
   (transform [this matrix])
@@ -39,6 +41,8 @@
     (throw (UnsupportedOperationException. "Extremes of an invisible box requested")))
   (hit [this ray] false))
 
+(def invisible-box (->InvisibleBox))
+
 (defrecord InfiniteBox []
   BoundingBox
   (transform [this matrix] this) ; TODO/FIXME oversimplified
@@ -48,6 +52,8 @@
   (get-extremes [this]
     (throw (UnsupportedOperationException. "Extremes of an infinite box requested")))
   (hit [this ray] true)) ;;; TODO/FIXME this is an oversimplification. We can do better
+
+(def infinite-box (->InfiniteBox))
 
 (def create-box)
 
@@ -105,6 +111,6 @@
 
 (defn create-box [min-corner max-corner]
   (cond 
-    (infinite-corners? min-corner max-corner) (->InfiniteBox)
-    (very-small-corners? min-corner max-corner) (->InvisibleBox)
+    (infinite-corners? min-corner max-corner) infinite-box
+    (very-small-corners? min-corner max-corner) invisible-box
     :default (->DefaultBox min-corner max-corner)))

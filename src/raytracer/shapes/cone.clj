@@ -41,9 +41,9 @@
 
 (defn is-within-bounds? [cone ray t]
   (and t
-      (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
-        (and (> y-intersection (:minimum cone))
-             (< y-intersection (:maximum cone))))))
+       (let [y-intersection (+ (* (:y (:direction ray)) t) (:y (:origin ray)))]
+         (and (> y-intersection (:minimum cone))
+              (< y-intersection (:maximum cone))))))
 
 (defn- create-intersections [cone ray [t1 t2 :as xt]]
   (if xt
@@ -115,7 +115,7 @@
       (and (< dist 1) (<= y (+ (:minimum this) const/EPSILON))) (svector/svector 0 -1 0)
       :default (compute-cone-side-normal point-object-space))))
 
-(defrecord Cone [material minimum maximum closed placement])
+(defrecord Cone [material minimum maximum closed placement bounding-box])
 
 (extend-type Cone
   shared/Transformable
@@ -126,7 +126,8 @@
   (local-intersect [this ray-object-space]
     (local-intersect this ray-object-space))
   (get-bounding-box [this]
-    (:bounding-box this))
+    (bounding-box/transform (:bounding-box this)
+                            (placement/get-transform (:placement this))))
   shared/Surface
   (compute-normal
     ([this point _ hierarchy]
@@ -144,7 +145,7 @@
   shared/Container
   (includes? [this object] (identical? this object)))
 
-(defn- compute-bounding-box [min max]
+(defn- create-bounding-box [min max]
   (bounding-box/create-box (point/point -1 min -1)
                            (point/point 1 max 1)))
 
@@ -156,10 +157,10 @@
                      :material material/default-material}
                     args-map)
         minimum (:minimum args)
-        maximum (:maxiimum args)]
+        maximum (:maximum args)]
     (->Cone (:material args)
             (:minimum args)
             (:maximum args)
             (:closed args)
             (placement/placement (:transform args))
-            (compute-bounding-box minimum maximum))))
+            (create-bounding-box minimum maximum))))

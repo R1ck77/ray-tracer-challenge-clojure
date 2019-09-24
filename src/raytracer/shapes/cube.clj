@@ -9,7 +9,7 @@
             [raytracer.shapes.bounding-box :as bounding-box]
             [raytracer.shapes.placement :as placement]))
 
-(defrecord Cube [material placement bounding-box])
+(defrecord Cube [material placement])
 
 (def cube-bounding-box (bounding-box/create-box (point/point -1 -1 -1)
                                                 (point/point 1 1 1)))
@@ -44,7 +44,8 @@
   (local-intersect [this ray-object-space]
     (aabb-intersection/local-intersect this ray-object-space))
   (get-bounding-box [this]
-    (:bounding-box this))
+    (bounding-box/transform cube-bounding-box
+                            (placement/get-transform (:placement this))))
   shared/Surface
   (compute-normal
     ([this point _ hierarchy]
@@ -64,5 +65,4 @@
 
 (defn cube []
   (->Cube (material/material)
-          (placement/placement)
-          cube-bounding-box))
+          (placement/placement)))

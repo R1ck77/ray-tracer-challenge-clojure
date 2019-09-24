@@ -17,28 +17,6 @@
 
 (def √2 (Math/sqrt 2))
 
-(deftest test-bounding-box-protocol
-  (testing "Bounding box for an infinite cylinder"
-    (is (= [(point/point -1.0 -4.0 -1.0)
-            (point/point 1.0 4.0 1.0)]
-           (bounding-box/get-corners (cylinder/cylinder :closed false, :minimum -4, :maximum 4)))))
-  (testing "Bounding box for a cylinder between -4, 4"
-    (is (= [(point/point -1.0 -4.0 -1.0)
-            (point/point 1.0 4.0 1.0)]
-           (bounding-box/get-corners (cylinder/cylinder :closed true, :minimum -4, :maximum 4)))))
-  (testing "Bounding box for a cylinder between -10, -3"
-    (is (= [(point/point -1.0 -10.0 -1.0)
-            (point/point 1.0 -3.0 1.0)]
-           (bounding-box/get-corners (cylinder/cylinder :closed true, :minimum -10, :maximum -3)))))
-  (testing "Bounding box for a cylinder between 3, 100"
-    (is (= [(point/point -1.0 3.0 -1.0)
-            (point/point 1.0 100.0 1.0)]
-           (bounding-box/get-corners (cylinder/cylinder :closed true, :minimum 3, :maximum 100)))))
-    (testing "Bounding box for a cylinder between -50, -50 (degenerate)"
-    (is (= [(point/point -1.0 -50.0 -1.0)
-            (point/point 1.0 -50.0 1.0)]
-           (bounding-box/get-corners (cylinder/cylinder :closed true, :minimum -50, :maximum -50))))))
-
 (defmacro test-capped-intersections-count [name point direction n-intersections-expected]
   `(let [cylinder# (cylinder/cylinder :minimum 1,
                                       :maximum 2,
