@@ -93,6 +93,7 @@
   ([children]
    (group children (placement/placement matrix/identity-matrix)))
   ([children placement]
+   {:pre [(every? (complement nil?) children)]}
    (if (empty? children)
      (->EmptyGroup placement)
      (create-non-empty-group children placement))))
