@@ -78,14 +78,6 @@
           {0 [], 1 [], 2 [], 3 []}
           marbles-dict))
 
-(defn print-volume [group]
-  (when *print-aabb-volumes*
-    (let [extremes (bounding-box/get-corners group)
-          sides (tuple/sub (second extremes) (first extremes))
-          volume (tuple/dot sides sides)]
-      (println volume)))
-  group)
-
 (defn- partition-marbles [marbles-dict limit]
   (:pre [(> limit 1)])
   (let [result (if (<= (count marbles-dict) limit)
@@ -94,8 +86,7 @@
                        half-x (/ (+ max-x min-x) 2)
                        half-z (/ (+ max-z min-z) 2)
                        partitioned (bin-marbles marbles-dict half-x half-z)]
-                   (shapes/group (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]
-    (print-volume result)))
+                   (shapes/group (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]))
 
 (defn- create-all-marbles [size]
   (into {}
