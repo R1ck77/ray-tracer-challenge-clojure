@@ -10,11 +10,6 @@
             [raytracer.shapes.placement :as placement]
             [raytracer.shapes.parent :as parent]))
 
-(def ^:dynamic *use-bounding-boxes* true)
-(def ^:dynamic *statistics* false) ; whether sampling the number of aabb hits or not
-
-(def hit-count-statistics (atom [0 0])) ; used for debugging statistics only
-
 (def group)
 
 (defn- intersect [group ray-object-space]
@@ -22,14 +17,6 @@
                      (map #(shared/local-intersect % (ray/transform ray-object-space
                                                                     (-> % shared/get-placement placement/get-inverse-transform)))
                           (:children group)))))
-
-(defn- update-statistics
-  "Only used to debug the aabb statistics"
-  [hit]
-  (if *statistics*
-    (swap! hit-count-statistics
-           #(vector (if hit (inc (first %)) (first %))
-                    (inc (second %))))))
 
 (defprotocol Optimizer
   (optimize [this optimizer] "Return a new group optimized with a specific optimizer"))
@@ -41,8 +28,7 @@
   (get-placement [this] (:placement this))
   shared/Intersectable
   (local-intersect [this ray-object-space]
-    ;; TODO/FIXME check + counter
-    )
+    (intersect this ray-object-space))
   (get-bounding-box [this]
     bounding-box)
   shared/Surface
