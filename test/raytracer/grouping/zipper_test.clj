@@ -37,6 +37,20 @@
             (zipper/create-zipper
              (group/group [(group/group [(group/group [])])])))))))
 
+(deftest testing-get-all-matching-objects
+  (testing "Returns the group object"
+    (let [group (group/group [])]
+      (is (= #{group}
+             (zipper/get-all-matching-objects (#'zipper/new-group-zipper (group/group []))
+                                              (constantly true))))))
+  (testing "Returns nested objects"
+    (let [group (group/group [shape-a])]
+      (is (= #{group shape-a}
+             (zipper/get-all-matching-objects (#'zipper/new-group-zipper (group/group []))
+                                                       (constantly true)))))))
+
+
+
 (deftest testing-update-objects
   (testing "Updates all objects, group objects included"
     (let [root (group/group [(shapes/sphere)
