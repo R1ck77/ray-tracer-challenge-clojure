@@ -79,14 +79,18 @@
           marbles-dict))
 
 (defn- partition-marbles [marbles-dict limit]
-  (:pre [(> limit 1)])
+  {:pre [(> limit 1)]
+   :post [(not (nil? %))]}
   (let [result (if (<= (count marbles-dict) limit)
                  (shapes/group (vals marbles-dict))
                  (let [{:keys [min-x max-x min-z max-z]} (get-group-extremes marbles-dict)
                        half-x (/ (+ max-x min-x) 2)
                        half-z (/ (+ max-z min-z) 2)
-                       partitioned (bin-marbles marbles-dict half-x half-z)]
-                   (shapes/group (map #(partition-marbles (into {} %) limit) (vals partitioned)))))]))
+                       partitioned (vals (bin-marbles marbles-dict half-x half-z))]
+                   (shapes/group
+                    (map #(partition-marbles % limit)
+                         (filter (complement empty?) 
+                                 (map #(into {} %)  partitioned))))))]))
 
 (defn- create-all-marbles [size]
   (into {}
