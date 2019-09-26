@@ -128,9 +128,9 @@
   ;;; 270" no smart grouping, 20x20
   ;;; 228" with just one extra group? Not sure
   (with-redefs [*image-resolution* [300 300]
-                group/*statistics* true
+                ray/*statistics* true
                 world/*maximum-reflections* 0
                 *marbles-side* 4]
-    (reset! group/hit-count-statistics [0 0])
+    (reset! ray/hit-count-statistics [0 0])
     (time (render-demo))
-    (println @group/hit-count-statistics)))
+    (println @ray/hit-count-statistics)))

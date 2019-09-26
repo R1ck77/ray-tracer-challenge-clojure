@@ -40,7 +40,7 @@
              (map :object xs)))))
 
   (testing "Intersecting a transformed group (bounding box ignored)"
-    (with-redefs [group/*use-bounding-boxes* false]
+    (with-redefs [ray/*use-bounding-boxes* false]
       (let [sphere (shared/change-transform (shapes/sphere)
                                      (transform/translate 5 0 0))
             group (shared/change-transform (group/group [sphere])
