@@ -38,22 +38,7 @@
     (is (= [empty-group] (bz/traverse (#'bz/new-group-zipper empty-group)))))
   (testing "Traverse returns nested objects"
     (is (= #{:shape-a :shape-b :shape-c :shape-d :group-a :group-b :group-c :group-0}
-           (into #{} (map :name (bz/traverse (#'bz/new-group-zipper group-0)))))))
-
-  (testing "Returns the group object (REMOVE)"
-    (let [group (group/group [])]
-      (is (= #{group}
-             (into #{}  (bz/traverse (#'bz/new-group-zipper (group/group []))))))))
-  (testing "Returns nested objects (REMOVE)"
-    (let [group (assoc (group/group [shape-a]) :name :group-a)]
-      (is (= #{group shape-a}
-             (into #{}  (bz/traverse (#'bz/new-group-zipper (group/group [])))))))))
-
-(deftest test-offending-test
-  (testing "Returns nested objects (REMOVE)"
-    (let [group (assoc (group/group [shape-a]) :name :group-a)]
-      (is (= #{group shape-a}
-             (into #{}  (bz/traverse (#'bz/new-group-zipper (group/group [])))))))))
+           (into #{} (map :name (bz/traverse (#'bz/new-group-zipper group-0))))))))
 
 (deftest test-get-all-matching-objects
   (testing "Returns the group object"
@@ -64,11 +49,11 @@
   (testing "Returns nested objects"
     (let [group (assoc (group/group [shape-a]) :name :group-a)]
       (is (= #{group shape-a}
-             (bz/get-all-matching-objects (#'bz/new-group-zipper (group/group []))
+             (bz/get-all-matching-objects (#'bz/new-group-zipper group)
                                               (constantly true)))))))
 
 (deftest test-update-objects
-#_  (testing "Updates all objects, group objects included"
+  (testing "Updates all objects, group objects included"
     (let [root (group/group [(shapes/sphere)
                              (shapes/sphere)
                              (group/group [])
@@ -78,18 +63,16 @@
                                                          (shapes/sphere)])
                                            (shapes/cube)
                                            (shapes/sphere)])])
-          zipper (bz/create-zipper root)
+          zipper (bz/new-group-zipper root)
           counter (ref 0)
           names (ref #{})]
-      (let [updated-zipper (shared/update-objects zipper (fn [node]
-                                                           (dosync
-                                                            (let [new-name (str "name-" @counter)
-                                                                  new-node (assoc node :name new-name)]                                                             
-                                                              (alter counter inc)
-                                                              (alter names #(conj % new-name))
-                                                              new-node))))
-            new-objects (bz/get-all-matching-objects (#'bz/new-group-zipper (shared/get-root updated-zipper))
-                                                         (constantly true)) 
-            set-names (into #{} (map :name new-objects))]
+      (let [updated-zipper (bz/update-zipper zipper (fn [node]
+                                                      (dosync
+                                                       (let [new-name (str "name-" @counter)]
+                                                         (alter counter inc)
+                                                         (alter names #(conj % new-name))
+                                                         (assoc node :name new-name)))))
+            new-objects (bz/get-all-matching-objects (bz/new-group-zipper updated-zipper)
+                                                     (constantly true))]
         (is (= @names
-               set-names))))))
+               (into #{} (map :name new-objects))))))))

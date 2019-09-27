@@ -4,7 +4,7 @@
             [raytracer.shapes.shared :as shapes-shared]
             [raytracer.shapes.group :as group]
             [raytracer.shapes.placement :as placement]
-            [raytracer.shapes.group.base-zipper :as base-zipper])
+            [raytracer.grouping.base-zipper :as base-zipper])
   (:import [raytracer.shapes.group Group EmptyGroup]))
 
 (defn- do-compute-local-to-world-transform  [zipper shape]
