@@ -54,25 +54,12 @@
 
 (deftest test-update-objects
   (testing "Updates all objects, group objects included"
-    (let [root (group/group [(shapes/sphere)
-                             (shapes/sphere)
-                             (group/group [])
-                             (shapes/cube)
-                             (group/group [(group/group [(shapes/cone)
-                                                         (shapes/cube)
-                                                         (shapes/sphere)])
-                                           (shapes/cube)
-                                           (shapes/sphere)])])
-          zipper (bz/new-group-zipper root)
-          counter (ref 0)
-          names (ref #{})]
-      (let [updated-zipper (bz/update-zipper zipper (fn [node]
-                                                      (dosync
-                                                       (let [new-name (str "name-" @counter)]
-                                                         (alter counter inc)
-                                                         (alter names #(conj % new-name))
-                                                         (assoc node :name new-name)))))
-            new-objects (bz/get-all-matching-objects (bz/new-group-zipper updated-zipper)
-                                                     (constantly true))]
-        (is (= @names
-               (into #{} (map :name new-objects))))))))
+    (let [zipper (bz/new-group-zipper group-0)
+          updated-zipper (bz/update-zipper zipper (fn [node]
+                                                    (update node :name #(.toUpperCase (str %)))))]
+      (is (= #{":EMPTY-GROUP" ":SHAPE-A" ":SHAPE-B" ":SHAPE-C" ":SHAPE-D" ":GROUP-A" ":GROUP-B" ":GROUP-C" ":GROUP-0"}
+             (into #{}
+                   (map :name (bz/get-all-matching-objects (bz/new-group-zipper updated-zipper)
+                                                           (constantly true)))))))))
+
+
